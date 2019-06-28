@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    #region
     public GameObject           player;
-    private ParentController    m_pc;
+    private PlayerController    m_pc;
 
     [HideInInspector] public Vector3    world_direction, world_up;
     [HideInInspector] public bool       isMoving;
@@ -16,9 +17,11 @@ public class CameraController : MonoBehaviour
     private float m_invCameraSpeed, m_boxsize, m_sphereRadius, m_updownSpeed;
     private bool  m_isTilting = false;
 
+    #endregion
+
     void Start()
     {
-        m_pc = player.GetComponent<ParentController>();
+        m_pc = player.GetComponent<PlayerController>();
 
         world_direction   = Vector3.right; // @TODO both have to be initializable by the Scene/Level
         world_up          = Vector3.up;
@@ -29,7 +32,7 @@ public class CameraController : MonoBehaviour
         m_invCameraSpeed     = 1 / cameraSpeed;
         m_updownSpeed        = 2.0f;
         m_boxsize            = 1.0f; // @TODO make this initializable by the Scene/leven
-        m_sphereRadius       = m_pc.player.GetComponent<SphereCollider>().radius * player.transform.lossyScale.x;
+        m_sphereRadius       = m_pc.player_sphere.GetComponent<SphereCollider>().radius * player.transform.lossyScale.x;
     }
 
     void LateUpdate()
@@ -51,6 +54,9 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    /**
+    * The camera can only rotate if it is not already moving and while the play is not moving. 
+    */
     protected bool CanRotate()
     {
         return !(isMoving || m_pc.isMoving || m_isTilting);
@@ -61,6 +67,10 @@ public class CameraController : MonoBehaviour
         return (int)(Input.GetAxisRaw("Horizontal")); // For keyboard input this is in {-1, 0, 1}. Left is -1, right is 1.
     }
 
+    /**
+     * Rotate the camera to the left (-1) or to the right (1) with respect to the current direction
+     * and up vector.
+     */
     protected IEnumerator CameraRotate(int dir)
     {
         isMoving = true;
@@ -88,10 +98,12 @@ public class CameraController : MonoBehaviour
         isMoving = false;
     }
 
-    // Dir = 1 for going up, dir = -1 for going down.
+    /**
+     * Rotates the camera up(1) or down(-1).
+     */
     public IEnumerator CameraUpDown(int dir)
     {
-        m_isTilting = true;
+        m_isTilting = true; // @TODO use isMoving instead.
         // Turn Camera up/down when the player moves up a wall or down an edge.
         Vector3 target = Quaternion.AngleAxis(90, Vector3.Cross(world_up, world_direction)*-dir) * offset;
         Vector3 start  = offset;
@@ -119,11 +131,18 @@ public class CameraController : MonoBehaviour
         m_isTilting = false;
     }
 
+    /**
+     * This rounds the up component of @vec to valid multiples of m_boxsize/2 +/- m_sphere Radius.
+     * 
+     * This is mainly necessary because the Idle animation introduces small numerical changes in the
+     * up component. To avoid jumping of the ball this has to be countered. 
+     */ // @TODO implemented the same function twice now. Maybe refactor and put in one common location?
     private Vector3 SnapToGrid(Vector3 vec)
     {
         return vec.Round(world_up) - (m_boxsize * 0.5f - m_sphereRadius) * world_up;
     }
 
+    // Currently only used for debuf outputs. 
     void Update()
     {
         // Green : Gravity

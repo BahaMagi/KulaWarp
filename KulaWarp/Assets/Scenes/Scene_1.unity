@@ -1224,9 +1224,8 @@ GameObject:
   - component: {fileID: 466213480}
   - component: {fileID: 466213479}
   - component: {fileID: 466213478}
-  - component: {fileID: 466213482}
   m_Layer: 8
-  m_Name: Player
+  m_Name: Sphere
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1304,24 +1303,6 @@ Transform:
   m_Father: {fileID: 1115407150}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &466213482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 466213477}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b56e57c4a445652469332a9f28afdb2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCamera: {fileID: 963194225}
-  speed: 5
-  dampTime: 0.02
-  world_direction: {x: 0, y: 0, z: 0}
-  world_up: {x: 0, y: 0, z: 0}
-  isMoving: 0
 --- !u!1 &471281128
 GameObject:
   m_ObjectHideFlags: 0
@@ -2168,7 +2149,7 @@ GameObject:
   - component: {fileID: 1115407146}
   - component: {fileID: 1115407145}
   m_Layer: 8
-  m_Name: Parent
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
