@@ -1,0 +1,31 @@
+isMoving = true;
+m_animator.SetBool(m_isMoving_Param_ID, true);
+
+// Set target position to the next block in front of the player. 
+// The result is rounded to avoid small deviations from the theoretical integer coordinates of the blocks due to Unity physics
+// and the idle animation.
+m_targetPosition    = SnapToGrid(transform.position + world_direction);
+m_remainingDistance = (Vector3.Scale(m_targetPosition, world_direction) - Vector3.Scale(transform.position, world_direction)).sqrMagnitude;
+
+Vector3 velocity    = Vector3.zero;
+Quaternion startRot = player.transform.rotation;
+
+while (m_remainingDistance > 0.01f)
+{
+	// Move to new position by using SmoothDamp to have an EaseIn and EaseOut effect. 
+	// Note that SmoothDamp allows repositioning the target during the interpolation.
+	m_rb.MovePosition(Vector3.SmoothDamp(transform.position, m_targetPosition, ref velocity, dampTime, speed));
+
+	Vector3 pos = Vector3.Scale(transform.position, world_direction);
+	Vector3 target = Vector3.Scale(m_targetPosition, world_direction) - pos;
+	m_remainingDistance = target.sqrMagnitude;// = target.x + target.y + target.z;
+
+	// Rotate the sphere according to the movement. 
+	float rot = (((pos.x + pos.y + pos.z) % m_circum) * m_rotConst) - 180;
+	player.transform.rotation = Quaternion.Euler(Vector3.Cross(world_direction * -rot, world_up));
+
+	yield return null;
+}
+
+isMoving = false;
+m_animator.SetBool(m_isMoving_Param_ID, false);
