@@ -118,8 +118,8 @@ public class CameraController : MonoBehaviour
         while (t * m_invCameraSpeed < 1)
         {
             t     += Time.deltaTime;
-            offset = Vector3.Lerp(start, target, t * m_invCameraSpeed * m_updownSpeed);
-            tmp    = Vector3.Lerp(upStart, upTarget, t * m_invCameraSpeed * m_updownSpeed);
+            offset = Vector3.Slerp(start, target, t * m_invCameraSpeed);
+            tmp    = Vector3.Slerp(upStart, upTarget, t * m_invCameraSpeed);
 
             // Move and rotate the camera accordigly. 
             transform.position = player.transform.position + offset;
