@@ -92,7 +92,6 @@ public class CameraController : MonoBehaviour
             yield return null;
         }
         world_direction = Quaternion.AngleAxis(90 * dir, world_up) * world_direction;
-        m_pc.world_direction = world_direction;
 
         isMoving = false;
     }

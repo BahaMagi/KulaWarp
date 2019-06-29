@@ -90,10 +90,11 @@ static class ExtensionMethods //@TODO put this class in a separate script
      */
     public static Vector3 Round(this ref Vector3 vec, Vector3 axis)
     {
+        Vector3Int a = Vector3Int.RoundToInt(axis);
         return new Vector3(
-            axis.x != 0 ? Mathf.RoundToInt(vec.x) : vec.x,
-            axis.y != 0 ? Mathf.RoundToInt(vec.y) : vec.y,
-            axis.z != 0 ? Mathf.RoundToInt(vec.z) : vec.z);
+            a.x != 0 ? Mathf.RoundToInt(vec.x) : vec.x,
+            a.y != 0 ? Mathf.RoundToInt(vec.y) : vec.y,
+            a.z != 0 ? Mathf.RoundToInt(vec.z) : vec.z);
     }
 
     /**
@@ -106,10 +107,11 @@ static class ExtensionMethods //@TODO put this class in a separate script
      */
     public static Vector3 Floor(this ref Vector3 vec, Vector3 axis)
     {
+        Vector3Int a = Vector3Int.RoundToInt(axis);
         return new Vector3(
-            axis.x != 0 ? Mathf.FloorToInt(vec.x) : vec.x,
-            axis.y != 0 ? Mathf.FloorToInt(vec.y) : vec.y,
-            axis.z != 0 ? Mathf.FloorToInt(vec.z) : vec.z);
+            a.x != 0 ? Mathf.FloorToInt(vec.x) : vec.x,
+            a.y != 0 ? Mathf.FloorToInt(vec.y) : vec.y,
+            a.z != 0 ? Mathf.FloorToInt(vec.z) : vec.z);
     }
 
     public static float L1Norm(this Vector3 vec)
@@ -120,7 +122,7 @@ static class ExtensionMethods //@TODO put this class in a separate script
     public static float getComponent(this Vector3 vec, Vector3 axis)
     {
         Vector3Int a = Vector3Int.RoundToInt(axis);
-        return (a.x != 0 ? vec.x : a.y != 0 ? vec.y : vec.z); ;
+        return (a.x != 0 ? vec.x : a.y != 0 ? vec.y : vec.z);
     }
 
     public static Vector3 setComponent(this ref Vector3 vec, Vector3 component, float value)
