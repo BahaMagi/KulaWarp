@@ -8,14 +8,14 @@ public class CameraController : MonoBehaviour
     public GameObject           player;
     private PlayerController    m_pc;
 
-    [HideInInspector] public Vector3    world_direction, world_up;
+    //[HideInInspector] public Vector3    world_direction, world_up;
     [HideInInspector] public bool       isMoving;
 
     public Vector3  offset          = new Vector3(-1.6f, 1.3f, 0);
     public float    offsetAngle     = 0.71762f, cameraSpeed = 0.5f;
 
     private float m_invCameraSpeed, m_boxsize, m_sphereRadius;
-    private bool  m_isTilting = false;
+    private bool  m_isMovingUpDown = false;
 
     #endregion
 
@@ -23,11 +23,11 @@ public class CameraController : MonoBehaviour
     {
         m_pc = player.GetComponent<PlayerController>();
 
-        world_direction   = Vector3.right; // @TODO both have to be initializable by the Scene/Level
-        world_up          = Vector3.up;
+        //world_direction   = Vector3.right; // @TODO both have to be initializable by the Scene/Level
+        //world_up          = Vector3.up;
 
         transform.position = player.transform.position + offset;
-        transform.LookAt(player.transform.position + offsetAngle * world_up);
+        transform.LookAt(player.transform.position + offsetAngle * m_pc.world_up); 
 
         m_invCameraSpeed     = 1 / cameraSpeed;
         m_boxsize            = 1.0f; // @TODO make this initializable by the Scene/level
@@ -41,7 +41,7 @@ public class CameraController : MonoBehaviour
         if (CanRotate() && input != 0)
             StartCoroutine(CameraRotate(input));
 
-        if (!(isMoving || m_isTilting))
+        if (!(isMoving || m_isMovingUpDown))
         {
             // The Idle Animation of the played causes a slight up and down when the play is not moving. So use the gridPos
             // rather than the real pos when moving the camera behind the player 
@@ -49,7 +49,7 @@ public class CameraController : MonoBehaviour
             transform.position = gridPos + offset;
 
             // Look in the direction of the player at a point <offsetAngle> units above (w/r to the world up vector) the center of the player. 
-            transform.LookAt(gridPos + offsetAngle * world_up, world_up);
+            transform.LookAt(gridPos + offsetAngle * m_pc.world_up, m_pc.world_up);
         }
     }
 
@@ -58,7 +58,7 @@ public class CameraController : MonoBehaviour
     */
     protected bool CanRotate()
     {
-        return !(isMoving || m_pc.isMoving || m_isTilting);
+        return !(isMoving || m_pc.isMoving || m_isMovingUpDown);
     }
 
     protected int HandleInput()
@@ -75,7 +75,7 @@ public class CameraController : MonoBehaviour
         isMoving = true;
 
         // Turn Camera to the Left of the Player
-        Vector3 target  = Quaternion.AngleAxis(90 * dir, world_up) * offset;
+        Vector3 target  = Quaternion.AngleAxis(90 * dir, m_pc.world_up) * offset;
         Vector3 start   = offset;
 
         float t = 0;
@@ -87,11 +87,11 @@ public class CameraController : MonoBehaviour
 
             // Move and rotate the camera accordigly. 
             transform.position = player.transform.position + offset;
-            transform.LookAt(player.transform.position + offsetAngle * world_up, world_up);
+            transform.LookAt(player.transform.position + offsetAngle * m_pc.world_up, m_pc.world_up);
 
             yield return null;
         }
-        world_direction = Quaternion.AngleAxis(90 * dir, world_up) * world_direction;
+        m_pc.world_direction = Quaternion.AngleAxis(90 * dir, m_pc.world_up) * m_pc.world_direction;
 
         isMoving = false;
     }
@@ -101,15 +101,15 @@ public class CameraController : MonoBehaviour
      */
     public IEnumerator CameraUpDown(int dir)
     {
-        m_isTilting = true; // @TODO use isMoving instead.
+        m_isMovingUpDown = true;
         // Turn Camera up/down when the player moves up a wall or down an edge.
-        Vector3 target = Quaternion.AngleAxis(90, Vector3.Cross(world_up, world_direction)*-dir) * offset;
+        Vector3 target = Quaternion.AngleAxis(90, Vector3.Cross(m_pc.world_up, m_pc.world_direction)*-dir) * offset;
         Vector3 start  = offset;
 
-        Vector3 upStart  = world_up;
-        Vector3 upTarget = -dir * world_direction;
-        Vector3 tmp      = world_up;
-        world_direction  = dir * world_up;
+        Vector3 upStart  = m_pc.world_up;
+        Vector3 upTarget = -dir * m_pc.world_direction;
+        Vector3 tmp      = m_pc.world_up;
+        //world_direction  = dir * world_up;
         
         float t = 0;
 
@@ -126,8 +126,8 @@ public class CameraController : MonoBehaviour
             yield return null;
         }
 
-        world_up    = tmp.Round(world_up);
-        m_isTilting = false;
+        //world_up    = tmp.Round(world_up);
+        m_isMovingUpDown = false;
     }
 
     /**
@@ -138,7 +138,7 @@ public class CameraController : MonoBehaviour
      */ // @TODO implemented the same function twice now. Maybe refactor and put in one common location?
     private Vector3 SnapToGrid(Vector3 vec)
     {
-        return vec.Round(world_up) - (m_boxsize * 0.5f - m_sphereRadius) * world_up;
+        return vec.Round(m_pc.world_up) - (m_boxsize * 0.5f - m_sphereRadius) * m_pc.world_up;
     }
 
     // Currently only used for debuf outputs. 
