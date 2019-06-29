@@ -14,7 +14,7 @@ public class CameraController : MonoBehaviour
     public Vector3  offset          = new Vector3(-1.6f, 1.3f, 0);
     public float    offsetAngle     = 0.71762f, cameraSpeed = 0.5f;
 
-    private float m_invCameraSpeed, m_boxsize, m_sphereRadius, m_updownSpeed;
+    private float m_invCameraSpeed, m_boxsize, m_sphereRadius;
     private bool  m_isTilting = false;
 
     #endregion
@@ -30,8 +30,7 @@ public class CameraController : MonoBehaviour
         transform.LookAt(player.transform.position + offsetAngle * world_up);
 
         m_invCameraSpeed     = 1 / cameraSpeed;
-        m_updownSpeed        = 2.0f;
-        m_boxsize            = 1.0f; // @TODO make this initializable by the Scene/leven
+        m_boxsize            = 1.0f; // @TODO make this initializable by the Scene/level
         m_sphereRadius       = m_pc.player_sphere.GetComponent<SphereCollider>().radius * player.transform.lossyScale.x;
     }
 
@@ -127,7 +126,8 @@ public class CameraController : MonoBehaviour
 
             yield return null;
         }
-        world_up = tmp.Round(world_up);
+
+        world_up    = tmp.Round(world_up);
         m_isTilting = false;
     }
 
@@ -154,10 +154,10 @@ public class CameraController : MonoBehaviour
         // Green: Offset
 
         //Debug.DrawRay(player.transform.position, offset, Color.green);
-        Debug.DrawRay(player.transform.position, world_up, Color.cyan);
+        //Debug.DrawRay(player.transform.position, world_up, Color.cyan);
         //Debug.DrawRay(transform.position, m_targetPosition - transform.position);
         //Debug.DrawRay(transform.position, Physics.gravity, Color.green);
-        Debug.DrawRay(player.transform.position, world_direction, Color.red);
+        //Debug.DrawRay(player.transform.position, world_direction, Color.red);
         //Debug.DrawRay(transform.position, world_direction * m_sphereRadius * 1.25f, Color.blue);
         //Debug.DrawRay(transform.position + 0.05f * world_direction, -world_up, Color.black);
     }

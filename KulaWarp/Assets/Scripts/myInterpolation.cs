@@ -78,7 +78,7 @@ public class MyInterps
 /**
  * Extend existing classes with utility functions. 
  */
-static class ExtensionMethods
+static class ExtensionMethods //@TODO put this class in a separate script 
 {
     /**
      * Round the components of vec for which axis is != 0. 
@@ -88,12 +88,12 @@ static class ExtensionMethods
      * 
      * will yield a = (1.2, 2, 1.8);
      */
-    public static Vector3 Round(this Vector3 vec, Vector3 axis)
+    public static Vector3 Round(this ref Vector3 vec, Vector3 axis)
     {
         return new Vector3(
-            axis.x != 0 ? Mathf.Round(vec.x) : vec.x,
-            axis.y != 0 ? Mathf.Round(vec.y) : vec.y,
-            axis.z != 0 ? Mathf.Round(vec.z) : vec.z);
+            axis.x != 0 ? Mathf.RoundToInt(vec.x) : vec.x,
+            axis.y != 0 ? Mathf.RoundToInt(vec.y) : vec.y,
+            axis.z != 0 ? Mathf.RoundToInt(vec.z) : vec.z);
     }
 
     /**
@@ -104,16 +104,36 @@ static class ExtensionMethods
      * 
      * will yield a = (1.2, 1, 1.8);
      */
-    public static Vector3 Floor(this Vector3 vec, Vector3 axis)
+    public static Vector3 Floor(this ref Vector3 vec, Vector3 axis)
     {
         return new Vector3(
-            axis.x != 0 ? Mathf.Floor(vec.x) : vec.x,
-            axis.y != 0 ? Mathf.Floor(vec.y) : vec.y,
-            axis.z != 0 ? Mathf.Floor(vec.z) : vec.z);
+            axis.x != 0 ? Mathf.FloorToInt(vec.x) : vec.x,
+            axis.y != 0 ? Mathf.FloorToInt(vec.y) : vec.y,
+            axis.z != 0 ? Mathf.FloorToInt(vec.z) : vec.z);
     }
 
     public static float L1Norm(this Vector3 vec)
     {  
         return vec.x + vec.y + vec.z;
+    }
+
+    public static float getComponent(this Vector3 vec, Vector3 axis)
+    {
+        Vector3Int a = Vector3Int.RoundToInt(axis);
+        return (a.x != 0 ? vec.x : a.y != 0 ? vec.y : vec.z); ;
+    }
+
+    public static Vector3 setComponent(this ref Vector3 vec, Vector3 component, float value)
+    {
+        Vector3Int c = Vector3Int.RoundToInt(component);
+
+        if (c.x != 0)
+            vec.x = value;
+        else if (c.y != 0)
+            vec.y = value;
+        else
+            vec.z = value;
+
+        return vec;
     }
 }
