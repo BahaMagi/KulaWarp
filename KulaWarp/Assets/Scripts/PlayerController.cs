@@ -291,25 +291,32 @@ public class PlayerController : MonoBehaviour
      */
     protected bool CanMove(out bool isHitFront)
     {
-        float       l           = 1.5f; // length of the rays sent. 
-        Vector3     origin      = transform.position + (1-m_sphereRadius) * world_up;
+        float l = 1.5f; // length of the rays sent.
+
+        // Send rays from a point above player position.
+        Vector3 origin = transform.position + (1 - m_sphereRadius) * world_up;
 
         // Check the front first. Any hit allows us to move.
-        Ray  front      = new Ray(origin, 1.1f*(world_direction - world_up));
-        isHitFront      = Physics.Raycast(front, l, m_envLayerMask);
+        // This covers both forward and forward-up movement.
+        Vector3  frontDown = world_direction - world_up;
+        isHitFront         = Physics.Raycast(origin, frontDown, l, m_envLayerMask);
+
+        // The player can't start moving until the previous movement is finished.
+        if (m_cc.isMoving) return false;
 
         // If there is something in front it is always possible to move. 
-        if (isHitFront)
-            return !m_cc.isMoving;
+        if (isHitFront) return true;
 
         // If there is no hit, then we can only move if left and right are empty. 
-        Vector3 crossProd = Vector3.Cross(world_up, world_direction);
-        Ray left          = new Ray(origin, crossProd - world_up);
-        Ray right         = new Ray(origin, -crossProd - world_up);
-        bool isHitLeft    = Physics.Raycast(left, l, m_envLayerMask);
-        bool isHitRight   = Physics.Raycast(right, l, m_envLayerMask);
+        Vector3 world_left = Vector3.Cross(world_up, world_direction);
 
-        return !(isHitRight || isHitLeft || m_cc.isMoving);
+        Vector3 leftDown  = world_left - world_up;
+        bool isHitLeft    = Physics.Raycast(origin, leftDown, l, m_envLayerMask);
+
+        Vector3 rightDown = -world_left - world_up;
+        bool isHitRight   = Physics.Raycast(origin, rightDown, l, m_envLayerMask);
+
+        return !isHitLeft && !isHitRight;
     }
 
     /**
