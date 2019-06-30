@@ -10,8 +10,20 @@
 [Uu]nityGenerated/
 # file on crash reports
 sysinfo.txt
+
+# Never ignore Asset meta data
+!/[Aa]ssets/**/*.meta
+
 # Unity3D generated meta files
 *.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# TextMesh Pro files
+[Aa]ssets/TextMesh*Pro/
+
+# Visual Studio cache directory
+.vs/
 
 ###
 # VS/MD solution and project files
@@ -39,3 +51,10 @@ sysinfo.txt
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# Builds
+*.apk
+*.unitypackage
+
+# Crashlytics generated file
+crashlytics-build.properties
