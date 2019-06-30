@@ -88,7 +88,7 @@ static class ExtensionMethods //@TODO put this class in a separate script
      * 
      * will yield a = (1.2, 2, 1.8);
      */
-    public static Vector3 Round(this ref Vector3 vec, Vector3 axis)
+    public static Vector3 Round(this Vector3 vec, Vector3 axis)
     {
         Vector3Int a = Vector3Int.RoundToInt(axis);
         return new Vector3(

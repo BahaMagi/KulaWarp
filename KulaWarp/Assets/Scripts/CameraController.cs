@@ -9,13 +9,14 @@ public class CameraController : MonoBehaviour
     private PlayerController    m_pc;
 
     //[HideInInspector] public Vector3    world_direction, world_up;
-    [HideInInspector] public bool       isMoving;
+    [HideInInspector] public bool       isMoving = false;
 
     public Vector3  offset          = new Vector3(-1.6f, 1.3f, 0);
-    public float    offsetAngle     = 0.71762f, cameraSpeed = 0.5f;
+    public float    offsetAngle     = 0.71762f, cameraSpeed = 0.5f, tiltSpeed = 0.5f;
 
     private float m_invCameraSpeed, m_boxsize, m_sphereRadius;
     private bool  m_isMovingUpDown = false;
+    private float m_upOff, m_dirOff;
 
     #endregion
 
@@ -23,15 +24,15 @@ public class CameraController : MonoBehaviour
     {
         m_pc = player.GetComponent<PlayerController>();
 
-        //world_direction   = Vector3.right; // @TODO both have to be initializable by the Scene/Level
-        //world_up          = Vector3.up;
-
         transform.position = player.transform.position + offset;
         transform.LookAt(player.transform.position + offsetAngle * m_pc.world_up); 
 
         m_invCameraSpeed     = 1 / cameraSpeed;
         m_boxsize            = 1.0f; // @TODO make this initializable by the Scene/level
         m_sphereRadius       = m_pc.player_sphere.GetComponent<SphereCollider>().radius * player.transform.lossyScale.x;
+
+        m_upOff  = Mathf.Abs(offset.getComponent(m_pc.world_direction));
+        m_dirOff = Mathf.Abs(offset.getComponent(m_pc.world_up));
     }
 
     void LateUpdate()
@@ -75,14 +76,14 @@ public class CameraController : MonoBehaviour
         isMoving = true;
 
         // Turn Camera to the Left of the Player
-        Vector3 target  = Quaternion.AngleAxis(90 * dir, m_pc.world_up) * offset;
+        Vector3 target  = -m_dirOff * dir * Vector3.Cross(m_pc.world_up, m_pc.world_direction) + m_upOff * m_pc.world_up;
         Vector3 start   = offset;
 
         float t = 0;
 
-        while(t * m_invCameraSpeed < 1)
+        while(t * m_invCameraSpeed <= 1)
         {
-            t += Time.deltaTime;
+            t     += Time.deltaTime;
             offset = Vector3.Slerp(start, target, t * m_invCameraSpeed);
 
             // Move and rotate the camera accordigly. 
@@ -91,7 +92,7 @@ public class CameraController : MonoBehaviour
 
             yield return null;
         }
-        m_pc.world_direction = Quaternion.AngleAxis(90 * dir, m_pc.world_up) * m_pc.world_direction;
+        m_pc.world_direction = dir*Vector3.Cross(m_pc.world_up, m_pc.world_direction);
 
         isMoving = false;
     }
@@ -102,31 +103,29 @@ public class CameraController : MonoBehaviour
     public IEnumerator CameraUpDown(int dir)
     {
         m_isMovingUpDown = true;
-        // Turn Camera up/down when the player moves up a wall or down an edge.
-        Vector3 target = Quaternion.AngleAxis(90, Vector3.Cross(m_pc.world_up, m_pc.world_direction)*-dir) * offset;
-        Vector3 start  = offset;
 
-        Vector3 upStart  = m_pc.world_up;
-        Vector3 upTarget = -dir * m_pc.world_direction;
-        Vector3 tmp      = m_pc.world_up;
-        //world_direction  = dir * world_up;
+        // Turn Camera up/down when the player moves up a wall or down an edge.
+        Vector3 start  = offset;
+        Vector3 target = -m_dirOff * m_pc.world_direction + m_upOff * m_pc.world_up;
+
+        Vector3 upStart  = m_pc.world_direction * dir;
+        Vector3 upTmp    = upStart;
         
         float t = 0;
 
-        while (t * m_invCameraSpeed < 1)
+        while (t * tiltSpeed <= 1)
         {
             t     += Time.deltaTime;
-            offset = Vector3.Slerp(start, target, t * m_invCameraSpeed);
-            tmp    = Vector3.Slerp(upStart, upTarget, t * m_invCameraSpeed);
+            offset = Vector3.Slerp(start, target, t * tiltSpeed);
+            upTmp  = Vector3.Slerp(upStart, m_pc.world_up, t * tiltSpeed);
 
             // Move and rotate the camera accordigly. 
             transform.position = player.transform.position + offset;
-            transform.LookAt(player.transform.position + offsetAngle * tmp, tmp);
+            transform.LookAt(player.transform.position + offsetAngle * upTmp, upTmp);
 
             yield return null;
         }
 
-        //world_up    = tmp.Round(world_up);
         m_isMovingUpDown = false;
     }
 

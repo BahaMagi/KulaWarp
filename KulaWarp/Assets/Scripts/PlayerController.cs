@@ -76,22 +76,37 @@ public class PlayerController : MonoBehaviour
      */
     protected void AttemptMove()
     {
-        bool canMove = CanMove(out bool hitFront);
+        if (isMoving)
+        {
+            //continueMovement();
+            return;
+        }
 
-        // The player is not moving and there is no next block -> go down
-        if (!isMoving && canMove && !hitFront)
-            StartCoroutine(MoveDownwards());
-        // The player is not moving and there is a next block (up or the same level) -> go forward (and evtl. up)
-        else if (!isMoving && canMove && hitFront)
-            StartCoroutine(MoveForwards());
-        // The player is already moving and there is a next block (up or the same level) -> go forward
-        //else if (isMoving && canMove && m_remainingDistance < (m_boxsize * m_boxsize * 0.1f) && hitFront)
-           // m_targetPosition += world_direction;
-        // The player is already moving and there is no next block -> prepare go down
-        //else if (isMoving && canMove && m_remainingDistance < (m_boxsize * m_boxsize * 0.20f) && !hitFront)
-            //m_targetPosition += world_direction;
-        else if (!isMoving && !canMove)
-            OnCantMove();
+        bool canMove = CanMove(out int nextBlockLevel);
+
+        if (!canMove)
+            return;
+
+        setTarget(nextBlockLevel);
+
+        switch(nextBlockLevel)
+        {
+            case -1:
+                StartCoroutine(MoveDownwards());
+                break;
+            case 0:
+            case 1:
+                StartCoroutine(MoveForwards());
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected void setTarget(int nextBlockLevel)
+    {
+        m_targetPosition = SnapToGridAll(transform.position);
+        m_targetPosition += world_direction * ((nextBlockLevel == -1) ? 0.5f : 1.0f);
     }
 
     /**
@@ -105,38 +120,29 @@ public class PlayerController : MonoBehaviour
     {
         setisMoving(true);
 
-        // Set target position to the next block in front of the player. 
-        // The result is rounded to avoid small deviations from the theoretical integer coordinates of the blocks due to Unity physics
-        // and the idle animation.
         Vector3 startPosition = transform.position;
-        m_targetPosition      = SnapToGrid(transform.position + world_direction);
-        m_targetPosition.Round(Vector3.one-world_up);
-
         m_remainingDistance   = (m_targetPosition - startPosition).sqrMagnitude;
 
-        float t = 0.0f;
+        float t      = 0.0f;
         bool arrived = false;
 
         while (!arrived)
         {
             m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed));
             m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
-            t += Time.deltaTime;
+            t                  += Time.deltaTime;
 
             RotatePlayerSphere();
 
             // Check with a ray cast whether the sphere has to move up. 
             Ray checkFront = new Ray(transform.position, world_direction);
-
-            if (Physics.Raycast(checkFront, m_sphereRadius * 1.1f, m_envLayerMask))
-            {
-                StartCoroutine(MoveUpwards());
-                yield break;
-            }
+            if (Physics.Raycast(checkFront, m_sphereRadius * 1.1f, m_envLayerMask)) MoveUpwards();
 
             yield return null;
         }
 
+        // In case MoveUpwards was called the parent player object needs to be reoriented. 
+        transform.rotation = Quaternion.FromToRotation(Vector3.up, world_up);
         setisMoving(false);
     }
 
@@ -148,19 +154,12 @@ public class PlayerController : MonoBehaviour
     * 2) Rotate 90° around that edge.
     * 3) Move to the center of that new face of the box. 
     */
-    protected IEnumerator MoveDownwards()
+    protected IEnumerator MoveDownwards() //@TODO Try at some point to put this into MoveForwards like MoveUpwards
     {
-        setisMoving(true);
+        setisMoving(true); 
 
         // Phase 1: Move to the edge of the box.
-
-        // Set target position to the next block in front of the player. 
-        // The result is rounded to avoid small deviations from the theoretical integer coordinates of the blocks due to Unity physics
-        // and the idle animation.
         Vector3 startPosition = transform.position;
-        m_targetPosition      = SnapToGrid(startPosition);
-        m_targetPosition.Round(Vector3.one - world_up);
-        m_targetPosition     += world_direction * 0.5f;
         m_remainingDistance   = m_boxsize * m_boxsize;
 
         float t      = 0.0f;
@@ -179,7 +178,6 @@ public class PlayerController : MonoBehaviour
         }
 
         // Phase 2: Rotate around the edge.
-
         t                  = 0.0f;
         float dt           = 0.0f;
         float angularSpeed = 90.0f * speed / (m_boxsize * 0.5f); // @TODO That 90 is arbitrary. Make this a public var so its editable from the inspector.
@@ -187,12 +185,12 @@ public class PlayerController : MonoBehaviour
         Vector3 contactPoint = transform.position - world_up * m_sphereRadius;
         m_rb.useGravity      = false; // Turn off gravity while rotating to avoid sliding.
 
+        Vector3 tmp     = world_up;
+        world_up        = world_direction;
+        world_direction = -tmp;
+
         // Start rotating the camera.
         StartCoroutine(m_cc.CameraUpDown(-1));
-
-        Vector3 tmp = world_up;
-        world_up = world_direction;
-        world_direction = -tmp;
 
         while (t < 90.0f)
         {
@@ -205,64 +203,29 @@ public class PlayerController : MonoBehaviour
         }
 
         // Phase 3: Move to the center of the face of the box. 
-
         // Turn gravity back on and change it to the new direction.
         Physics.gravity = -9.81f * world_up;
         m_rb.useGravity = true;
 
-        startPosition       = transform.position;
-        m_targetPosition    = SnapToGrid(startPosition + world_direction * 0.5f);
+        m_targetPosition = SnapToGridAll(transform.position+0.5f * world_direction);
         m_remainingDistance = (m_targetPosition - startPosition).sqrMagnitude;
-        m_targetPosition.Round(Vector3.one - world_up);
-
-        t       = 0.0f;
-        arrived = false;
-
-        while (!arrived)
-        {
-            m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed));
-
-            m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
-            t                  += Time.deltaTime;
-
-            RotatePlayerSphere();
-
-            yield return null;
-        }
-
-        setisMoving(false);
+        
+        // Finish of the movement by moving forwards to the new target. 
+        StartCoroutine(MoveForwards());
     }
 
-    protected IEnumerator MoveUpwards()
+    protected void MoveUpwards()
     {
-        Vector3 startPosition = transform.position;
+        Physics.gravity = 9.81f * world_direction;
+
         m_targetPosition      = m_targetPosition - world_direction * (0.5f * m_boxsize + m_sphereRadius) + world_up * (-m_sphereRadius + 0.5f * m_boxsize);
-        Physics.gravity       = 9.81f * world_direction;
-
-        m_remainingDistance = (m_targetPosition - startPosition).sqrMagnitude;
-
-        StartCoroutine(m_cc.CameraUpDown(1));
+        m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
 
         Vector3 tmp     = world_up;
         world_up        = -world_direction;
         world_direction = tmp;
-        
-        float t      = 0.0f;
-        bool arrived = false;
 
-        while (!arrived)
-        {
-            m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed));
-            m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
-            t += Time.deltaTime;
-
-            RotatePlayerSphere();
-
-            yield return null;
-        }
-
-        transform.rotation = Quaternion.FromToRotation(Vector3.up, world_up);
-        setisMoving(false);
+        StartCoroutine(m_cc.CameraUpDown(1));
     }
 
     /**
@@ -289,7 +252,7 @@ public class PlayerController : MonoBehaviour
      *
      * Also, the player is restriced to only move when the camera is not rotating. 
      */
-    protected bool CanMove(out bool isHitFront)
+    protected bool CanMove(out int nextBlockLevel)
     {
         float l = 1.5f; // length of the rays sent.
 
@@ -299,7 +262,9 @@ public class PlayerController : MonoBehaviour
         // Check the front first. Any hit allows us to move.
         // This covers both forward and forward-up movement.
         Vector3  frontDown = world_direction - world_up;
-        isHitFront         = Physics.Raycast(origin, frontDown, l, m_envLayerMask);
+        RaycastHit hitFront;
+        bool isHitFront = Physics.Raycast(origin, frontDown, out hitFront, l, m_envLayerMask);
+        nextBlockLevel = isHitFront ? hitFront.distance < 1 ? 1 : 0 : -1;
 
         // The player can't start moving until the previous movement is finished.
         if (m_cc.isMoving) return false;
@@ -338,9 +303,14 @@ public class PlayerController : MonoBehaviour
      * This is mainly necessary because the Idle animation introduces small numerical changes in the
      * up component. To avoid jumping of the ball this has to be countered. 
      */
-    private Vector3 SnapToGrid(Vector3 vec)
+    private Vector3 SnapToGridY(Vector3 vec)
     {
         return vec.Round(world_up) - (m_boxsize * 0.5f - m_sphereRadius) * world_up;
+    }
+
+    private Vector3 SnapToGridAll(Vector3 vec)
+    {
+        return vec.Round(Vector3.one) - (m_boxsize * 0.5f - m_sphereRadius) * world_up;
     }
 
     // Currently only used for debug outputs
