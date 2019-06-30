@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public float easeInTime   = 0.02f; // Dampening strength of the EaseIn. 
 
     [HideInInspector] public Vector3 world_direction, world_up; // Current World and Camera forwarwards/up direction
-    [HideInInspector] public bool       isMoving;
+    [HideInInspector] public bool    isMoving;
 
     private SphereCollider   m_sphereCollider_player;
     private Rigidbody        m_rb;
@@ -76,20 +76,18 @@ public class PlayerController : MonoBehaviour
      */
     protected void AttemptMove()
     {
-        if (isMoving)
-        {
-            //continueMovement();
-            return;
-        }
-
         bool canMove = CanMove(out int nextBlockLevel);
 
-        if (!canMove)
+        if (!canMove) return;
+
+        if (isMoving)
+        {
+            if(nextBlockLevel == 0) setTarget(nextBlockLevel);
             return;
+        }
+        else setTarget(nextBlockLevel);
 
-        setTarget(nextBlockLevel);
-
-        switch(nextBlockLevel)
+        switch (nextBlockLevel)
         {
             case -1:
                 StartCoroutine(MoveDownwards());
@@ -105,7 +103,8 @@ public class PlayerController : MonoBehaviour
 
     protected void setTarget(int nextBlockLevel)
     {
-        m_targetPosition = SnapToGridAll(transform.position);
+        Vector3 pos = transform.position;
+        m_targetPosition = SnapToGridAll(pos);
         m_targetPosition += world_direction * ((nextBlockLevel == -1) ? 0.5f : 1.0f);
     }
 
@@ -136,7 +135,11 @@ public class PlayerController : MonoBehaviour
 
             // Check with a ray cast whether the sphere has to move up. 
             Ray checkFront = new Ray(transform.position, world_direction);
-            if (Physics.Raycast(checkFront, m_sphereRadius * 1.1f, m_envLayerMask)) MoveUpwards();
+            if (Physics.Raycast(checkFront, m_sphereRadius * 1.1f, m_envLayerMask))
+            {
+                MoveUpwards();
+                startPosition = transform.position;
+            }
 
             yield return null;
         }
@@ -252,12 +255,12 @@ public class PlayerController : MonoBehaviour
      *
      * Also, the player is restriced to only move when the camera is not rotating. 
      */
-    protected bool CanMove(out int nextBlockLevel)
+    protected bool CanMove(out int nextBlockLevel, int distance = 1)
     {
         float l = 1.5f; // length of the rays sent.
 
         // Send rays from a point above player position.
-        Vector3 origin = transform.position + (1 - m_sphereRadius) * world_up;
+        Vector3 origin = transform.position + (1 - m_sphereRadius) * world_up + (1 - distance) * world_direction;
 
         // Check the front first. Any hit allows us to move.
         // This covers both forward and forward-up movement.
