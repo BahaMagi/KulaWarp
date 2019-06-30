@@ -139,6 +139,7 @@ public class PlayerController : MonoBehaviour
             {
                 MoveUpwards();
                 startPosition = transform.position;
+                t = 0.0f;
             }
 
             yield return null;

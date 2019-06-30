@@ -2187,7 +2187,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194225}
   player_sphere: {fileID: 466213477}
-  speed: 5
+  speed: 4.5
   easeInTime: 0.02
   world_direction: {x: 0, y: 0, z: 0}
   world_up: {x: 0, y: 0, z: 0}
