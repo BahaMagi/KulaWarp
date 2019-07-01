@@ -31,8 +31,8 @@ public class CameraController : MonoBehaviour
         m_boxsize            = 1.0f; // @TODO make this initializable by the Scene/level
         m_sphereRadius       = m_pc.player_sphere.GetComponent<SphereCollider>().radius * player.transform.lossyScale.x;
 
-        m_upOff  = Mathf.Abs(offset.getComponent(m_pc.world_direction));
-        m_dirOff = Mathf.Abs(offset.getComponent(m_pc.world_up));
+        m_upOff  = Mathf.Abs(offset.getComponent(m_pc.world_up));
+        m_dirOff = Mathf.Abs(offset.getComponent(m_pc.world_direction));
     }
 
     void LateUpdate()
@@ -78,6 +78,7 @@ public class CameraController : MonoBehaviour
         // Turn Camera to the Left of the Player
         Vector3 target  = -m_dirOff * dir * Vector3.Cross(m_pc.world_up, m_pc.world_direction) + m_upOff * m_pc.world_up;
         Vector3 start   = offset;
+        Debug.Log(target);
 
         float t = 0;
 
