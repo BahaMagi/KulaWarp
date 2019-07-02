@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KeyController : MonoBehaviour
+public class CrystalController : MonoBehaviour
 {
     public GameObject      gameController;
     private GameController m_gc;
@@ -30,6 +30,6 @@ public class KeyController : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         gameObject.SetActive(false);
-        m_gc.CollectKey(gameObject);
+        m_gc.CollectCrystal(gameObject);
     }
 }
