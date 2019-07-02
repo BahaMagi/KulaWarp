@@ -11,7 +11,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     #region
-    public GameObject mainCamera, player_sphere;
+    public GameObject mainCamera, player_sphere, game;
 
     public float speed        = 5f; // Maximum speed of the player
     public float easeInTime   = 0.02f; // Dampening strength of the EaseIn. 
@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody        m_rb;
     private Animator         m_animator;
     private CameraController m_cc;
+    private GameController   m_gc;
 
     private int m_isMoving_Param_ID; // ID for parameter that triggers Idle -> Moving transition in animator. 
 
@@ -38,13 +39,12 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         isMoving        = false;
-        world_up        = Vector3.up;
-        world_direction = Vector3.right;
 
         m_sphereCollider_player = player_sphere.GetComponent<SphereCollider>();
         m_rb                    = GetComponent<Rigidbody>();
         m_cc                    = mainCamera.GetComponent<CameraController>();
         m_animator              = GetComponent<Animator>();
+        m_gc                    = game.GetComponent<GameController>();
 
         m_isMoving_Param_ID = Animator.StringToHash("isMoving"); // @TODO Check if there is another way of doing this that is not string search based. 
 
@@ -55,6 +55,16 @@ public class PlayerController : MonoBehaviour
         m_envLayerMask  = 1 << 10;
 
         m_RotationAngles = Vector3.zero;
+
+        world_up        = m_gc.startUp;
+        world_direction = m_gc.startDir;
+    }
+
+    public void ResetPlayer()
+    {
+        world_up           = m_gc.startUp;
+        world_direction    = m_gc.startDir;
+        transform.position = m_gc.startPosPlayer;
     }
 
     void FixedUpdate()

@@ -30,6 +30,6 @@ public class KeyController : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         gameObject.SetActive(false);
-        m_gc.CollectKey();
+        m_gc.CollectKey(gameObject);
     }
 }

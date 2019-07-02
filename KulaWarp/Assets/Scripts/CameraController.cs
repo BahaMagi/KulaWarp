@@ -5,11 +5,12 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     #region
-    public GameObject           player;
+    public GameObject           player, game;
     private PlayerController    m_pc;
+    private GameController      m_gc;
 
     //[HideInInspector] public Vector3    world_direction, world_up;
-    [HideInInspector] public bool       isMoving = false;
+    [HideInInspector] public bool       isMoving;
 
     public Vector3  offset          = new Vector3(-1.6f, 1.3f, 0);
     public float    offsetAngle     = 0.71762f, cameraSpeed = 0.5f, tiltSpeed = 0.5f;
@@ -17,12 +18,14 @@ public class CameraController : MonoBehaviour
     private float m_invCameraSpeed, m_boxsize, m_sphereRadius;
     private bool  m_isMovingUpDown = false;
     private float m_upOff, m_dirOff;
+    private Animator m_anim;
 
     #endregion
 
     void Start()
     {
         m_pc = player.GetComponent<PlayerController>();
+        m_gc = game.GetComponent<GameController>();
 
         transform.position = player.transform.position + offset;
         transform.LookAt(player.transform.position + offsetAngle * m_pc.world_up); 
@@ -33,6 +36,36 @@ public class CameraController : MonoBehaviour
 
         m_upOff  = Mathf.Abs(offset.getComponent(m_pc.world_up));
         m_dirOff = Mathf.Abs(offset.getComponent(m_pc.world_direction));
+
+        m_anim   = gameObject.GetComponent<Animator>();
+        StartCoroutine(PlayIntro());
+    }
+
+    /**
+     * Plays an intro animation. During this time @isMoving is set to true to avoid camera movements.
+     */
+    public IEnumerator PlayIntro()
+    {
+        isMoving       = true;
+        m_anim.enabled = true;
+
+        m_anim.Play("CameraIntro");
+        float animLength = m_anim.runtimeAnimatorController.animationClips[0].length;
+
+        yield return new WaitForSeconds(animLength);
+
+        isMoving       = false;
+        m_anim.enabled = false;
+    }
+
+    public void ResetCamera()
+    {
+        offset             = m_gc.startUp * m_upOff - m_gc.startDir * m_dirOff;
+        transform.position = m_gc.startPosPlayer + offset;
+
+        transform.LookAt(m_gc.startPosPlayer + offsetAngle * m_gc.startUp);
+
+        StartCoroutine(PlayIntro());
     }
 
     void LateUpdate()

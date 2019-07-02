@@ -38,6 +38,6 @@ public class PickUpController : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         gameObject.SetActive(false);
-        m_gc.Score(value);
+        m_gc.Score(value, gameObject);
     }
 }
