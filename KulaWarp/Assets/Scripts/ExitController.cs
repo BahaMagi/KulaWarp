@@ -18,7 +18,7 @@ public class ExitController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (m_isActivated) m_gc.WinLevel();
+        if (m_isActivated) StartCoroutine(m_gc.WinLevel());
     }
 
     public void Activate(bool activated)

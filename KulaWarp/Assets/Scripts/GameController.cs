@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
+    public GameObject crystalImgBnWPrefab;
     public GameObject player;
     public GameObject mainCamera;
     public GameObject exit;
+    public GameObject UI;
 
     private CameraController m_cc;
     private PlayerController m_pc;
     private ExitController   m_ec;
+    private UIController     m_uic;
 
     private int   m_score, m_totalScore, m_keyCount;
     private float m_curTime;
@@ -28,9 +32,10 @@ public class GameController : MonoBehaviour
         m_totalScore = 0; // @TODO this has to be saved/loaded. 
         m_curTime    = 0;
 
-        m_cc = mainCamera.GetComponent<CameraController>();
-        m_pc = player.GetComponent<PlayerController>();
-        m_ec = exit.GetComponent<ExitController>();
+        m_cc  = mainCamera.GetComponent<CameraController>();
+        m_pc  = player.GetComponent<PlayerController>();
+        m_ec  = exit.GetComponent<ExitController>();
+        m_uic = UI.GetComponent<UIController>();
 
         Physics.gravity = -9.81f * startUp;
 
@@ -62,12 +67,23 @@ public class GameController : MonoBehaviour
 
     }
 
-    public void WinLevel()
+    public IEnumerator WinLevel()
     {
         player.SetActive(false);
         m_cc.isMoving = true;
         mainCamera.transform.position = new Vector3(1.5f, 6.5f, -6);
         mainCamera.transform.rotation = Quaternion.Euler(54, 0, 0);
+
+        yield return new WaitForSeconds(3.0f);
+
+#if UNITY_EDITOR
+        // Application.Quit() does not work in the editor so
+        // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+         Application.Quit();
+#endif
+
     }
 
     public void Score(int points, GameObject o)
@@ -80,6 +96,7 @@ public class GameController : MonoBehaviour
     {
         m_keyCount++;
         m_deactivatedPickUps.Push(o);
+        m_uic.ColorCrystal();
 
         if (m_keyCount >= targetCrystalCount)
         {
