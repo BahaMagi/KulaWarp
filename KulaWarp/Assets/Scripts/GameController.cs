@@ -38,6 +38,7 @@ public class GameController : MonoBehaviour
         m_totalScore    = 0; // @TODO this has to be saved/loaded. 
         m_curTime       = 0;
         Physics.gravity = -9.81f * startUp;
+        Time.timeScale = 1.0f;
 
         LoadComponents();
 
@@ -116,6 +117,7 @@ public class GameController : MonoBehaviour
         // Back to main menue without saving. Arcade Mode can be continued from the last "big save". 
         // Auto-Save after each level, but "big saves" after each 10 levels or so. 
         // Having played a level in Arcade Mode unlocks it for single level game mode. 
+        SceneManager.LoadScene(0);
     }
 
     public IEnumerator WinLevel() // @TODO load next level. 
@@ -132,7 +134,7 @@ public class GameController : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(3.0f); // @TODO Score screen in this time and continue on button press
 
-        Quit(); // @TODO make next level load here
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     public void Score(int points, GameObject o)
