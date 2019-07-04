@@ -13,14 +13,15 @@ public class HUDController : MonoBehaviour
     public GameObject crystalImgPrefab; // The prefab that holds the UI.Image component of the black and white crystal
     public Sprite     crystalImgColor; // The sprite (= image file) of the colored crystal. 
     public Sprite     crystalImgBnW; // The sprite (= image file) of the black and white crystal. 
-    public GameObject scoreTMP;
+    public GameObject scoreTMP, timeTMP;
 
-    private TextMeshProUGUI m_text;
+    private TextMeshProUGUI m_scoreText, m_timeText;
+
+    private float m_timeLimit, m_curTime;
 
     private List<GameObject> m_crystals;
     #endregion
 
-    // Start is called before the first frame update
     void Awake()
     {
         LoadComponents();
@@ -32,12 +33,28 @@ public class HUDController : MonoBehaviour
             m_crystals.Add(Instantiate(crystalImgPrefab, Vector3.zero, Quaternion.identity));
             m_crystals[i].transform.SetParent(transform.GetChild(0).transform, false);
         }
+
+        m_curTime = 0.0f; // @TODO Sync this with the GameController to allow the hourglass time to start later in time
+        m_timeLimit = m_gc.timeLimit;
     }
 
     void LoadComponents()
     {
-        m_gc   = game.GetComponent<GameController>();
-        m_text = scoreTMP.GetComponent<TextMeshProUGUI>();
+        m_gc        = game.GetComponent<GameController>();
+        m_scoreText = scoreTMP.GetComponent<TextMeshProUGUI>();
+        m_timeText  = timeTMP.GetComponent<TextMeshProUGUI>();
+    }
+
+    void Update()
+    {
+        DisplayTime();
+
+        m_curTime += Time.deltaTime;
+    }
+
+    void DisplayTime()
+    {
+        m_timeText.text = (int)((m_timeLimit - m_curTime) / 60) + ":" + (int)(m_timeLimit - m_curTime) % 60;
     }
 
     public void ColorCrystal() // @TODO make this work for spending crystals as well. 
@@ -47,6 +64,6 @@ public class HUDController : MonoBehaviour
 
     public void Score(int score)
     {
-        m_text.text = "Score: " + score.ToString("000000");
+        m_scoreText.text = "Score: " + score.ToString("000000");
     }
 }
