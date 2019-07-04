@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -90,14 +90,7 @@ public class GameController : MonoBehaviour
 
     public void Quit()
     {
-        // @TODO Temp solution for testing in the editor until the game has a menu
-#if UNITY_EDITOR
-        // Application.Quit() does not work in the editor so
-        // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-         Application.Quit();
-#endif
+        SceneManager.LoadScene(0); // @TODO make the MainMenu index a variable somewhere
     }
 
     /**
