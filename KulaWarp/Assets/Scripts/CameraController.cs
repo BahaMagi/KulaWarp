@@ -16,9 +16,9 @@ public class CameraController : MonoBehaviour
     public Vector3  offset      = new Vector3(-1.6f, 1.3f, 0);
     public float    offsetAngle = 0.71762f, cameraSpeed = 0.5f, tiltSpeed = 0.5f;
 
-    private float m_invCameraSpeed, m_boxsize, m_sphereRadius;
-    private bool  m_isMovingUpDown = false;
-    private float m_upOff, m_dirOff;
+    private float    m_invCameraSpeed, m_boxsize, m_sphereRadius;
+    private bool     m_isMovingUpDown = false;
+    private float    m_upOff, m_dirOff;
     private Animator m_anim;
 
     #endregion
@@ -57,7 +57,7 @@ public class CameraController : MonoBehaviour
 
         // The methods that move the camera also take care of their placement and lookat for these frames.
         // So only do that here if the camera is not moving.
-        if (!(isMoving || m_isMovingUpDown))
+        if (!(isMoving || m_isMovingUpDown || m_gc.isPaused))
         {
             // The Idle Animation of the played causes a slight up and down when the play is not moving. So use the gridPos
             // rather than the real pos when moving the camera behind the player 
@@ -181,6 +181,17 @@ public class CameraController : MonoBehaviour
         transform.LookAt(m_gc.startPosPlayer + offsetAngle * m_gc.startUp);
 
         StartCoroutine(PlayIntro());
+    }
+
+    public void PauseCamera()
+    {
+        transform.position = new Vector3(1.5f, 6.5f, -6); // @TODO make this adjustable in the inspector
+        transform.rotation = Quaternion.Euler(54, 0, 0);
+    }
+
+    public void ResumeCamera()
+    {
+
     }
 
     // Currently only used for debuf outputs. 

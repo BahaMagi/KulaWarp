@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
     public GameObject mainCamera;
     public GameObject exit;
     public GameObject UI;
+    public GameObject pauseMenu;
 
     [HideInInspector] public CameraController m_cc;
     [HideInInspector] public PlayerController m_pc;
@@ -23,6 +24,8 @@ public class GameController : MonoBehaviour
     public Vector3 startPosPlayer, startUp, startDir;
     public int     targetCrystalCount = 1; // >= 0
     public float   timeLimit          = 120; // in Seconds
+
+    [HideInInspector] public bool isPaused = false; //@TODO quite some of these things could be made static. 
 
     private Stack<GameObject> m_deactivatedPickUps;
     #endregion
@@ -39,6 +42,8 @@ public class GameController : MonoBehaviour
         LoadComponents();
 
         m_deactivatedPickUps = new Stack<GameObject>();
+
+        pauseMenu.SetActive(false);
     }
 
     void LoadComponents()
@@ -54,7 +59,45 @@ public class GameController : MonoBehaviour
         if (m_totalScore < 0) GameOver();  // @TODO This should be checked only on death (i.e. when points are lost). 
         if (m_curTime > timeLimit) RestartLevel();
 
+        HandleInput();
+
         m_curTime += Time.deltaTime;
+    }
+
+    void HandleInput()
+    {
+        if (Input.GetButtonDown("Pause") &&  isPaused && !m_cc.isMoving && !m_pc.isMoving) Resume();
+        if (Input.GetButtonDown("Pause") && !isPaused && !m_cc.isMoving && !m_pc.isMoving) Pause();
+    }
+
+    public void Pause()
+    {
+        isPaused       = true;
+        Time.timeScale = 0.0f;
+
+        m_cc.PauseCamera();
+        pauseMenu.SetActive(true);
+    }
+
+    public void Resume()
+    {
+        isPaused       = false;
+        Time.timeScale = 1.0f;
+
+        m_cc.ResumeCamera();
+        pauseMenu.SetActive(false);
+    }
+
+    public void Quit()
+    {
+        // @TODO Temp solution for testing in the editor until the game has a menu
+#if UNITY_EDITOR
+        // Application.Quit() does not work in the editor so
+        // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+         Application.Quit();
+#endif
     }
 
     /**
@@ -88,20 +131,15 @@ public class GameController : MonoBehaviour
         player.SetActive(false);
         m_cc.isMoving = true;
 
+        // Stop time
+        Time.timeScale = 0f;
+
         // Set a pose for the camera as background for the score screen. 
-        mainCamera.transform.position = new Vector3(1.5f, 6.5f, -6); // @TODO make this adjustable in the inspector
-        mainCamera.transform.rotation = Quaternion.Euler(54, 0, 0);
+        m_cc.PauseCamera();
 
-        yield return new WaitForSeconds(3.0f); // @TODO Score screen in this time and continue on button press
+        yield return new WaitForSecondsRealtime(3.0f); // @TODO Score screen in this time and continue on button press
 
-        // @TODO Temp solution for testing in the editor until the game has a menu
-#if UNITY_EDITOR
-        // Application.Quit() does not work in the editor so
-        // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-         Application.Quit();
-#endif
+        Quit(); // @TODO make next level load here
     }
 
     public void Score(int points, GameObject o)
