@@ -11,6 +11,9 @@
 # file on crash reports
 sysinfo.txt
 
+# TextMesh Pro files
+*/[Aa]ssets/TextMesh*Pro/
+
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
 
@@ -18,9 +21,6 @@ sysinfo.txt
 *.pidb.meta
 *.pdb.meta
 *.mdb.meta
-
-# TextMesh Pro files
-[Aa]ssets/TextMesh*Pro/
 
 # Visual Studio cache directory
 .vs/

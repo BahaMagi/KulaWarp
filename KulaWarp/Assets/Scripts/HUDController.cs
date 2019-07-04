@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class HUDController : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class HUDController : MonoBehaviour
     public GameObject crystalImgPrefab; // The prefab that holds the UI.Image component of the black and white crystal
     public Sprite     crystalImgColor; // The sprite (= image file) of the colored crystal. 
     public Sprite     crystalImgBnW; // The sprite (= image file) of the black and white crystal. 
+    public GameObject scoreTMP;
+
+    private TextMeshProUGUI m_text;
 
     private List<GameObject> m_crystals;
     #endregion
@@ -32,11 +36,17 @@ public class HUDController : MonoBehaviour
 
     void LoadComponents()
     {
-        m_gc = game.GetComponent<GameController>();
+        m_gc   = game.GetComponent<GameController>();
+        m_text = scoreTMP.GetComponent<TextMeshProUGUI>();
     }
 
-    public void ColorCrystal() // @TODO make this work for spending keys as well. 
+    public void ColorCrystal() // @TODO make this work for spending crystals as well. 
     {
-        m_crystals[m_gc.getKeyCount() - 1].GetComponent<Image>().sprite = crystalImgColor;
+        m_crystals[m_gc.getCrystalCount() - 1].GetComponent<Image>().sprite = crystalImgColor;
+    }
+
+    public void Score(int score)
+    {
+        m_text.text = "Score: " + score.ToString("000000");
     }
 }

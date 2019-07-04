@@ -107,6 +107,7 @@ public class GameController : MonoBehaviour
     public void Score(int points, GameObject o)
     {
         m_score += points;
+        m_uic.Score(m_score);
         m_deactivatedPickUps.Push(o);
     }
 
@@ -126,7 +127,7 @@ public class GameController : MonoBehaviour
         else                                      m_ec.Activate(false);
     }
 
-    public int getKeyCount()
+    public int getCrystalCount()
     {
         return m_crystalCount;
     }
