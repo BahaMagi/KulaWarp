@@ -4,40 +4,51 @@ using UnityEngine;
 
 public class PickUpController : MonoBehaviour
 {
-    public  GameObject     gameController; 
-    private GameController m_gc;
+    #region
+    public  GameObject     gameController;
 
-    public float rotAngle = 45.0f;
-    public int value = 100;
-    [HideInInspector] public Vector3 up;
+    protected GameController m_gc;
 
-    private float m_time = 0.0f;
+    public float rotSpeed   = 45.0f; // Speed of the rotation in angle / sec 
+    public float hoverSpeed = 2.0f, hoverAmount = 0.01f; // Up/down cylces / sec and distance in units from center of the pickup. 
+    public int scoreValue   = 100; //Point value of this pickup.
+    public Vector3 up       = Vector3.up; // The up vector for a pick up has to be specified as depending on the position this could otherwise be ambiguous. 
 
-    void Start()
+    protected float m_time = 0.0f;
+    protected Vector3 m_idlePos;
+    #endregion
+
+    protected void Start()
     {
-        up     = Vector3.up;
+        // Initialize the animations randomly to have each pickup start the animation at a different point.
+        m_idlePos = transform.position;
         m_time = Random.Range(0, 6);
         transform.Rotate(new Vector3(0, Random.Range(0, 180), 0));
 
+        LoadComponents();
+    }
+
+    protected void LoadComponents()
+    {
         m_gc = gameController.GetComponent<GameController>();
     }
 
-    void Update()
+    protected void Update()
     {
         AnimObject();
     }
 
-    void AnimObject()
+    protected void AnimObject()
     {
-        transform.Rotate(new Vector3(0, rotAngle, 0) * Time.deltaTime);
-        transform.position = transform.position + up * Mathf.Sin(2.0f*m_time) *0.001f;
-        m_time = m_time + Time.deltaTime;
-        m_time = m_time <= 2 * Mathf.PI ? m_time : 0;
+        transform.Rotate(up * rotSpeed * Time.deltaTime);
+        transform.position = m_idlePos + up * Mathf.Sin(hoverSpeed * m_time) * hoverAmount;
+
+        m_time += Time.deltaTime;
     }
 
-    void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         gameObject.SetActive(false);
-        m_gc.Score(value, gameObject);
+        m_gc.Score(scoreValue, gameObject);
     }
 }

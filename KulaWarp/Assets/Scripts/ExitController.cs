@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class ExitController : MonoBehaviour
 {
-    public GameObject game;
+    public  GameObject game;
+
     private GameController m_gc;
 
     private bool m_isActivated;
@@ -13,6 +14,11 @@ public class ExitController : MonoBehaviour
     {
         m_isActivated = false;
 
+        LoadComponents();
+    }
+
+    void LoadComponents()
+    {
         m_gc = game.GetComponent<GameController>();
     }
 
@@ -24,5 +30,7 @@ public class ExitController : MonoBehaviour
     public void Activate(bool activated)
     {
         m_isActivated = activated;
+        if (m_isActivated) gameObject.GetComponent<Renderer>().material.color = Color.green;
+        else               gameObject.GetComponent<Renderer>().material.color = Color.red;
     }
 }

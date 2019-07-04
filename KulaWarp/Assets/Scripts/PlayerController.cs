@@ -11,7 +11,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     #region
-    public GameObject mainCamera, player_sphere, game;
+    public GameObject player_sphere, game;
 
     public float speed        = 5f; // Maximum speed of the player
     public float easeInTime   = 0.02f; // Dampening strength of the EaseIn. 
@@ -35,16 +35,18 @@ public class PlayerController : MonoBehaviour
     private int         m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
 
     #endregion
+    public void ResetPlayer()
+    {
+        world_up           = m_gc.startUp;
+        world_direction    = m_gc.startDir;
+        transform.position = m_gc.startPosPlayer;
+    }
 
     void Start()
     {
         isMoving        = false;
 
-        m_sphereCollider_player = player_sphere.GetComponent<SphereCollider>();
-        m_rb                    = GetComponent<Rigidbody>();
-        m_cc                    = mainCamera.GetComponent<CameraController>();
-        m_animator              = GetComponent<Animator>();
-        m_gc                    = game.GetComponent<GameController>();
+        LoadComponents();
 
         m_isMoving_Param_ID = Animator.StringToHash("isMoving"); // @TODO Check if there is another way of doing this that is not string search based. 
 
@@ -60,11 +62,13 @@ public class PlayerController : MonoBehaviour
         world_direction = m_gc.startDir;
     }
 
-    public void ResetPlayer()
+    void LoadComponents()
     {
-        world_up           = m_gc.startUp;
-        world_direction    = m_gc.startDir;
-        transform.position = m_gc.startPosPlayer;
+        m_gc                    = game.GetComponent<GameController>();
+        m_sphereCollider_player = player_sphere.GetComponent<SphereCollider>();
+        m_rb                    = GetComponent<Rigidbody>();
+        m_cc                    = m_gc.mainCamera.GetComponent<CameraController>();
+        m_animator              = GetComponent<Animator>();
     }
 
     void FixedUpdate()
@@ -75,7 +79,7 @@ public class PlayerController : MonoBehaviour
             AttemptMove();
     }
 
-    protected int HandleInput()
+    int HandleInput()
     {
         return (int)(Input.GetAxisRaw("Vertical")); // For keyboard input this is in {-1, 0, 1} 
     }
@@ -84,18 +88,15 @@ public class PlayerController : MonoBehaviour
      * Checks if the player can move forwards and based on the topology of the level decides to go 
      * forwards or downwards. For more infromation see @CanMove()
      */
-    protected void AttemptMove()
+    void AttemptMove()
     {
         bool canMove = CanMove(out int nextBlockLevel);
 
         if (!canMove) return;
 
-        if (isMoving)
-        {
-            if(nextBlockLevel == 0) setTarget(nextBlockLevel);
-            return;
-        }
-        else setTarget(nextBlockLevel);
+        setTarget(nextBlockLevel);
+
+        if (isMoving) return;
 
         switch (nextBlockLevel)
         {
@@ -111,10 +112,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    protected void setTarget(int nextBlockLevel)
+    void setTarget(int nextBlockLevel)
     {
-        Vector3 pos = transform.position;
-        m_targetPosition = SnapToGridAll(pos);
+        Vector3 pos       = transform.position;
+        m_targetPosition  = SnapToGridAll(pos);
         m_targetPosition += world_direction * ((nextBlockLevel == -1) ? 0.5f : 1.0f);
     }
 
@@ -125,7 +126,7 @@ public class PlayerController : MonoBehaviour
      * 
      * The 
      */
-    protected IEnumerator MoveForwards()
+    IEnumerator MoveForwards()
     {
         setisMoving(true);
 
@@ -168,7 +169,7 @@ public class PlayerController : MonoBehaviour
     * 2) Rotate 90° around that edge.
     * 3) Move to the center of that new face of the box. 
     */
-    protected IEnumerator MoveDownwards() //@TODO Try at some point to put this into MoveForwards like MoveUpwards
+    IEnumerator MoveDownwards() //@TODO Try at some point to put this into MoveForwards like MoveUpwards
     {
         setisMoving(true); 
 
@@ -221,18 +222,18 @@ public class PlayerController : MonoBehaviour
         Physics.gravity = -9.81f * world_up;
         m_rb.useGravity = true;
 
-        m_targetPosition = SnapToGridAll(transform.position+0.5f * world_direction);
+        m_targetPosition    = SnapToGridAll(transform.position+0.5f * world_direction);
         m_remainingDistance = (m_targetPosition - startPosition).sqrMagnitude;
         
         // Finish of the movement by moving forwards to the new target. 
         StartCoroutine(MoveForwards());
     }
 
-    protected void MoveUpwards()
+    void MoveUpwards()
     {
         Physics.gravity = 9.81f * world_direction;
 
-        m_targetPosition      = m_targetPosition - world_direction * (0.5f * m_boxsize + m_sphereRadius) + world_up * (-m_sphereRadius + 0.5f * m_boxsize);
+        m_targetPosition    = m_targetPosition - world_direction * (0.5f * m_boxsize + m_sphereRadius) + world_up * (-m_sphereRadius + 0.5f * m_boxsize);
         m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
 
         Vector3 tmp     = world_up;
@@ -245,7 +246,7 @@ public class PlayerController : MonoBehaviour
     /**
      * Rotates the player sphere according to its current position in world space according to the world direction.
      */
-    protected void RotatePlayerSphere()
+    void RotatePlayerSphere()
     {
         float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
         float dTheta      = targetTheta - m_RotationAngles.getComponent(world_direction);
@@ -266,7 +267,7 @@ public class PlayerController : MonoBehaviour
      *
      * Also, the player is restriced to only move when the camera is not rotating. 
      */
-    protected bool CanMove(out int nextBlockLevel, int distance = 1)
+    bool CanMove(out int nextBlockLevel, int distance = 1)
     {
         float l = 1.5f; // length of the rays sent.
 
@@ -275,10 +276,10 @@ public class PlayerController : MonoBehaviour
 
         // Check the front first. Any hit allows us to move.
         // This covers both forward and forward-up movement.
-        Vector3  frontDown = world_direction - world_up;
         RaycastHit hitFront;
-        bool isHitFront = Physics.Raycast(origin, frontDown, out hitFront, l, m_envLayerMask);
-        nextBlockLevel = isHitFront ? hitFront.distance < 1 ? 1 : 0 : -1;
+        Vector3 frontDown = world_direction - world_up;
+        bool isHitFront   = Physics.Raycast(origin, frontDown, out hitFront, l, m_envLayerMask);
+        nextBlockLevel    = isHitFront ? hitFront.distance < 1 ? 1 : 0 : -1;
 
         // The player can't start moving until the previous movement is finished.
         if (m_cc.isMoving) return false;
@@ -301,11 +302,16 @@ public class PlayerController : MonoBehaviour
     /**
      * Triger sounds and animations when the player is asked to move without valid move. 
      */
-    protected void OnCantMove()
+    void OnCantMove()
     {
+        //@TODO Play OnCan't Move Animation if the player is not moving but asked to move in a direction it cannot.
     }
 
-    protected void setisMoving(bool moving)
+    /**
+     * The isMoving trigger for the idle animation has to be set together with the @isMoving 
+     * variable of this class.
+     */
+    void setisMoving(bool moving)
     {
         isMoving = moving;
         m_animator.SetBool(m_isMoving_Param_ID, moving);
@@ -317,12 +323,12 @@ public class PlayerController : MonoBehaviour
      * This is mainly necessary because the Idle animation introduces small numerical changes in the
      * up component. To avoid jumping of the ball this has to be countered. 
      */
-    private Vector3 SnapToGridY(Vector3 vec)
+    Vector3 SnapToGridY(Vector3 vec)
     {
         return vec.Round(world_up) - (m_boxsize * 0.5f - m_sphereRadius) * world_up;
     }
 
-    private Vector3 SnapToGridAll(Vector3 vec)
+    Vector3 SnapToGridAll(Vector3 vec)
     {
         return vec.Round(Vector3.one) - (m_boxsize * 0.5f - m_sphereRadius) * world_up;
     }
@@ -339,11 +345,11 @@ public class PlayerController : MonoBehaviour
         // Gray: can move front
 
         Vector3 origin = transform.position + (1 - m_sphereRadius) * world_up;
-        Debug.DrawRay(origin, (1.1f*(world_direction - world_up)), Color.grey);
-        Debug.DrawRay(transform.position, world_up, Color.cyan);
-        Debug.DrawRay(transform.position, m_targetPosition - transform.position, Color.red);
-        Debug.DrawRay(transform.position, Physics.gravity, Color.green);
-        Debug.DrawRay(transform.position- 0.1f * world_up, world_direction, Color.white);
-        Debug.DrawRay(transform.position, world_direction * m_sphereRadius * 1.1f, Color.blue);
+        //Debug.DrawRay(origin, (1.1f*(world_direction - world_up)), Color.grey);
+        //Debug.DrawRay(transform.position, world_up, Color.cyan);
+        //Debug.DrawRay(transform.position, m_targetPosition - transform.position, Color.red);
+        //Debug.DrawRay(transform.position, Physics.gravity, Color.green);
+        //Debug.DrawRay(transform.position- 0.1f * world_up, world_direction, Color.white);
+        //Debug.DrawRay(transform.position, world_direction * m_sphereRadius * 1.1f, Color.blue);
     }
 }
