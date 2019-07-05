@@ -285,11 +285,38 @@ public class PlayerController : MonoBehaviour
 
         if (isMoving || (int)(Input.GetAxisRaw("Vertical")) == 1)
         {
-            //isWarping = true;
+            if (isMoving)
+            {
+                StopCoroutine(MoveForwards());
+                StopCoroutine(MoveDownwards());
+            }
 
-            //m_animator.SetTrigger(m_warp_trigger_ID);
+            isWarping             = true;
+            m_rb.useGravity       = false;
+            m_rb.detectCollisions = false;
 
-            yield break;
+            m_animator.SetTrigger(m_warp_trigger_ID);
+
+            float t = 0.0f;
+            Vector3 startPosition = transform.position;
+            m_targetPosition      = SnapToGridAll(startPosition);
+            m_targetPosition     += world_direction * 2.0f;
+
+            while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("FadeIn"))
+            {
+                m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out bool arrived, t, easeInTime, speed));
+                m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
+                t += Time.deltaTime;
+
+                // RotatePlayerSphere(); // @TODO Should the sphere rotate while warping?
+                yield return null;
+            }
+            transform.position = m_targetPosition;
+
+            isWarping             = false;
+            isMoving              = false;
+            m_rb.useGravity       = true;
+            m_rb.detectCollisions = true;
         }
         else
         {
@@ -348,7 +375,7 @@ public class PlayerController : MonoBehaviour
         nextBlockLevel    = isHitFront ? hitFront.distance < 1 ? 1 : 0 : -1;
 
         // The player can't start moving until the previous movement is finished.
-        if (m_cc.isMoving) return false;
+        if (isWarping || isFalling || m_cc.isMoving) return false;
 
         // If there is something in front it is always possible to move. 
         if (isHitFront) return true;
@@ -367,6 +394,8 @@ public class PlayerController : MonoBehaviour
 
     bool CanWarp()
     {
+        if (isWarping || isFalling || m_cc.isMoving) return false;
+
         // If the player is moving or forward is pressed when the player cannot move,
         // check two blocks in front of the player. 
         // The order of the hit items in the array is NOT guaranteed. So all have to be checked.
