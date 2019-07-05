@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public float easeInTime   = 0.02f; // Dampening strength of the EaseIn. 
 
     [HideInInspector] public Vector3 world_direction, world_up; // Current World and Camera forwarwards/up direction
-    [HideInInspector] public bool    isMoving;
+    [HideInInspector] public bool    isMoving, isWarping, isFalling;
 
     private SphereCollider   m_sphereCollider_player;
     private Rigidbody        m_rb;
@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     private GameController   m_gc;
 
     private int m_isMoving_Param_ID; // ID for parameter that triggers Idle -> Moving transition in animator. 
+    private int m_warp_trigger_ID;
 
     private Vector3     m_RotationAngles; // Stores the current rotation angles of the sphere in world axis coordinates
     private Vector3     m_targetPosition;
@@ -44,11 +45,12 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        isMoving        = false;
+        isMoving = false; isWarping = false; isFalling = false;
 
         LoadComponents();
 
         m_isMoving_Param_ID = Animator.StringToHash("isMoving"); // @TODO Check if there is another way of doing this that is not string search based. 
+        m_warp_trigger_ID   = Animator.StringToHash("warp");
 
         m_sphereRadius  = m_sphereCollider_player.radius * player_sphere.transform.lossyScale.x;
         m_circum        = 2 * Mathf.PI * m_sphereRadius;
@@ -73,14 +75,29 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        // Check whether the player is falling and for nearing impacts. 
+        CheckForImpact();
+
         int input = HandleInput();
 
         if (input == 1)
             AttemptMove();
+        else if (input == 2)
+            StartCoroutine(Warp());
     }
 
+    /**
+     * Returns an int which represents the input.
+     * 0 : no input -> no movement
+     * 1 : Forward was pressed -> rolling
+     * -1: Backwards was pressed -> not used here
+     * 2 : Jump was pressed -> warp
+     */
     int HandleInput()
     {
+        if (Input.GetButtonDown("Jump"))
+            return 2;
+
         return (int)(Input.GetAxisRaw("Vertical")); // For keyboard input this is in {-1, 0, 1} 
     }
 
@@ -120,6 +137,22 @@ public class PlayerController : MonoBehaviour
         Vector3 pos       = transform.position;
         m_targetPosition  = SnapToGridAll(pos);
         m_targetPosition += world_direction * ((nextBlockLevel == -1) ? 0.5f : 1.0f);
+    }
+
+    void CheckForImpact()
+    {
+        // Check with a ray cast whether the sphere is in the air.
+        Ray checkDown = new Ray(transform.position, -world_up);
+        bool hit = Physics.Raycast(checkDown, m_sphereRadius * 2.0f, m_envLayerMask);
+        if (!isFalling) isFalling = !hit;
+        else
+        {
+            if (hit)
+            {
+                isFalling = false;
+                m_animator.SetTrigger("impact");
+            }
+        }
     }
 
     /**
@@ -246,6 +279,36 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(m_cc.CameraUpDown(1));
     }
 
+    IEnumerator Warp()
+    {
+        if (!CanWarp()) yield break;
+
+        if (isMoving || (int)(Input.GetAxisRaw("Vertical")) == 1)
+        {
+            //isWarping = true;
+
+            //m_animator.SetTrigger(m_warp_trigger_ID);
+
+            yield break;
+        }
+        else
+        {
+            isWarping = true;
+
+            m_animator.SetTrigger(m_warp_trigger_ID);
+
+            while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("FadeIn")) yield return null; //@TODO get the ID 
+
+            m_rb.useGravity = false;
+            transform.position += 2.0f * world_up;
+
+            yield return new WaitForSeconds(0.3f); //@TODO make this time a public var to be adjustable as "hover time"
+
+            m_rb.useGravity = true;
+            isWarping = false;
+        }
+    }
+
     /**
      * Rotates the player sphere according to its current position in world space according to the world direction.
      */
@@ -300,6 +363,39 @@ public class PlayerController : MonoBehaviour
         bool isHitRight   = Physics.Raycast(origin, rightDown, l, m_envLayerMask);
 
         return !isHitLeft && !isHitRight;
+    }
+
+    bool CanWarp()
+    {
+        // If the player is moving or forward is pressed when the player cannot move,
+        // check two blocks in front of the player. 
+        // The order of the hit items in the array is NOT guaranteed. So all have to be checked.
+        // Also, only entry points are registered, no exit points. 
+        // As such, if there is one further away than one box size it can only mean there is 
+        // is box at the target 
+        if (isMoving || (int)(Input.GetAxisRaw("Vertical")) == 1)
+        {
+            RaycastHit[] raycasthits;
+            raycasthits = Physics.RaycastAll(transform.position, world_direction, 2.0f, m_envLayerMask);
+
+            if (raycasthits.Length > 0) // Something was hit
+                for (int i = 0; i < raycasthits.Length; i++) // Check all hits
+                    if (raycasthits[i].distance > m_boxsize) return false;
+
+            return true;
+        }
+        else // If the player is not moving and nothing is pressed, check 2 blocks above the player. 
+        {
+            RaycastHit[] raycasthits;
+            float rayLength = 2.0f + 0.5f - m_sphereRadius;
+            raycasthits = Physics.RaycastAll(transform.position, world_up, rayLength, m_envLayerMask);
+
+            if (raycasthits.Length > 0) // Something was hit
+                for (int i = 0; i < raycasthits.Length; i++) // Check all hits
+                    if (raycasthits[i].distance > m_boxsize) return false;
+
+            return true;
+        }
     }
 
     /**
