@@ -94,9 +94,12 @@ public class PlayerController : MonoBehaviour
 
         if (!canMove) return;
 
-        setTarget(nextBlockLevel);
-
-        if (isMoving) return;
+        if (isMoving)
+        {
+            if (nextBlockLevel >= 0) setTarget(nextBlockLevel);
+            return;
+        }
+        else setTarget(nextBlockLevel);
 
         switch (nextBlockLevel)
         {
