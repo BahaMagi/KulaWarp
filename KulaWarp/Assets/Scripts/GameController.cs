@@ -94,6 +94,12 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene(0); // @TODO make the MainMenu index a variable somewhere
     }
 
+    public void PlayerDie()
+    {
+        // @TODO death animations are lacking here 
+        RestartLevel();
+    }
+
     /**
      * When the level is reset, e.g. due to death, reset the camera, player and game variables.
      */
