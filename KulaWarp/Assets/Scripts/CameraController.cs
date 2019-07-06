@@ -61,7 +61,7 @@ public class CameraController : MonoBehaviour
         {
             // The Idle Animation of the played causes a slight up and down when the play is not moving. So use the gridPos
             // rather than the real pos when moving the camera behind the player 
-            Vector3 gridPos    = SnapToGrid(player.transform.position);
+            Vector3 gridPos    = m_pc.isFalling ? player.transform.position : SnapToGrid(player.transform.position);
             transform.position = gridPos + offset;
 
             // Look in the direction of the player at a point <offsetAngle> units above (w/r to the world up vector) the center of the player. 

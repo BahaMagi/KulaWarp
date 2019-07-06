@@ -666,7 +666,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 2.296e-41, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: -8.796361e+12, y: 1048576.4, z: -1.7014118e+38, w: 2.5243547e-29}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -848,7 +848,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: -1.14e-43, y: 0, z: 0, w: 2.1e-44}
+  m_BoundingSphereOverride: {x: -1.14e-42, y: 6.6e-44, z: 1.1e-44, w: 1.4e-44}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -1155,6 +1155,8 @@ MonoBehaviour:
   world_direction: {x: 0, y: 0, z: 0}
   world_up: {x: 0, y: 0, z: 0}
   isMoving: 0
+  isWarping: 0
+  isFalling: 0
 --- !u!54 &1115407147
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1775,6 +1777,11 @@ PrefabInstance:
       propertyPath: game
       value: 
       objectReference: {fileID: 137166317}
+    - target: {fileID: 7654617910894864529, guid: 9e015a55e43877b46859c824f0e126cc,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e015a55e43877b46859c824f0e126cc, type: 3}
 --- !u!1001 &3764660698748568161

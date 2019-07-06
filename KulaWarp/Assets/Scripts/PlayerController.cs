@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     private CameraController m_cc;
     private GameController   m_gc;
 
+    private Coroutine moveForwards, moveDownwards;
+
     private int m_isMoving_Param_ID; // ID for parameter that triggers Idle -> Moving transition in animator. 
     private int m_warp_trigger_ID;
 
@@ -34,6 +36,7 @@ public class PlayerController : MonoBehaviour
     private float       m_sphereRadius, m_boxsize; // Radius of the player sphere and environment box size. 
     private float       m_circum,       m_rotConst; // Circumference of player sphere and precomputed constant to speed up computation
     private int         m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
+    private bool        m_inPhase2 = false;
 
     #endregion
     public void ResetPlayer()
@@ -95,7 +98,7 @@ public class PlayerController : MonoBehaviour
      */
     int HandleInput()
     {
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButton("Jump"))
             return 2;
 
         return (int)(Input.GetAxisRaw("Vertical")); // For keyboard input this is in {-1, 0, 1} 
@@ -121,11 +124,11 @@ public class PlayerController : MonoBehaviour
         switch (nextBlockLevel)
         {
             case -1:
-                StartCoroutine(MoveDownwards());
+                moveDownwards = StartCoroutine(MoveDownwards());
                 break;
             case 0:
             case 1:
-                StartCoroutine(MoveForwards());
+                moveForwards = StartCoroutine(MoveForwards());
                 break;
             default:
                 break;
@@ -142,17 +145,15 @@ public class PlayerController : MonoBehaviour
     void CheckForImpact()
     {
         // Check with a ray cast whether the sphere is in the air.
-        Ray checkDown = new Ray(transform.position, -world_up);
-        bool hit = Physics.Raycast(checkDown, m_sphereRadius * 2.0f, m_envLayerMask);
+        bool hit = Physics.Raycast(transform.position, -world_up, m_sphereRadius * 2.0f, m_envLayerMask);
+
         if (!isFalling) isFalling = !hit;
         else
-        {
             if (hit)
             {
                 isFalling = false;
                 m_animator.SetTrigger("impact");
             }
-        }
     }
 
     /**
@@ -164,7 +165,7 @@ public class PlayerController : MonoBehaviour
      */
     IEnumerator MoveForwards()
     {
-        setisMoving(true);
+        SetisMoving(true);
 
         Vector3 startPosition = transform.position;
         m_remainingDistance   = (m_targetPosition - startPosition).sqrMagnitude;
@@ -194,7 +195,7 @@ public class PlayerController : MonoBehaviour
 
         // In case MoveUpwards was called the parent player object needs to be reoriented. 
         transform.rotation = Quaternion.FromToRotation(Vector3.up, world_up);
-        setisMoving(false);
+        SetisMoving(false);
     }
 
     /**
@@ -207,7 +208,7 @@ public class PlayerController : MonoBehaviour
     */
     IEnumerator MoveDownwards() //@TODO Try at some point to put this into MoveForwards like MoveUpwards
     {
-        setisMoving(true); 
+        SetisMoving(true); 
 
         // Phase 1: Move to the edge of the box.
         Vector3 startPosition = transform.position;
@@ -229,6 +230,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Phase 2: Rotate around the edge.
+        m_inPhase2 = true;
         t                  = 0.0f;
         float dt           = 0.0f;
         float angularSpeed = 90.0f * speed / (m_boxsize * 0.5f); // @TODO That 90 is arbitrary. Make this a public var so its editable from the inspector.
@@ -253,16 +255,17 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
-        // Phase 3: Move to the center of the face of the box. 
         // Turn gravity back on and change it to the new direction.
         Physics.gravity = -9.81f * world_up;
         m_rb.useGravity = true;
+        m_inPhase2      = false;
 
+        // Phase 3: Move to the center of the face of the box. 
         m_targetPosition    = SnapToGridAll(transform.position+0.5f * world_direction);
         m_remainingDistance = (m_targetPosition - startPosition).sqrMagnitude;
         
         // Finish of the movement by moving forwards to the new target. 
-        StartCoroutine(MoveForwards());
+        moveForwards = StartCoroutine(MoveForwards());
     }
 
     void MoveUpwards()
@@ -287,10 +290,10 @@ public class PlayerController : MonoBehaviour
         {
             if (isMoving)
             {
-                StopCoroutine(MoveForwards());
-                StopCoroutine(MoveDownwards());
+                if (moveForwards  != null) StopCoroutine(moveForwards);
+                if (moveDownwards != null) StopCoroutine(moveDownwards);
             }
-
+            
             isWarping             = true;
             m_rb.useGravity       = false;
             m_rb.detectCollisions = false;
@@ -302,19 +305,21 @@ public class PlayerController : MonoBehaviour
             m_targetPosition      = SnapToGridAll(startPosition);
             m_targetPosition     += world_direction * 2.0f;
 
-            while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("FadeIn"))
+            bool arrived = false;
+            while (!arrived)
             {
-                m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out bool arrived, t, easeInTime, speed));
+                m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed));
                 m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
                 t += Time.deltaTime;
 
-                // RotatePlayerSphere(); // @TODO Should the sphere rotate while warping?
+                RotatePlayerSphere();
+
                 yield return null;
             }
             transform.position = m_targetPosition;
 
+            SetisMoving(false);
             isWarping             = false;
-            isMoving              = false;
             m_rb.useGravity       = true;
             m_rb.detectCollisions = true;
         }
@@ -333,6 +338,16 @@ public class PlayerController : MonoBehaviour
 
             m_rb.useGravity = true;
             isWarping = false;
+        }
+
+        // If the player is falling without anything below wait for 2 seconds and test again (moving platform or 
+        // something might have appeared). If there is still nothing, trigger death by falling. 
+        if (isFalling)
+        {
+            if (!Physics.Raycast(transform.position, -world_up, 50.0f)) yield return new WaitForSeconds(1.5f);
+            else yield break;
+
+            if (!Physics.Raycast(transform.position, -world_up, 50.0f)) m_gc.PlayerDie();
         }
     }
 
@@ -394,7 +409,7 @@ public class PlayerController : MonoBehaviour
 
     bool CanWarp()
     {
-        if (isWarping || isFalling || m_cc.isMoving) return false;
+        if (isWarping || isFalling || m_cc.isMoving || m_inPhase2) return false;
 
         // If the player is moving or forward is pressed when the player cannot move,
         // check two blocks in front of the player. 
@@ -439,7 +454,7 @@ public class PlayerController : MonoBehaviour
      * The isMoving trigger for the idle animation has to be set together with the @isMoving 
      * variable of this class.
      */
-    void setisMoving(bool moving)
+    void SetisMoving(bool moving)
     {
         isMoving = moving;
         m_animator.SetBool(m_isMoving_Param_ID, moving);
