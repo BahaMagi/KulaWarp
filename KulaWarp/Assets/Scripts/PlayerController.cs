@@ -308,7 +308,7 @@ public class PlayerController : MonoBehaviour
             bool arrived = false;
             while (!arrived)
             {
-                m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed));
+                m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed*1.5f));
                 m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
                 t += Time.deltaTime;
 
@@ -317,6 +317,8 @@ public class PlayerController : MonoBehaviour
                 yield return null;
             }
             transform.position = m_targetPosition;
+
+            while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) yield return null;
 
             SetisMoving(false);
             isWarping             = false;
@@ -332,13 +334,17 @@ public class PlayerController : MonoBehaviour
             while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("FadeIn")) yield return null; //@TODO get the ID 
 
             m_rb.useGravity = false;
-            transform.position += 2.0f * world_up;
+            transform.position += world_up * (2.0f + 0.5f*m_boxsize - m_sphereRadius);
+            m_targetPosition = transform.position;
 
             yield return new WaitForSeconds(0.3f); //@TODO make this time a public var to be adjustable as "hover time"
 
             m_rb.useGravity = true;
             isWarping = false;
         }
+
+        // Check if the gravity axis has to change.
+        CheckforBoxAfterWarp();
 
         // If the player is falling without anything below wait for 2 seconds and test again (moving platform or 
         // something might have appeared). If there is still nothing, trigger death by falling. 
@@ -348,7 +354,37 @@ public class PlayerController : MonoBehaviour
             else yield break;
 
             if (!Physics.Raycast(transform.position, -world_up, 50.0f)) m_gc.PlayerDie();
+
+            yield break;
         }
+    }
+
+    /**
+     * After a Warp the gravity axis (and up and dir vector along with it) are set to a box close to the target
+     * of the warp. If there is none, the player just falls with the gravity as it was before the warp. 
+     * Order in which existance of boxes is checked is (relative to dir/up before the warp):
+     * -up -> dir -> dir X up -> up x dir -> -dir -> up
+     */
+    void CheckforBoxAfterWarp()
+    {
+        Vector3 origin = m_targetPosition;
+        if (     Physics.Raycast(origin, -world_up,        1.0f, m_envLayerMask)) SetGravityAfterWarp(-world_up);
+        else if (Physics.Raycast(origin, world_direction,  1.0f, m_envLayerMask)) SetGravityAfterWarp(world_direction);
+        else if (Physics.Raycast(origin, Vector3.Cross(world_direction, world_up), 1.0f, m_envLayerMask)) SetGravityAfterWarp(Vector3.Cross(world_direction, world_up));
+        else if (Physics.Raycast(origin, Vector3.Cross(world_up, world_direction), 1.0f, m_envLayerMask)) SetGravityAfterWarp(Vector3.Cross(world_up, world_direction));
+        else if (Physics.Raycast(origin, -world_direction, 1.0f, m_envLayerMask)) SetGravityAfterWarp(-world_direction);
+        else if (Physics.Raycast(origin, world_up,         1.0f, m_envLayerMask)) SetGravityAfterWarp(world_up);
+    }
+
+    void SetGravityAfterWarp(Vector3 boxDir)
+    {
+        // If the old world_direction is still a valid direction (i.e. the new gravity axis is not 
+        // pointing in the same or opposit direction) then keep it. Otherwise set it to the old 
+        // world_up direction. 
+        if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(world_direction, boxDir))) < 0.01f) world_direction = world_up;
+
+        world_up        = -boxDir;
+        Physics.gravity = 9.81f * boxDir;
     }
 
     /**
@@ -489,7 +525,8 @@ public class PlayerController : MonoBehaviour
 
         Vector3 origin = transform.position + (1 - m_sphereRadius) * world_up;
         //Debug.DrawRay(origin, (1.1f*(world_direction - world_up)), Color.grey);
-        //Debug.DrawRay(transform.position, world_up, Color.cyan);
+        Debug.DrawRay(transform.position, world_up, Color.cyan);
+        Debug.DrawRay(transform.position, world_direction, Color.red);
         //Debug.DrawRay(transform.position, m_targetPosition - transform.position, Color.red);
         //Debug.DrawRay(transform.position, Physics.gravity, Color.green);
         //Debug.DrawRay(transform.position- 0.1f * world_up, world_direction, Color.white);
