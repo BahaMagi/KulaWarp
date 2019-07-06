@@ -74,7 +74,7 @@ public class CameraController : MonoBehaviour
     */
     bool CanRotate()
     {
-        return !(isMoving || m_pc.isMoving || m_isMovingUpDown);
+        return !(isMoving || m_pc.isMoving || m_isMovingUpDown || m_pc.isWarping || m_pc.isFalling);
     }
 
     int HandleInput()
@@ -131,6 +131,36 @@ public class CameraController : MonoBehaviour
         while (t * tiltSpeed <= 1)
         {
             t     += Time.deltaTime;
+            offset = Vector3.Slerp(start, target, t * tiltSpeed);
+            upTmp  = Vector3.Slerp(upStart, m_pc.world_up, t * tiltSpeed);
+
+            // Move and rotate the camera accordigly. 
+            transform.position = player.transform.position + offset;
+            transform.LookAt(player.transform.position + offsetAngle * upTmp, upTmp);
+
+            yield return null;
+        }
+
+        m_isMovingUpDown = false;
+    }
+
+    /**
+     * dir and up are the target direction and up vectors. This has to be called before they are changed
+     */
+    public IEnumerator GravityChange(Vector3 dir, Vector3 up)
+    {
+        m_isMovingUpDown = true;
+
+        float t = 0;
+        Vector3 start  = offset;
+        Vector3 target = -m_dirOff * dir + m_upOff * up;
+
+        Vector3 upStart = m_pc.world_up;
+        Vector3 upTmp   = upStart;
+
+        while (t * tiltSpeed <= 1)
+        {
+            t += Time.deltaTime;
             offset = Vector3.Slerp(start, target, t * tiltSpeed);
             upTmp  = Vector3.Slerp(upStart, m_pc.world_up, t * tiltSpeed);
 

@@ -378,11 +378,17 @@ public class PlayerController : MonoBehaviour
 
     void SetGravityAfterWarp(Vector3 boxDir)
     {
+        
+
         // If the old world_direction is still a valid direction (i.e. the new gravity axis is not 
         // pointing in the same or opposit direction) then keep it. Otherwise set it to the old 
         // world_up direction. 
-        if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(world_direction, boxDir))) < 0.01f) world_direction = world_up;
+        Vector3 newDir = world_direction;
+        if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(world_direction, boxDir))) < 0.01f) newDir = world_up;
 
+        StartCoroutine(m_cc.GravityChange(newDir, -boxDir));
+
+        world_direction = newDir;
         world_up        = -boxDir;
         Physics.gravity = 9.81f * boxDir;
     }
@@ -525,8 +531,8 @@ public class PlayerController : MonoBehaviour
 
         Vector3 origin = transform.position + (1 - m_sphereRadius) * world_up;
         //Debug.DrawRay(origin, (1.1f*(world_direction - world_up)), Color.grey);
-        Debug.DrawRay(transform.position, world_up, Color.cyan);
-        Debug.DrawRay(transform.position, world_direction, Color.red);
+        //Debug.DrawRay(transform.position, world_up, Color.cyan);
+        //Debug.DrawRay(transform.position, world_direction, Color.red);
         //Debug.DrawRay(transform.position, m_targetPosition - transform.position, Color.red);
         //Debug.DrawRay(transform.position, Physics.gravity, Color.green);
         //Debug.DrawRay(transform.position- 0.1f * world_up, world_direction, Color.white);
