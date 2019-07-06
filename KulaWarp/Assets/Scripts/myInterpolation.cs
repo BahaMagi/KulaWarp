@@ -79,7 +79,7 @@ public class MyInterps
  * Extend existing classes with utility functions. 
  */
 static class ExtensionMethods //@TODO put this class in a separate script 
-{
+{ 
     /**
      * Round the components of vec for which axis is != 0. 
      * For example: 
@@ -138,4 +138,8 @@ static class ExtensionMethods //@TODO put this class in a separate script
 
         return vec;
     }
+    
+    //@TODO Take care of the "ref" vs none "ref" Extensions. Might lead to unintended sideeffects. 
+    // Should unify the behaviour at some point.
 }
+

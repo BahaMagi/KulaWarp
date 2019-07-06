@@ -17,9 +17,9 @@ TagManager:
   - Player
   - Abstract
   - Environment
-  - 
-  - 
-  - 
+  - PickUps
+  - Exit
+  - Obstacles
   - 
   - 
   - 
