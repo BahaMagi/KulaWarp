@@ -2033,12 +2033,12 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4108570847034658900, guid: 78ad0040c41b1544a993e78114f7b7ae,
+    - target: {fileID: 4108570846448198099, guid: 78ad0040c41b1544a993e78114f7b7ae,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 137166318}
-    - target: {fileID: 4108570846448198099, guid: 78ad0040c41b1544a993e78114f7b7ae,
+    - target: {fileID: 4108570847034658900, guid: 78ad0040c41b1544a993e78114f7b7ae,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -2211,7 +2211,7 @@ GameObject:
   - component: {fileID: 1997137206}
   - component: {fileID: 8296172667758099516}
   - component: {fileID: 8296172667758099515}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Crystal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
