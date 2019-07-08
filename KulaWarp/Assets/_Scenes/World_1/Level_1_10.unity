@@ -2573,6 +2573,21 @@ PrefabInstance:
       propertyPath: m_textInfo.pageCount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3764660698489731697, guid: 989bc41edbf79ff489b1a4fcb024ab93,
+        type: 3}
+      propertyPath: m_Name
+      value: ScoreTMP
+      objectReference: {fileID: 0}
+    - target: {fileID: 3764660700247274848, guid: 989bc41edbf79ff489b1a4fcb024ab93,
+        type: 3}
+      propertyPath: m_Name
+      value: TimeTMP
+      objectReference: {fileID: 0}
+    - target: {fileID: 3764660698970268633, guid: 989bc41edbf79ff489b1a4fcb024ab93,
+        type: 3}
+      propertyPath: m_Name
+      value: Crystal_HUD
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 989bc41edbf79ff489b1a4fcb024ab93, type: 3}
 --- !u!1 &1495674593 stripped

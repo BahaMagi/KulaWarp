@@ -2,9 +2,93 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
+
+[System.Serializable]
+public class SaveData
+{
+    public int totalPoints          = 0;
+    public int curLevel             = 0;
+    public List<int> pointsPerLevel = new List<int>();
+}
 
 public class GameController : MonoBehaviour
 {
+    [HideInInspector] public static GameController gc;
+
+    private SaveData m_saveData;
+    private bool m_isPaused;
+
+    public string savePath = Application.dataPath + "/save.mem";
+
+    void Awake()
+    {
+        // Make this a public singelton
+        if (gc == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            gc = this;
+        }
+        else if (gc != this) Destroy(gameObject);
+
+        m_saveData = new SaveData();
+    }
+
+    public void SaveGame()
+    {
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream      stream    = new FileStream(savePath, FileMode.Create);
+
+        formatter.Serialize(stream, m_saveData);
+
+        stream.Close();
+    }
+
+    public void LoadGame()
+    {
+        if (!File.Exists(savePath))
+            return;
+
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream      stream    = new FileStream(savePath, FileMode.Open);
+
+        m_saveData = formatter.Deserialize(stream) as SaveData;
+
+        stream.Close();
+    }
+
+    public void HandleInput()
+    { }
+
+    public void Win()
+    {
+        // Stop input affecting the player or the camera.
+        PlayerController.pc.Disable();
+
+        // Stop time
+        Time.timeScale = 0f;
+
+        // Set a pose for the camera as background for the score screen. 
+        CameraController.cc.PauseCamera();
+
+        yield return new WaitForSecondsRealtime(3.0f); // @TODO Score screen in this time and continue on button press
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public void Lose()
+    { }
+
+    public void GameOver()
+    { }
+
+    public void Quit()
+    { }
+
+
+//----------------------------------------------------------
     #region
     public GameObject crystalImgBnWPrefab;
     public GameObject player;

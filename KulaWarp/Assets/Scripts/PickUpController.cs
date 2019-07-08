@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickUpController : MonoBehaviour
+public class PickUpController : ObjectBase
 {
     #region
     public  GameObject     gameController;
@@ -50,5 +50,10 @@ public class PickUpController : MonoBehaviour
     {
         gameObject.SetActive(false);
         m_gc.Score(scoreValue, gameObject);
+    }
+
+    public override void Reset()
+    {
+        gameObject.SetActive(true);
     }
 }
