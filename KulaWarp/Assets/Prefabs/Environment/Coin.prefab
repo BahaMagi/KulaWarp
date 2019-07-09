@@ -9,12 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7704267073500125306}
+  - component: {fileID: 3427726243086043210}
   - component: {fileID: 1706873787367662156}
   - component: {fileID: 4939465560480177845}
   - component: {fileID: 5019558446572522920}
   - component: {fileID: 2935494183149335180}
-  - component: {fileID: 315548653959918848}
-  - component: {fileID: 3427726243086043210}
   m_Layer: 11
   m_Name: Coin
   m_TagString: Untagged
@@ -36,6 +35,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -28.58, z: 0}
+--- !u!114 &3427726243086043210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6678934787335416425}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f88e3870a0f2d5544a6f7913562720a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotSpeed: 45
+  hoverSpeed: 2
+  hoverAmount: 0.01
+  scoreValue: 100
+  up: {x: 0, y: 0, z: 0}
 --- !u!33 &1706873787367662156
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -110,40 +126,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!95 &315548653959918848
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6678934787335416425}
-  m_Enabled: 0
-  m_Avatar: {fileID: 9000000, guid: 6d72804f2b3f83e49bff20740b086a23, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &3427726243086043210
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6678934787335416425}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f88e3870a0f2d5544a6f7913562720a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameController: {fileID: 0}
-  rotSpeed: 45
-  hoverSpeed: 2
-  hoverAmount: 0.01
-  scoreValue: 100
-  up: {x: 0, y: 0, z: 0}

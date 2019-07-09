@@ -1,6 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Events;
+
+public abstract class ObjectBase : MonoBehaviour
+{
+    public abstract void Reset();
+}
 
 /**
  * Holds a variaty of interpolations to expand what is provided by Unity.
@@ -26,7 +30,7 @@ public class MyInterps
      */
     public static Vector3 Coserp(Vector3 start, Vector3 end, float t)
     {
-        t = 1- Mathf.Cos(Mathf.Clamp01(t) * Mathf.PI * 0.5f);
+        t = 1 - Mathf.Cos(Mathf.Clamp01(t) * Mathf.PI * 0.5f);
 
         return new Vector3(
             start.x + (end.x - start.x) * t,
@@ -56,7 +60,7 @@ public class MyInterps
     public static Vector3 QuadEaseIn(Vector3 start, Vector3 target, out bool done, float t, float ease_in, float speed)
     {
         Vector3 direction = (target - start);
-        float   t_, mag   = direction.magnitude; // @TODO Move this calculation to when the target is set to calculate the sqrt only once!
+        float t_, mag = direction.magnitude; // @TODO Move this calculation to when the target is set to calculate the sqrt only once!
         direction = direction.normalized;
 
         if (t <= ease_in * 0.5f && ease_in > 0)
@@ -64,7 +68,7 @@ public class MyInterps
         else
             t_ = speed * (t - ease_in * 0.25f);
 
-        t_   = Mathf.Min(t_, mag);
+        t_ = Mathf.Min(t_, mag);
         done = t_ == mag;
 
         return new Vector3(
@@ -78,8 +82,10 @@ public class MyInterps
 /**
  * Extend existing classes with utility functions. 
  */
-static class ExtensionMethods //@TODO put this class in a separate script 
-{ 
+static class ExtensionMethods
+{//@TODO Take care of the "ref" vs none "ref" Extensions. Might lead to unintended sideeffects. 
+    // Should unify the behaviour at some point.
+
     /**
      * Round the components of vec for which axis is != 0. 
      * For example: 
@@ -115,7 +121,7 @@ static class ExtensionMethods //@TODO put this class in a separate script
     }
 
     public static float L1Norm(this Vector3 vec)
-    {  
+    {
         return vec.x + vec.y + vec.z;
     }
 
@@ -138,8 +144,21 @@ static class ExtensionMethods //@TODO put this class in a separate script
 
         return vec;
     }
-    
-    //@TODO Take care of the "ref" vs none "ref" Extensions. Might lead to unintended sideeffects. 
-    // Should unify the behaviour at some point.
-}
 
+    /**
+     * This rounds the up component of @vec to valid multiples of m_boxsize/2 +/- m_sphere Radius.
+     * 
+     * This is mainly necessary because the Idle animation introduces small numerical changes in the
+     * up component. To avoid jumping of the ball this has to be countered. 
+     */
+    public static Vector3 SnapToGridUp(this Vector3 vec, Vector3 up)
+    {
+        return vec.Round(up) - (LevelController.lc.boxSize * 0.5f - PlayerController.pc.sphereRadius) * up;
+    }
+
+    public static Vector3 SnapToGridAll(this Vector3 vec, Vector3 up)
+    {
+        return vec.Round(Vector3.one) - (LevelController.lc.boxSize * 0.5f - PlayerController.pc.sphereRadius) * up;
+    }
+
+}
