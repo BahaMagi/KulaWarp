@@ -2151,6 +2151,11 @@ PrefabInstance:
       propertyPath: startPos.x
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 3112335864343108892, guid: 540209a4b7b3aad429020536eac9b1b7,
+        type: 3}
+      propertyPath: gravity
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 540209a4b7b3aad429020536eac9b1b7, type: 3}
 --- !u!114 &1448278534 stripped
@@ -2624,11 +2629,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 54068309140363624, guid: 21ee87b15ba1f1d4991fb9d533235894,
+        type: 3}
+      propertyPath: m_Mass
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 54068309140363625, guid: 21ee87b15ba1f1d4991fb9d533235894,
         type: 3}
       propertyPath: game
       value: 
       objectReference: {fileID: 1516861430}
+    - target: {fileID: 54068310053535782, guid: 21ee87b15ba1f1d4991fb9d533235894,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 21ee87b15ba1f1d4991fb9d533235894, type: 3}
 --- !u!1 &1701626921 stripped

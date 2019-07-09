@@ -117,9 +117,9 @@ public class PlayerController : ObjectBase
         // Check the front first. Any hit allows us to move.
         // This covers both forward and forward-up movement.
         RaycastHit hitFront;
-        Vector3 frontDown = world_direction - world_up;
-        bool isHitFront = Physics.Raycast(origin, frontDown, out hitFront, l, m_envLayerMask);
-        nextBlockLevel = isHitFront ? hitFront.distance < 1 ? 1 : 0 : -1;
+        Vector3 frontDown  = world_direction - world_up;
+        bool    isHitFront = Physics.Raycast(origin, frontDown, out hitFront, l, m_envLayerMask);
+        nextBlockLevel     = isHitFront ? hitFront.distance < 1 ? 1 : 0 : -1;
 
         // The player can't start moving until the previous movement is finished.
         if (isWarping || isFalling || CameraController.cc.isMoving) return false;
@@ -130,16 +130,11 @@ public class PlayerController : ObjectBase
         // If there is no hit, then we can only move if left and right are empty. 
         Vector3 world_left = Vector3.Cross(world_up, world_direction);
 
-        Vector3 leftDown = world_left - world_up;
-        bool isHitLeft = Physics.Raycast(origin, leftDown, l, m_envLayerMask);
+        Vector3 leftDown  = world_left - world_up;
+        bool    isHitLeft = Physics.Raycast(origin, leftDown, l, m_envLayerMask);
 
-        Vector3 rightDown = -world_left - world_up;
-        bool isHitRight = Physics.Raycast(origin, rightDown, l, m_envLayerMask);
-
-        Debug.DrawRay(origin, leftDown, Color.red, 30.0f);
-        Debug.DrawRay(origin, frontDown, Color.red, 30.0f);
-        Debug.DrawRay(origin, rightDown, Color.red, 30.0f);
-
+        Vector3 rightDown  = -world_left - world_up;
+        bool    isHitRight = Physics.Raycast(origin, rightDown, l, m_envLayerMask);
 
         return !isHitLeft && !isHitRight;
     }
@@ -225,7 +220,7 @@ public class PlayerController : ObjectBase
      */
     int HandleInput()
     {
-        if (Input.GetButton("Jump"))
+        if (Input.GetButton("Warp"))
             return 2;
 
         return (int)(Input.GetAxisRaw("Vertical")); // For keyboard input this is in {-1, 0, 1} 
@@ -296,7 +291,7 @@ public class PlayerController : ObjectBase
         }
 
         // Turn gravity back on and change it to the new direction.
-        Physics.gravity = -9.81f * world_up;
+        Physics.gravity = -LevelController.lc.gravity * world_up;
         m_rb.useGravity = true;
         isGravityShifting = false;
 
@@ -327,7 +322,7 @@ public class PlayerController : ObjectBase
 
         while (!arrived)
         {
-            m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed));
+            m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed).SnapToGridUp(world_up));
             m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
             t += Time.deltaTime;
 
@@ -352,7 +347,7 @@ public class PlayerController : ObjectBase
 
     void MoveUpwards()
     {
-        Physics.gravity = 9.81f * world_direction;
+        Physics.gravity = LevelController.lc.gravity * world_direction;
 
         m_targetPosition = m_targetPosition - world_direction * (0.5f * LevelController.lc.boxSize + sphereRadius) + world_up * (-sphereRadius + 0.5f * LevelController.lc.boxSize);
         m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
@@ -396,7 +391,7 @@ public class PlayerController : ObjectBase
 
         world_direction = newDir;
         world_up        = -boxDir;
-        Physics.gravity = 9.81f * boxDir;
+        Physics.gravity = LevelController.lc.gravity * boxDir;
     }
 
     /**
@@ -438,7 +433,7 @@ public class PlayerController : ObjectBase
             float t = 0.0f;
             Vector3 startPosition = transform.position;
             m_targetPosition      = startPosition.SnapToGridAll(world_up);
-            m_targetPosition     += world_direction * 2.0f;
+            m_targetPosition     += world_direction * 2.0f + world_up * (0.5f - sphereRadius);
 
             bool arrived = false;
             while (!arrived)
@@ -453,7 +448,7 @@ public class PlayerController : ObjectBase
             }
             transform.position = m_targetPosition;
 
-            while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) yield return null;
+            //while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) yield return null;
 
             SetisMoving(false);
             isWarping             = false;
@@ -469,7 +464,7 @@ public class PlayerController : ObjectBase
             while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("FadeIn")) yield return null; //@TODO get the ID 
 
             m_rb.useGravity = false;
-            transform.position += world_up * (2.0f + 0.5f*LevelController.lc.boxSize - sphereRadius);
+            transform.position += world_up * (2.0f *LevelController.lc.boxSize + 0.5f - sphereRadius);
             m_targetPosition = transform.position;
 
             yield return new WaitForSeconds(0.3f); //@TODO make this time a public var to be adjustable as "hover time"

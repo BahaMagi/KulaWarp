@@ -53,7 +53,7 @@ public class GameController : MonoBehaviour
     {
         // @TODO there has to be a "Game Over screen" shown here
 
-        while (!Input.GetButtonDown("Jump")) yield return null;
+        while (!Input.GetButtonDown("Warp")) yield return null;
 
         // Return to the main menu
         SceneManager.LoadScene(0);
@@ -103,7 +103,7 @@ public class GameController : MonoBehaviour
 
         // @TODO there has to be a "Died screen" shown here
 
-        while (!Input.GetButtonDown("Jump")) yield return null;
+        while (!Input.GetButtonDown("Warp")) yield return null;
 
         Resume();
 
@@ -159,7 +159,7 @@ public class GameController : MonoBehaviour
 
         // @TODO there has to be a "Win screen" shown here
 
-        while (!Input.GetButtonDown("Jump")) yield return null;
+        while (!Input.GetButtonDown("Warp")) yield return null;
 
         // Save stats
         m_saveData.pointsPerLevel.Add(LevelController.lc.GetPoints());

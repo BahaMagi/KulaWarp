@@ -29,7 +29,7 @@ public class PickUpController : ObjectBase
 
     protected void AnimObject()
     {
-        transform.Rotate(up * rotSpeed * Time.deltaTime);
+        transform.Rotate(Vector3.up, rotSpeed * Time.deltaTime);
         transform.position = m_idlePos + up * Mathf.Sin(hoverSpeed * m_time) * hoverAmount;
 
         m_time += Time.deltaTime;
