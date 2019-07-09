@@ -58,6 +58,8 @@ public class PlayerController : ObjectBase
 
         world_up        = LevelController.lc.startUp;
         world_direction = LevelController.lc.startDir;
+
+        LevelController.lc.Register(this);
     }
 
     void FixedUpdate()
@@ -107,10 +109,10 @@ public class PlayerController : ObjectBase
      */
     bool CanMove(out int nextBlockLevel)
     {
-        float l = 1.5f; // length of the rays sent.
+        float l = 1.6f; // length of the rays sent.
 
         // Send rays from a point above player position.
-        Vector3 origin = transform.position + (1 - sphereRadius) * world_up;
+        Vector3 origin = transform.position.SnapToGridUp(world_up) + (1 - sphereRadius) * world_up;
 
         // Check the front first. Any hit allows us to move.
         // This covers both forward and forward-up movement.
@@ -133,6 +135,11 @@ public class PlayerController : ObjectBase
 
         Vector3 rightDown = -world_left - world_up;
         bool isHitRight = Physics.Raycast(origin, rightDown, l, m_envLayerMask);
+
+        Debug.DrawRay(origin, leftDown, Color.red, 30.0f);
+        Debug.DrawRay(origin, frontDown, Color.red, 30.0f);
+        Debug.DrawRay(origin, rightDown, Color.red, 30.0f);
+
 
         return !isHitLeft && !isHitRight;
     }
@@ -379,8 +386,6 @@ public class PlayerController : ObjectBase
 
     void SetGravityAfterWarp(Vector3 boxDir)
     {
-
-
         // If the old world_direction is still a valid direction (i.e. the new gravity axis is not 
         // pointing in the same or opposit direction) then keep it. Otherwise set it to the old 
         // world_up direction. 
@@ -415,6 +420,7 @@ public class PlayerController : ObjectBase
     {
         if (!CanWarp()) yield break;
 
+        // Warp forwards
         if (isMoving || (int)(Input.GetAxisRaw("Vertical")) == 1)
         {
             if (isMoving)
@@ -454,7 +460,7 @@ public class PlayerController : ObjectBase
             m_rb.useGravity       = true;
             m_rb.detectCollisions = true;
         }
-        else
+        else // Warp Upwards
         {
             isWarping = true;
 
@@ -490,7 +496,7 @@ public class PlayerController : ObjectBase
 
     public void Disable()
     {
-        gameObject.SetActive(false);
+        player_sphere.SetActive(false);
     }
 
     public override void Reset()
@@ -504,7 +510,7 @@ public class PlayerController : ObjectBase
 
         isMoving = false; isWarping = false; isFalling = false; isGravityShifting = false;
 
-        gameObject.SetActive(true);
+        player_sphere.SetActive(true);
     }
 
     //---------------------------------------------------//

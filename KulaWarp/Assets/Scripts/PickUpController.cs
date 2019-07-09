@@ -18,6 +18,8 @@ public class PickUpController : ObjectBase
         m_idlePos = transform.position;
         m_time    = Random.Range(0, 6);
         transform.Rotate(new Vector3(0, Random.Range(0, 180), 0));
+
+        LevelController.lc.Register(this);
     }
 
     protected void Update()

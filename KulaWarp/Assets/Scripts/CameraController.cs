@@ -35,6 +35,8 @@ public class CameraController : ObjectBase
         // Play the camera intro of that level
         m_anim   = gameObject.GetComponent<Animator>();
         StartCoroutine(PlayIntro());
+
+        LevelController.lc.Register(this);
     }
 
     void LateUpdate()
@@ -126,7 +128,7 @@ public class CameraController : ObjectBase
     */
     bool CanRotate()
     {
-        return !(isMoving || PlayerController.pc.isMoving || isMovingUpDown || PlayerController.pc.isWarping || PlayerController.pc.isFalling);
+        return !isMoving && !isMovingUpDown && !GameController.gc.IsPaused() && !PlayerController.pc.isMoving  && !PlayerController.pc.isWarping && !PlayerController.pc.isFalling;
     }
 
     /**

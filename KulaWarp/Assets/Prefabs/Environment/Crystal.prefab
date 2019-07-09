@@ -9,10 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1633975537348519883}
+  - component: {fileID: 6041500656866397396}
   - component: {fileID: 7779417118798847485}
   - component: {fileID: 4092228124846252292}
-  - component: {fileID: 8657906236500642481}
-  - component: {fileID: 6041500656866397396}
   - component: {fileID: 2375180140847093214}
   - component: {fileID: 2375180140847093209}
   m_Layer: 0
@@ -36,6 +35,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
+--- !u!114 &6041500656866397396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2375180140847093208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8bbdc423e0112044b416b09c8f35361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotSpeed: 45
+  hoverSpeed: 2
+  hoverAmount: 0.01
+  scoreValue: 100
+  up: {x: 0, y: 1, z: 0}
 --- !u!33 &7779417118798847485
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -81,43 +97,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!95 &8657906236500642481
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2375180140847093208}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: de65923c55fac6f40903884196ca2f06, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &6041500656866397396
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2375180140847093208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8bbdc423e0112044b416b09c8f35361, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameController: {fileID: 0}
-  rotSpeed: 45
-  hoverSpeed: 2
-  hoverAmount: 0.01
-  scoreValue: 100
-  up: {x: 0, y: 1, z: 0}
 --- !u!54 &2375180140847093214
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -22,8 +22,6 @@ public class UIController : ObjectBase
 
         LoadComponents();
 
-        LevelController.lc.Register(this);
-
         // Instantiate Crystal sprites at the bottom left corner of the screen
         m_crystals = new List<GameObject>();
         for (int i = 0; i < LevelController.lc.targetCryCount; i++)
