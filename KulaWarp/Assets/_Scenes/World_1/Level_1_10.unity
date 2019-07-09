@@ -2887,7 +2887,7 @@ MonoBehaviour:
   gravity: 9.81
   timeLimit: 120
   boxSize: 1
-  targetCryCount: 3
+  targetCryCount: 1
   startPos: {x: 4, y: 0.7, z: 0}
   startUp: {x: 0, y: 1, z: 0}
   startDir: {x: -1, y: 0, z: 0}

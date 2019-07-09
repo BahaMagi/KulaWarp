@@ -206,7 +206,7 @@ public class PlayerController : ObjectBase
     public void Die()
     {
         //@TODO play death animation
-        GameController.gc.Lose();
+        StartCoroutine(GameController.gc.Lose());
     }
 
     /**

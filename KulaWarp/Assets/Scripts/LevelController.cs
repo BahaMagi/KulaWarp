@@ -59,7 +59,7 @@ public class LevelController : MonoBehaviour
 
     public void OnExitEnter()
     {// Invoked by the TriggerBase script attached to the exit. 
-        if (m_curCrys >= targetCryCount) GameController.gc.Win();
+        if (m_curCrys >= targetCryCount) StartCoroutine(GameController.gc.Win());
     }
 
     public void Pause()

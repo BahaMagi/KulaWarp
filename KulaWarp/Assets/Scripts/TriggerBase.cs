@@ -16,3 +16,4 @@ public class TriggerBase : MonoBehaviour
         onTriggerEnter.Invoke();
     }
 }
+

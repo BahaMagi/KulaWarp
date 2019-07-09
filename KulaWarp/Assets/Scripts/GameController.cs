@@ -88,6 +88,7 @@ public class GameController : MonoBehaviour
     public  IEnumerator Lose()
     {
         // Stop input affecting the player or the camera.
+        Pause(false);
         PlayerController.pc.Disable();
 
         // Stop time
@@ -104,17 +105,19 @@ public class GameController : MonoBehaviour
 
         while (!Input.GetButtonDown("Jump")) yield return null;
 
+        Resume();
+
         // Restart the level
         LevelController.lc.Restart();
     }
 
-    public  void Pause()
+    public  void Pause(bool showMenu = true)
     {
         m_isPaused     = true;
         Time.timeScale = 0.0f;
 
         CameraController.cc.PauseCamera();
-        pauseMenu.SetActive(true);
+        if(showMenu) pauseMenu.SetActive(true);
     }
 
     public  void Quit()
@@ -145,6 +148,7 @@ public class GameController : MonoBehaviour
     public  IEnumerator Win()
     {
         // Stop input affecting the player or the camera.
+        Pause(false);
         PlayerController.pc.Disable();
 
         // Stop time
@@ -162,6 +166,8 @@ public class GameController : MonoBehaviour
         m_saveData.totalPoints += LevelController.lc.GetPoints();
         m_saveData.curLevel++;
         SaveGame();
+
+        Resume();
 
         // Load the next level if there is one. If there is not, return to the main menu.
         if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCount)
