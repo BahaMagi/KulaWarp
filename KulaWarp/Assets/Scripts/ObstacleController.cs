@@ -19,6 +19,6 @@ public class ObstacleController : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        m_gc.PlayerDie();
+        PlayerController.pc.Die();
     }
 }

@@ -7,6 +7,6 @@ public class CrystalController : PickUpController
     protected override void OnTriggerEnter(Collider other)
     {
         gameObject.SetActive(false);
-        m_gc.CollectCrystal(gameObject);
+        LevelController.lc.CollectCrystal();
     }
 }

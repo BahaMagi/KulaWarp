@@ -8,13 +8,12 @@ public class LevelController : MonoBehaviour
 
     private int              m_points  = 0, m_curCrys = 0;
     private float            m_curTime = 0.0f;
-    private Vector3          m_worldUp, m_worldDir;
     private List<ObjectBase> m_objList;
-    private GameObject       m_exit;
 
-    public float           gravity = 9.81f, timeLimit = 120.0f;
+    public float           gravity = 9.81f, timeLimit = 120.0f, boxSize = 1.0f;
     public int             targetCryCount = 1;
     public Vector3         startPos, startUp, startDir;
+    public GameObject exit;
 
     #region MonoBehaviour
     void Awake()
@@ -23,9 +22,7 @@ public class LevelController : MonoBehaviour
         if (lc == null) lc = this;
         else if (lc != this) Destroy(gameObject);
 
-        m_worldUp = startUp; m_worldDir = startDir;
-
-        m_exit = GameObject.Find("Exit");
+        exit = GameObject.Find("Exit");
         m_objList = new List<ObjectBase>();
     }
 
@@ -42,8 +39,8 @@ public class LevelController : MonoBehaviour
 
     void ActivateExit()
     {
-        if (m_curCrys >= targetCryCount) m_exit.GetComponent<Renderer>().material.color = Color.green;
-        else m_exit.GetComponent<Renderer>().material.color = Color.red;
+        if (m_curCrys >= targetCryCount) exit.GetComponent<Renderer>().material.color = Color.green;
+        else exit.GetComponent<Renderer>().material.color = Color.red;
     }
 
     public void CollectCrystal()
@@ -53,6 +50,16 @@ public class LevelController : MonoBehaviour
         UIController.uic.ColorCrystal(m_curCrys);
 
         ActivateExit();
+    }
+
+    public int  GetPoints()
+    {
+        return m_points;
+    }
+
+    public void OnExitEnter()
+    {// Invoked by the TriggerBase script attached to the exit. 
+        if (m_curCrys >= targetCryCount) GameController.gc.Win();
     }
 
     public void Pause()
@@ -67,8 +74,6 @@ public class LevelController : MonoBehaviour
     {
         m_curTime = 0; m_curCrys = 0; m_points  = 0;
         Physics.gravity = -gravity * startUp;
-
-        m_worldDir = startDir; m_worldUp = startUp;
 
         // Reset all objects that have registerd with the level, 
         // e.g. player, camera, pickups, crystals, ... 
