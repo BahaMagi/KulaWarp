@@ -6,6 +6,7 @@ public class CameraController : ObjectBase
     public static CameraController cc;
 
     public GameObject player;
+    public AnimationClip cameraIntroAnimation;
 
     [HideInInspector] public bool isMoving, isMovingUpDown;
 
@@ -15,8 +16,11 @@ public class CameraController : ObjectBase
     private float    m_invCameraSpeed; // m_boxsize, m_sphereRadius;
     private float    m_upOff, m_dirOff; // Preextract them at start as they are needed frequently
     private Animator m_anim;
+    private AnimatorOverrideController m_animOverrideCtrl;
 
-#region Monobehavior
+
+
+    #region Monobehavior
     void Awake()
     {
         // Make this a public singelton
@@ -32,8 +36,14 @@ public class CameraController : ObjectBase
         m_upOff  = Mathf.Abs(offset.getComponent(PlayerController.pc.world_up));
         m_dirOff = Mathf.Abs(offset.getComponent(PlayerController.pc.world_direction));
 
-        // Play the camera intro of that level
+        // Set the intro animation of that level and play it
         m_anim   = gameObject.GetComponent<Animator>();
+
+        m_animOverrideCtrl = new AnimatorOverrideController(m_anim.runtimeAnimatorController);
+        m_anim.runtimeAnimatorController = m_animOverrideCtrl;
+
+        m_animOverrideCtrl["CameraIntroBase"] = cameraIntroAnimation;
+
         StartCoroutine(PlayIntro());
 
         LevelController.lc.Register(this);

@@ -24,6 +24,8 @@ public class LevelController : MonoBehaviour
 
         exit = GameObject.Find("Exit");
         m_objList = new List<ObjectBase>();
+
+        Physics.gravity = -gravity * startUp;
     }
 
     void Update()
