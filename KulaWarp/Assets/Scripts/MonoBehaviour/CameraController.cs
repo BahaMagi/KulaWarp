@@ -1,8 +1,151 @@
-﻿using System.Collections;
+﻿#define _NEW_
+
+using System.Collections;
 using UnityEngine;
+
 
 public class CameraController : ObjectBase
 {
+#if _NEW_
+    //**
+    public static CameraController cc;
+
+    public float dirOffset = -1.6f, upOffset  = 1.3f, lookAtUpOffset = 0.71762f;
+    public float rotSpeed  = 0.5f,  tiltSpeed = 0.5f, followSpeed    = 1.0f;
+
+    public enum CamState { Default, TiltUp, TiltDown, RotLeft, RotRight, RotUp, RotDown, RotBack, Pause, Anim};
+    /*[HideInInspector]*/ public CamState camState = CamState.Default;
+
+    private Animator m_anim;
+    private AnimatorOverrideController m_animOverrideCtrl;
+    private int m_reset_trigger_ID;
+
+    private Vector3 m_pos, m_up, m_lookAt, m_dir;
+
+    #region Base_Classes
+    void Awake()
+    {
+        // Make this a public singelton
+        if (cc == null) cc = this;
+        else if (cc != this) Destroy(gameObject);
+
+        // Set the intro animation of that level
+        m_anim             = gameObject.GetComponent<Animator>();
+        m_animOverrideCtrl = new AnimatorOverrideController(m_anim.runtimeAnimatorController);
+        m_anim.runtimeAnimatorController      = m_animOverrideCtrl;
+        m_animOverrideCtrl["CameraIntroBase"] = LevelController.lc.cameraIntroAnimation;
+
+        m_reset_trigger_ID = Animator.StringToHash("reset");
+
+        LevelController.lc.Register(this); // This makes sure Reset() is called upon a level restart.
+    }
+
+    void LateUpdate()
+    {
+        HandleInput();
+
+        // Set m_dir, m_up and m_pos depening on 
+        if      (camState == CamState.Default)  Follow();
+        else if (camState <= CamState.TiltDown) Tilt();
+        else if (camState <= CamState.RotBack)  Rotate();
+        else if (camState == CamState.Anim)     return;
+
+        // If the game is paused, dont use LookAt() but rather just set the position and rotation of the camera for now
+        // @TODO implement a proper pause cam that is flying around the level
+        if( camState == CamState.Pause)
+        {
+            transform.position = LevelController.lc.pauseCamPos;
+            transform.rotation = Quaternion.Euler(LevelController.lc.pauseCamEuler);
+            return;
+        }
+
+        transform.position = m_pos + m_dir * dirOffset + upOffset * m_up;
+        transform.LookAt(m_lookAt, m_up);
+    }
+
+    public override void Reset()
+    {
+        m_anim.SetTrigger(m_reset_trigger_ID);
+    }
+    #endregion Base_Classes
+
+    bool CanRotate()
+    {
+        return IsDefault() && !PlayerController.pc.isMoving && !PlayerController.pc.isWarping && !PlayerController.pc.isFalling;
+    }
+
+    bool CanTilt()
+    {
+        return (camState <= CamState.TiltDown) && !PlayerController.pc.isFalling;
+    }
+
+    void Follow()
+    {
+        m_up  = PlayerController.pc.world_up;
+        m_dir = PlayerController.pc.world_direction;
+
+        //Get the current player position. If it is not falling, compensate for movement in the Up component 
+        // due to animations by snapping it back to the grid. 
+        Vector3 playerPos = PlayerController.pc.gameObject.transform.position;
+        if (!PlayerController.pc.isFalling) playerPos = playerPos.SnapToGridUp(PlayerController.pc.world_up);
+
+        m_pos    = playerPos; 
+        m_lookAt = playerPos + lookAtUpOffset * m_up;
+    }
+
+    void HandleInput()
+    {
+        if      (Input.GetButtonDown("Horizontal") && Input.GetAxisRaw("Horizontal") == -1 && CanRotate())
+            camState = CamState.RotLeft;
+        else if (Input.GetButtonDown("Horizontal") && Input.GetAxisRaw("Horizontal") ==  1 && CanRotate())
+            camState = CamState.RotRight;
+        else if (Input.GetButtonDown("Vertical")   && Input.GetAxisRaw("Vertical")   == -1 && CanRotate())
+            camState = CamState.RotBack;
+        else if (Input.GetButton("LookUp")   && CanTilt())
+            camState = CamState.TiltUp;
+        else if (Input.GetButton("LookDown") && CanTilt())
+            camState = CamState.TiltDown;
+    }
+
+    public bool IsDefault()
+    {
+        return camState == CamState.Default;
+    }
+
+    public void Pause()
+    {
+        camState = CamState.Pause;
+    }
+
+    public void Resume()
+    {
+        camState = CamState.Default;
+    }
+
+    void Rotate()
+    {
+        if (camState == CamState.RotLeft || camState == CamState.RotRight)
+        {
+            // SLerp the position by Lerping the direction vector to the desired direction. 
+            int     dir    = camState == CamState.RotLeft ? -1 : 1;
+            Vector3 target = dir * Vector3.Cross(PlayerController.pc.world_up, PlayerController.pc.world_direction);
+            m_dir          = Vector3.RotateTowards(m_dir, target, Time.deltaTime * rotSpeed, 0.0f);
+
+            // As RotateTowards will not overshoot, we can check for equality
+            if (m_dir == target)
+            {
+                PlayerController.pc.world_direction = target;
+                camState = CamState.Default;
+            }
+        }
+    }
+
+    void Tilt()
+    { }
+
+    //*/
+    //---------------------------------------------------------------------
+#else
     public static CameraController cc;
 
     public GameObject player;
@@ -11,12 +154,14 @@ public class CameraController : ObjectBase
     [HideInInspector] public bool isMoving, isMovingUpDown;
 
     public Vector3  offset      = new Vector3(-1.6f, 1.3f, 0);
-    public float    offsetAngle = 0.71762f, cameraSpeed = 0.5f, tiltSpeed = 0.5f;
+    public float    offsetAngle = 0.71762f; // This moves the LookAt() point up. So its technically a distance and not anangle
+    public float    rotationSpeed = 0.5f, tiltSpeed = 0.5f;
 
     private float    m_invCameraSpeed; // m_boxsize, m_sphereRadius;
     private float    m_upOff, m_dirOff; // Preextract them at start as they are needed frequently
     private Animator m_anim;
     private AnimatorOverrideController m_animOverrideCtrl;
+
 
 
 
@@ -31,7 +176,7 @@ public class CameraController : ObjectBase
         transform.position = player.transform.position + offset;
         transform.LookAt(player.transform.position + offsetAngle * PlayerController.pc.world_up); 
 
-        m_invCameraSpeed     = 1 / cameraSpeed;
+        m_invCameraSpeed = 1 / rotationSpeed;
 
         m_upOff  = Mathf.Abs(offset.getComponent(PlayerController.pc.world_up));
         m_dirOff = Mathf.Abs(offset.getComponent(PlayerController.pc.world_direction));
@@ -56,20 +201,25 @@ public class CameraController : ObjectBase
         if (CanRotate() && input != 0)
             StartCoroutine(CameraRotate(input));
 
+        if (Input.GetButton("LookUp"))
+            LookUpOffset();
+        else if (Input.GetButton("LookDown"))
+            LookDownOffset();
+
         // The methods that move the camera also take care of their placement and lookat for these frames.
         // So only do that here if the camera is not moving.
         if (!(isMoving || isMovingUpDown || GameController.gc.IsPaused()))
         {
             // The Idle Animation of the played causes a slight up and down when the play is not moving. So use the gridPos
             // rather than the real pos when moving the camera behind the player 
-            Vector3 gridPos    = PlayerController.pc.isFalling ? player.transform.position : player.transform.position.SnapToGridUp(PlayerController.pc.world_up);
+            Vector3 gridPos = PlayerController.pc.isFalling ? player.transform.position : player.transform.position.SnapToGridUp(PlayerController.pc.world_up);
             transform.position = gridPos + offset;
 
             // Look in the direction of the player at a point <offsetAngle> units above (w/r to the world up vector) the center of the player. 
             transform.LookAt(gridPos + offsetAngle * PlayerController.pc.world_up, PlayerController.pc.world_up);
         }
     }
-#endregion Monobehavior
+    #endregion Monobehavior
 
     /**
      * Rotate the camera to the left (-1) or to the right (1) with respect to the current direction
@@ -176,6 +326,50 @@ public class CameraController : ObjectBase
         return (int)(Input.GetAxisRaw("Horizontal")); // For keyboard input this is in {-1, 0, 1}. Left is -1, right is 1.
     }
 
+    void LookAtPlayer()
+    {
+        Vector3 lookAtPos, lookAtUp;
+
+
+        // The Idle Animation of the played causes a slight up and down when the play is not moving. So use the gridPos
+        // rather than the real pos when moving the camera behind the player 
+        Vector3 gridPos = PlayerController.pc.isFalling ? player.transform.position : player.transform.position.SnapToGridUp(PlayerController.pc.world_up);
+
+
+        if (!(isMoving || isMovingUpDown || GameController.gc.IsPaused()))
+        {
+            // Look in the direction of the player at a point <offsetAngle> units above (w/r to the world up vector) the center of the player. 
+            lookAtPos = gridPos + offsetAngle * PlayerController.pc.world_up;
+            lookAtUp = PlayerController.pc.world_up);
+        }
+
+        transform.LookAt(lookAtPos, lookAtUp);
+    }
+
+    void FollowPlayer()
+    {
+        if (!(isMoving || isMovingUpDown || GameController.gc.IsPaused()))
+        {
+            // The Idle Animation of the played causes a slight up and down when the play is not moving. So use the gridPos
+            // rather than the real pos when moving the camera behind the player 
+            Vector3 gridPos = PlayerController.pc.isFalling ? player.transform.position : player.transform.position.SnapToGridUp(PlayerController.pc.world_up);
+            transform.position = gridPos + offset;
+
+            // Look in the direction of the player at a point <offsetAngle> units above (w/r to the world up vector) the center of the player. 
+            transform.LookAt(gridPos + offsetAngle * PlayerController.pc.world_up, PlayerController.pc.world_up);
+        }
+    }
+
+    void LookDownOffset()
+    {
+
+    }
+
+    void LookUpOffset()
+    {
+
+    }
+
     /**
   * Plays an intro animation. During this time @isMoving is set to true to avoid camera movements.
   */
@@ -214,7 +408,7 @@ public class CameraController : ObjectBase
     {
         // @TODO Think about transition from pause back 
     }
-
+#endif
 
     //---------------------------------------------------//
     // Currently only used for debuf outputs. 

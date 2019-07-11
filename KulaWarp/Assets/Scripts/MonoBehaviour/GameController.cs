@@ -63,7 +63,7 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetButtonDown("Pause") && m_isPaused) Resume();
         else if (Input.GetButtonDown("Pause") && !m_isPaused && 
-           !CameraController.cc.isMoving && 
+           CameraController.cc.IsDefault() && 
            !PlayerController.pc.isMoving) Pause();
     }
 
@@ -95,7 +95,7 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0f;
 
         // Set a pose for the camera as background for the score screen. 
-        CameraController.cc.PauseCamera();
+        CameraController.cc.Pause();
 
         // Apply the points penatly and check for game over
         m_saveData.totalPoints -= LevelController.lc.GetPoints();
@@ -116,7 +116,7 @@ public class GameController : MonoBehaviour
         m_isPaused     = true;
         Time.timeScale = 0.0f;
 
-        CameraController.cc.PauseCamera();
+        CameraController.cc.Pause();
         if(showMenu) pauseMenu.SetActive(true);
     }
 
@@ -131,7 +131,7 @@ public class GameController : MonoBehaviour
         m_isPaused     = false;
         Time.timeScale = 1.0f;
 
-        CameraController.cc.ResumeCamera();
+        CameraController.cc.Resume();
         pauseMenu.SetActive(false);
     }
 
@@ -155,7 +155,7 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0f;
 
         // Set a pose for the camera as background for the score screen. 
-        CameraController.cc.PauseCamera();
+        CameraController.cc.Pause();
 
         // @TODO there has to be a "Win screen" shown here
 
