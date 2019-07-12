@@ -271,13 +271,14 @@ public class PlayerController : ObjectBase
         float angularSpeed = 90.0f * speed / (LevelController.lc.boxSize * 0.5f); // @TODO That 90 is arbitrary. Make this a public var so its editable from the inspector.
                                                                  // @TODO also: the m_boxsize*0.5 should be m_sphereRadius*2 in theory. Want to test that again.
         Vector3 contactPoint = transform.position - world_up * sphereRadius;
-        m_rb.useGravity = false; // Turn off gravity while rotating to avoid sliding.
+        m_rb.useGravity      = false; // Turn off gravity while rotating to avoid sliding.
 
-        Vector3 tmp = world_up;
-        world_up = world_direction;
+        Vector3 tmp     = world_up;
+        world_up        = world_direction;
         world_direction = -tmp;
 
         // Start rotating the camera.
+        CameraController.cc.camState = CameraController.CamState.RotDown;
         //StartCoroutine(CameraController.cc.CameraUpDown(-1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#1/3
 
         while (t < 90.0f)
@@ -349,14 +350,15 @@ public class PlayerController : ObjectBase
     {
         Physics.gravity = LevelController.lc.gravity * world_direction;
 
-        m_targetPosition = m_targetPosition - world_direction * (0.5f * LevelController.lc.boxSize + sphereRadius) + world_up * (-sphereRadius + 0.5f * LevelController.lc.boxSize);
+        m_targetPosition    = m_targetPosition - world_direction * (0.5f * LevelController.lc.boxSize + sphereRadius) + world_up * (-sphereRadius + 0.5f * LevelController.lc.boxSize);
         m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
 
-        Vector3 tmp = world_up;
-        world_up = -world_direction;
+        Vector3 tmp     = world_up;
+        world_up        = -world_direction;
         world_direction = tmp;
 
-       // StartCoroutine(CameraController.cc.CameraUpDown(1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#2/3
+        CameraController.cc.camState = CameraController.CamState.RotUp;
+        // StartCoroutine(CameraController.cc.CameraUpDown(1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#2/3
     }
 
     /**

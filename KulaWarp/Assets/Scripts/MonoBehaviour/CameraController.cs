@@ -20,7 +20,7 @@ public class CameraController : ObjectBase
     private AnimatorOverrideController m_animOverrideCtrl;
     private int m_reset_trigger_ID;
 
-    private Vector3 m_pos, m_up, m_lookAt, m_dir;
+    public Vector3 m_playerPos, m_up, m_lookAt, m_dir;
 
     #region Base_Classes
     void Awake()
@@ -44,22 +44,21 @@ public class CameraController : ObjectBase
     {
         HandleInput();
 
+        // Get the current player position
+        m_playerPos = PlayerController.pc.gameObject.transform.position;
+
+        // If the player is not falling, compensate for movement in the Up component 
+        // due to animations by snapping it back to the grid. 
+        if (!PlayerController.pc.isFalling) m_playerPos = m_playerPos.SnapToGridUp(PlayerController.pc.world_up);
+
         // Set m_dir, m_up and m_pos depening on 
-        if      (camState == CamState.Default)  Follow();
+        if (camState == CamState.Default)       Follow();
         else if (camState <= CamState.TiltDown) Tilt();
         else if (camState <= CamState.RotBack)  Rotate();
+        else if (camState == CamState.Pause)    Pause();
         else if (camState == CamState.Anim)     return;
 
-        // If the game is paused, dont use LookAt() but rather just set the position and rotation of the camera for now
-        // @TODO implement a proper pause cam that is flying around the level
-        if( camState == CamState.Pause)
-        {
-            transform.position = LevelController.lc.pauseCamPos;
-            transform.rotation = Quaternion.Euler(LevelController.lc.pauseCamEuler);
-            return;
-        }
-
-        transform.position = m_pos + m_dir * dirOffset + upOffset * m_up;
+        transform.position = m_playerPos + m_dir * dirOffset + upOffset * m_up;
         transform.LookAt(m_lookAt, m_up);
     }
 
@@ -81,16 +80,9 @@ public class CameraController : ObjectBase
 
     void Follow()
     {
-        m_up  = PlayerController.pc.world_up;
-        m_dir = PlayerController.pc.world_direction;
-
-        //Get the current player position. If it is not falling, compensate for movement in the Up component 
-        // due to animations by snapping it back to the grid. 
-        Vector3 playerPos = PlayerController.pc.gameObject.transform.position;
-        if (!PlayerController.pc.isFalling) playerPos = playerPos.SnapToGridUp(PlayerController.pc.world_up);
-
-        m_pos    = playerPos; 
-        m_lookAt = playerPos + lookAtUpOffset * m_up;
+        m_up     = PlayerController.pc.world_up;
+        m_dir    = PlayerController.pc.world_direction;
+        m_lookAt = m_playerPos + lookAtUpOffset * m_up;
     }
 
     void HandleInput()
@@ -114,7 +106,9 @@ public class CameraController : ObjectBase
 
     public void Pause()
     {
-        camState = CamState.Pause;
+        camState    = CamState.Pause;
+        m_lookAt    = LevelController.lc.pauseCamLookAt;
+        m_playerPos = LevelController.lc.pauseCamPos;
     }
 
     public void Resume()
@@ -124,12 +118,38 @@ public class CameraController : ObjectBase
 
     void Rotate()
     {
+        float epsilon = 0.0001f;
+
         if (camState == CamState.RotLeft || camState == CamState.RotRight)
         {
             // SLerp the position by Lerping the direction vector to the desired direction. 
             int     dir    = camState == CamState.RotLeft ? -1 : 1;
             Vector3 target = dir * Vector3.Cross(PlayerController.pc.world_up, PlayerController.pc.world_direction);
             m_dir          = Vector3.RotateTowards(m_dir, target, Time.deltaTime * rotSpeed, 0.0f);
+
+            // As RotateTowards will not overshoot, we can check for equality
+            if (Vector3.Distance(m_dir, target) < epsilon)
+            {
+                PlayerController.pc.world_direction = target;
+                camState = CamState.Default;
+            }
+        }
+        else if (camState == CamState.RotDown || camState == CamState.RotUp)
+        {
+            Vector3 target_up  = PlayerController.pc.world_up;
+            Vector3 target_dir = PlayerController.pc.world_direction;
+
+            m_dir    = Vector3.RotateTowards(m_dir, target_dir, Time.deltaTime * rotSpeed * 2, 0.0f);
+            m_up     = Vector3.RotateTowards(m_up,  target_up,  Time.deltaTime * rotSpeed * 2, 0.0f);
+            m_lookAt = m_playerPos + lookAtUpOffset * m_up;
+
+            // As this is triggered by the PlayerController the pc also takes care of the world_dir/up changes. 
+            if (Vector3.Distance(m_dir, target_dir) < epsilon && Vector3.Distance(m_up, target_up) < epsilon) camState = CamState.Default;
+        }
+        else if (camState == CamState.RotBack)
+        {
+            Vector3 target = -PlayerController.pc.world_direction;
+            m_dir          = Vector3.RotateTowards(m_dir, target, Time.deltaTime * 2*rotSpeed, 0.0f);
 
             // As RotateTowards will not overshoot, we can check for equality
             if (m_dir == target)

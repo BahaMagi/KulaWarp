@@ -18,8 +18,8 @@ public class LevelController : MonoBehaviour
 
     // Camera Settings
     public AnimationClip cameraIntroAnimation;
-    public Vector3       pauseCamPos   = new Vector3(1.5f, 6.5f, -6.0f);
-    public Vector3       pauseCamEuler = new Vector3(54.0f, 0.0f, 0.0f);
+    public Vector3       pauseCamPos    = new Vector3(1.5f, 6.5f, -6.0f);
+    public Vector3       pauseCamLookAt = new Vector3(0.0f, 0.0f, 0.0f);
 
     #region MonoBehaviour
     void Awake()
