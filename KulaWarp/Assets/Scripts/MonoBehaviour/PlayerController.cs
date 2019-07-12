@@ -122,7 +122,7 @@ public class PlayerController : ObjectBase
         nextBlockLevel     = isHitFront ? hitFront.distance < 1 ? 1 : 0 : -1;
 
         // The player can't start moving until the previous movement is finished.
-        if (isWarping || isFalling || CameraController.cc.isMoving) return false;
+        if (isWarping || isFalling || !CameraController.cc.IsDefault()) return false;
 
         // If there is something in front it is always possible to move. 
         if (isHitFront) return true;
@@ -141,7 +141,7 @@ public class PlayerController : ObjectBase
 
     bool CanWarp()
     {
-        if (isWarping || isFalling || CameraController.cc.isMoving || isGravityShifting) return false;
+        if (isWarping || isFalling || !CameraController.cc.IsDefault() || isGravityShifting) return false;
 
         // If the player is moving or forward is pressed when the player cannot move,
         // check two blocks in front of the player. 
@@ -271,14 +271,15 @@ public class PlayerController : ObjectBase
         float angularSpeed = 90.0f * speed / (LevelController.lc.boxSize * 0.5f); // @TODO That 90 is arbitrary. Make this a public var so its editable from the inspector.
                                                                  // @TODO also: the m_boxsize*0.5 should be m_sphereRadius*2 in theory. Want to test that again.
         Vector3 contactPoint = transform.position - world_up * sphereRadius;
-        m_rb.useGravity = false; // Turn off gravity while rotating to avoid sliding.
+        m_rb.useGravity      = false; // Turn off gravity while rotating to avoid sliding.
 
-        Vector3 tmp = world_up;
-        world_up = world_direction;
+        Vector3 tmp     = world_up;
+        world_up        = world_direction;
         world_direction = -tmp;
 
         // Start rotating the camera.
-        StartCoroutine(CameraController.cc.CameraUpDown(-1));
+        CameraController.cc.camState = CameraController.CamState.GravChange;
+        //StartCoroutine(CameraController.cc.CameraUpDown(-1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#1/3
 
         while (t < 90.0f)
         {
@@ -349,14 +350,15 @@ public class PlayerController : ObjectBase
     {
         Physics.gravity = LevelController.lc.gravity * world_direction;
 
-        m_targetPosition = m_targetPosition - world_direction * (0.5f * LevelController.lc.boxSize + sphereRadius) + world_up * (-sphereRadius + 0.5f * LevelController.lc.boxSize);
+        m_targetPosition    = m_targetPosition - world_direction * (0.5f * LevelController.lc.boxSize + sphereRadius) + world_up * (-sphereRadius + 0.5f * LevelController.lc.boxSize);
         m_remainingDistance = (m_targetPosition - transform.position).sqrMagnitude;
 
-        Vector3 tmp = world_up;
-        world_up = -world_direction;
+        Vector3 tmp     = world_up;
+        world_up        = -world_direction;
         world_direction = tmp;
 
-        StartCoroutine(CameraController.cc.CameraUpDown(1));
+        CameraController.cc.camState = CameraController.CamState.GravChange;
+        // StartCoroutine(CameraController.cc.CameraUpDown(1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#2/3
     }
 
     /**
@@ -387,11 +389,13 @@ public class PlayerController : ObjectBase
         Vector3 newDir = world_direction;
         if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(world_direction, boxDir))) < 0.01f) newDir = world_up;
 
-        StartCoroutine(CameraController.cc.GravityChange(newDir, -boxDir));
+        //StartCoroutine(CameraController.cc.GravityChange(newDir, -boxDir)); <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#3/3
 
         world_direction = newDir;
         world_up        = -boxDir;
         Physics.gravity = LevelController.lc.gravity * boxDir;
+
+        CameraController.cc.camState = CameraController.CamState.GravChange;
     }
 
     /**

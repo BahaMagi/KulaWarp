@@ -10,10 +10,16 @@ public class LevelController : MonoBehaviour
     private float            m_curTime = 0.0f;
     private List<ObjectBase> m_objList;
 
+    // Physics and level settings
     public float           gravity = 9.81f, timeLimit = 120.0f, boxSize = 1.0f;
     public int             targetCryCount = 1;
     public Vector3         startPos, startUp, startDir;
-    public GameObject exit;
+    public GameObject      exit;
+
+    // Camera Settings
+    public AnimationClip cameraIntroAnimation;
+    public Vector3       pauseCamPos    = new Vector3(1.5f, 6.5f, -6.0f);
+    public Vector3       pauseCamLookAt = new Vector3(0.0f, 0.0f, 0.0f);
 
     #region MonoBehaviour
     void Awake()
@@ -22,7 +28,7 @@ public class LevelController : MonoBehaviour
         if (lc == null) lc = this;
         else if (lc != this) Destroy(gameObject);
 
-        exit = GameObject.Find("Exit");
+        exit      = GameObject.Find("Exit");
         m_objList = new List<ObjectBase>();
 
         Physics.gravity = -gravity * startUp;
