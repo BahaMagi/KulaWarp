@@ -170,7 +170,7 @@ public class GameController : MonoBehaviour
         Resume();
 
         // Load the next level if there is one. If there is not, return to the main menu.
-        if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCountInBuildSettings)
+        if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCountInBuildSettings - 1)
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         else
             SceneManager.LoadScene(0);

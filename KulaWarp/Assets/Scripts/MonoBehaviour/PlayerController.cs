@@ -278,7 +278,7 @@ public class PlayerController : ObjectBase
         world_direction = -tmp;
 
         // Start rotating the camera.
-        CameraController.cc.camState = CameraController.CamState.RotDown;
+        CameraController.cc.camState = CameraController.CamState.GravChange;
         //StartCoroutine(CameraController.cc.CameraUpDown(-1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#1/3
 
         while (t < 90.0f)
@@ -357,7 +357,7 @@ public class PlayerController : ObjectBase
         world_up        = -world_direction;
         world_direction = tmp;
 
-        CameraController.cc.camState = CameraController.CamState.RotUp;
+        CameraController.cc.camState = CameraController.CamState.GravChange;
         // StartCoroutine(CameraController.cc.CameraUpDown(1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#2/3
     }
 
@@ -394,6 +394,8 @@ public class PlayerController : ObjectBase
         world_direction = newDir;
         world_up        = -boxDir;
         Physics.gravity = LevelController.lc.gravity * boxDir;
+
+        CameraController.cc.camState = CameraController.CamState.GravChange;
     }
 
     /**
