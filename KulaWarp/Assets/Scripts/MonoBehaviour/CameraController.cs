@@ -113,7 +113,7 @@ public class CameraController : ObjectBase
         else if (Input.GetButtonDown("Vertical")   && Input.GetAxisRaw("Vertical")   == -1 && CanRotate())
             camState = CamState.RotBack;
 
-        // Rotation is possible while tilting
+        // Rotation is possible while tilting, hence the separate if/else
         if      (Input.GetButton("LookUp")   && CanTilt()) m_tilt = 1;
         else if (Input.GetButton("LookDown") && CanTilt()) m_tilt = -1;
         else m_tilt = 0;
