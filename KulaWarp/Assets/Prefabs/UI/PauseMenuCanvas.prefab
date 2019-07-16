@@ -434,7 +434,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 7003762034347329243, guid: 710f3ebb285155948a1837581138c5b9,
+          type: 3}
         m_MethodName: Quit
         m_Mode: 1
         m_Arguments:
@@ -457,7 +458,7 @@ Animator:
   m_GameObject: {fileID: 4108570846448198110}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 667ae9805fcd3b54a86c820cd92f594a, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -556,9 +557,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
+    m_Mode: 4
+    m_SelectOnUp: {fileID: 4108570847034658900}
+    m_SelectOnDown: {fileID: 4108570846448198099}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
@@ -585,7 +586,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4108570846936677498}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 54068309140363625, guid: 21ee87b15ba1f1d4991fb9d533235894,
+          type: 3}
+        m_MethodName: Die
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!95 &4108570846936677496
@@ -598,7 +611,7 @@ Animator:
   m_GameObject: {fileID: 4108570846936677478}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 667ae9805fcd3b54a86c820cd92f594a, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -727,7 +740,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 7003762034347329243, guid: 710f3ebb285155948a1837581138c5b9,
+          type: 3}
         m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
@@ -750,7 +764,7 @@ Animator:
   m_GameObject: {fileID: 4108570847034658898}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 667ae9805fcd3b54a86c820cd92f594a, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

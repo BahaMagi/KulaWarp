@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 54068309140363629}
+  - component: {fileID: 54068309140363625}
   - component: {fileID: 54068309140363630}
   - component: {fileID: 54068309140363631}
   - component: {fileID: 54068309140363624}
-  - component: {fileID: 54068309140363625}
   - component: {fileID: 54068309140363626}
   m_Layer: 8
   m_Name: Player
@@ -30,12 +30,34 @@ Transform:
   m_GameObject: {fileID: 54068309140363627}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4, y: 0.71, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
+  m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
   m_Children:
   - {fileID: 54068310053535786}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &54068309140363625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54068309140363627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4290e83576fdc754680a4fd7c710764f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player_sphere: {fileID: 54068310053535782}
+  speed: 3.5
+  easeInTime: 0.3
+  world_direction: {x: 0, y: 0, z: 0}
+  world_up: {x: 0, y: 0, z: 0}
+  isMoving: 0
+  isWarping: 0
+  isFalling: 0
+  isGravityShifting: 0
+  sphereRadius: 0
 --- !u!33 &54068309140363630
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -51,7 +73,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 54068309140363627}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: d8f701cbe3d21c7438302aec224b3d98, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -71,27 +93,8 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 2
---- !u!114 &54068309140363625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 54068309140363627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4290e83576fdc754680a4fd7c710764f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player_sphere: {fileID: 54068310053535782}
-  game: {fileID: 0}
-  speed: 4.5
-  easeInTime: 0.02
-  world_direction: {x: 0, y: 0, z: 0}
-  world_up: {x: 0, y: 0, z: 0}
-  isMoving: 0
 --- !u!95 &54068309140363626
 Animator:
   serializedVersion: 3
@@ -196,7 +199,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 54068310053535782}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: d8f701cbe3d21c7438302aec224b3d98, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2

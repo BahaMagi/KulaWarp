@@ -43,20 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b2a194c1aad8324baaa0561dad711bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crystalImgBnWPrefab: {fileID: 7929397208123042615, guid: 255b4dbb01c8e3241a8eecb33182402a,
+  saveFileName: /save.mem
+  pauseMenu: {fileID: 4108570847542129461, guid: 78ad0040c41b1544a993e78114f7b7ae,
     type: 3}
-  player: {fileID: 0}
-  mainCamera: {fileID: 0}
-  exit: {fileID: 0}
-  UI: {fileID: 0}
-  pauseMenu: {fileID: 0}
-  m_cc: {fileID: 0}
-  m_pc: {fileID: 0}
-  m_ec: {fileID: 0}
-  m_uic: {fileID: 0}
-  startPosPlayer: {x: 4, y: 0.7, z: 0}
-  startUp: {x: 0, y: 1, z: 0}
-  startDir: {x: -1, y: 0, z: 0}
-  targetCrystalCount: 1
-  timeLimit: 120
-  isPaused: 0
