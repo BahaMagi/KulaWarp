@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class UIController : ObjectBase
@@ -11,6 +12,9 @@ public class UIController : ObjectBase
     public Sprite     crystalImgColor; // The sprite (= image file) of the colored crystal. 
     public Sprite     crystalImgBnW; // The sprite (= image file) of the black and white crystal. 
     public GameObject scoreTMP, timeTMP;
+
+    private EventSystem m_es;
+    private GameObject  m_pauseMenuContinueBtn, m_pauseMenu;
 
     private TextMeshProUGUI  m_scoreText, m_timeText;
     private List<GameObject> m_crystals;
@@ -29,17 +33,8 @@ public class UIController : ObjectBase
             m_crystals.Add(Instantiate(crystalImgPrefab, Vector3.zero, Quaternion.identity));
             m_crystals[i].transform.SetParent(transform.GetChild(0).transform, false);
         }
-    }
 
-    void LoadComponents()
-    {
-        m_scoreText = scoreTMP.GetComponent<TextMeshProUGUI>();
-        m_timeText  = timeTMP.GetComponent<TextMeshProUGUI>();
-    }
-
-    public void DisplayTime(float time, float timelimit)
-    {
-        m_timeText.text = (int)((timelimit - time) / 60) + ":" + (int)(timelimit - time) % 60;
+        m_pauseMenu.SetActive(false);
     }
 
     public void ColorCrystal(int count, bool color = true)
@@ -49,9 +44,27 @@ public class UIController : ObjectBase
         m_crystals[count - 1].GetComponent<Image>().sprite = color ? crystalImgColor : crystalImgBnW;
     }
 
-    public void Score(int score)
+    public void DisplayTime(float time, float timelimit)
     {
-        m_scoreText.text = "Score: " + score.ToString("000000");
+        m_timeText.text = (int)((timelimit - time) / 60) + ":" + (int)(timelimit - time) % 60;
+    }
+
+    void LoadComponents()
+    {
+        m_scoreText = scoreTMP.GetComponent<TextMeshProUGUI>();
+        m_timeText  = timeTMP.GetComponent<TextMeshProUGUI>();
+
+        m_es                   = GameObject.Find("EventSystem").GetComponent<EventSystem>();
+        m_pauseMenuContinueBtn = GameObject.Find("Continue Button");
+        m_pauseMenu            = GameObject.Find("PauseMenuCanvas");
+    }
+
+    public void PauseScreen(bool show)
+    {
+        m_pauseMenu.SetActive(show);
+
+        if (show) m_es.SetSelectedGameObject(m_pauseMenuContinueBtn);
+        else m_es.SetSelectedGameObject(null);
     }
 
     public override void Reset()
@@ -61,4 +74,16 @@ public class UIController : ObjectBase
         for (int i = 0; i < LevelController.lc.targetCryCount; i++)
             ColorCrystal(i, false);
     }
+
+    public void ResetCrystals()
+    {
+        for (int i = 0; i < m_crystals.Count; i++) m_crystals[i].GetComponent<Image>().sprite = crystalImgBnW;
+    }
+
+    public void Score(int score)
+    {
+        m_scoreText.text = "Score: " + score.ToString("000000");
+    }
+
+    
 }

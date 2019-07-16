@@ -19,6 +19,8 @@ public class CameraController : ObjectBase
     private int     m_tilt = 0;
     private float   m_dirOffset, m_upOffset;
 
+    private bool m_keyDown = false; // Axis Input does not provide GetXXDown() so this acts as replacement
+
 #region Base_Classes
     void Awake()
     {
@@ -106,12 +108,15 @@ public class CameraController : ObjectBase
 
     void HandleInput()
     {
-        if      (Input.GetButtonDown("Horizontal") && Input.GetAxisRaw("Horizontal") == -1 && CanRotate())
-            camState = CamState.RotLeft;
-        else if (Input.GetButtonDown("Horizontal") && Input.GetAxisRaw("Horizontal") ==  1 && CanRotate())
-            camState = CamState.RotRight;
-        else if (Input.GetButtonDown("Vertical")   && Input.GetAxisRaw("Vertical")   == -1 && CanRotate())
-            camState = CamState.RotBack;
+        if      (Input.GetAxisRaw("Horizontal") == -1 && CanRotate() && !m_keyDown)
+            { camState = CamState.RotLeft; m_keyDown = true; }
+        else if (Input.GetAxisRaw("Horizontal") ==  1 && CanRotate() && !m_keyDown)
+            { camState = CamState.RotRight; m_keyDown = true; }
+        else if (Input.GetAxisRaw("Vertical")   == -1 && CanRotate() && !m_keyDown)
+            { camState = CamState.RotBack; m_keyDown = true; }
+        else if (Input.GetAxisRaw("Horizontal") == 0 &&
+                 Input.GetAxisRaw("Vertical") == 0 && IsDefault())
+            m_keyDown = false;
 
         // Rotation is possible while tilting, hence the separate if/else
         if      (Input.GetButton("LookUp")   && CanTilt()) m_tilt = 1;

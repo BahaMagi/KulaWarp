@@ -194,7 +194,7 @@ public class PlayerController : ObjectBase
     void CheckImpact()
     {
         // Check with a ray cast whether the sphere is in the air.
-        bool hit = Physics.Raycast(transform.position, -world_up, sphereRadius * 2.0f, m_envLayerMask);
+        bool hit = Physics.Raycast(transform.position, -world_up, sphereRadius * 1.15f, m_envLayerMask);
 
         if (!isFalling) isFalling = !hit;
         else
@@ -205,10 +205,15 @@ public class PlayerController : ObjectBase
         }
     }
 
+    public void OnObstacleEnter()
+    {
+        if (!isWarping) Die();
+    }
+
     public void Die()
     {
         //@TODO play death animation
-        StartCoroutine(GameController.gc.Lose());
+        GameController.gc.Lost();
     }
 
     /**
@@ -220,7 +225,7 @@ public class PlayerController : ObjectBase
      */
     int HandleInput()
     {
-        if (Input.GetButton("Warp"))
+        if (Input.GetButtonDown("Warp"))
             return 2;
 
         return (int)(Input.GetAxisRaw("Vertical")); // For keyboard input this is in {-1, 0, 1} 
@@ -279,7 +284,6 @@ public class PlayerController : ObjectBase
 
         // Start rotating the camera.
         CameraController.cc.camState = CameraController.CamState.GravChange;
-        //StartCoroutine(CameraController.cc.CameraUpDown(-1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#1/3
 
         while (t < 90.0f)
         {
@@ -292,8 +296,8 @@ public class PlayerController : ObjectBase
         }
 
         // Turn gravity back on and change it to the new direction.
-        Physics.gravity = -LevelController.lc.gravity * world_up;
-        m_rb.useGravity = true;
+        Physics.gravity   = -LevelController.lc.gravity * world_up;
+        m_rb.useGravity   = true;
         isGravityShifting = false;
 
         // Phase 3: Move to the center of the face of the box. 
@@ -358,7 +362,6 @@ public class PlayerController : ObjectBase
         world_direction = tmp;
 
         CameraController.cc.camState = CameraController.CamState.GravChange;
-        // StartCoroutine(CameraController.cc.CameraUpDown(1));<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#2/3
     }
 
     /**
@@ -388,8 +391,6 @@ public class PlayerController : ObjectBase
         // world_up direction. 
         Vector3 newDir = world_direction;
         if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(world_direction, boxDir))) < 0.01f) newDir = world_up;
-
-        //StartCoroutine(CameraController.cc.GravityChange(newDir, -boxDir)); <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<#3/3
 
         world_direction = newDir;
         world_up        = -boxDir;
@@ -434,12 +435,12 @@ public class PlayerController : ObjectBase
 
             m_animator.SetTrigger(m_warp_trigger_ID);
 
-            float t = 0.0f;
+            //float t = 0.0f;
             Vector3 startPosition = transform.position;
             m_targetPosition      = startPosition.SnapToGridAll(world_up);
             m_targetPosition     += world_direction * 2.0f + world_up * (0.5f - sphereRadius);
 
-            bool arrived = false;
+            /*bool arrived = false;
             while (!arrived)
             {
                 m_rb.MovePosition(MyInterps.QuadEaseIn(startPosition, m_targetPosition, out arrived, t, easeInTime, speed*1.5f));
@@ -449,10 +450,10 @@ public class PlayerController : ObjectBase
                 RotatePlayerSphere();
 
                 yield return null;
-            }
+            }*/
             transform.position = m_targetPosition;
 
-            //while (!m_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) yield return null;
+            while (isWarping) yield return null;
 
             SetisMoving(false);
             isWarping             = false;
@@ -493,21 +494,26 @@ public class PlayerController : ObjectBase
         }
     }
 
-    public void Disable()
+    public void Enable(bool enable)
     {
-        player_sphere.SetActive(false);
+        player_sphere.SetActive(enable);
     }
+
 
     public override void Reset()
     {
-        if (m_moveForCoro  != null) StopCoroutine(m_moveForCoro);
-        if (m_moveDownCoro != null) StopCoroutine(m_moveDownCoro);
+        StopAllCoroutines();
+        //if (m_moveForCoro  != null) StopCoroutine(m_moveForCoro);
+        //if (m_moveDownCoro != null) StopCoroutine(m_moveDownCoro);
 
         world_up           = LevelController.lc.startUp;
         world_direction    = LevelController.lc.startDir;
         transform.position = LevelController.lc.startPos;
 
         isMoving = false; isWarping = false; isFalling = false; isGravityShifting = false;
+
+        m_rb.useGravity = true;
+        m_rb.velocity = Vector3.zero; m_rb.angularVelocity = Vector3.zero;
 
         player_sphere.SetActive(true);
     }

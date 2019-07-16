@@ -1,9 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class SaveData
@@ -17,13 +18,13 @@ public class GameController : MonoBehaviour
 {
     [HideInInspector] public static GameController gc;
 
-    private SaveData m_saveData;
-    private bool     m_isPaused;
-    private string   m_savePath;
+    private enum GameState { Default, Paused, GameOver, Won, Lost };
+    private GameState m_gameState = GameState.Default;
+    private SaveData  m_saveData;
+    private string    m_savePath;
 
     public string     saveFileName;
-    public GameObject pauseMenu;
-
+ 
 #region Monobehavior
     void Awake()
     {
@@ -34,9 +35,6 @@ public class GameController : MonoBehaviour
             gc = this;
         }
         else if (gc != this) Destroy(gameObject);
-
-        m_isPaused = false;
-        pauseMenu.SetActive(false);
 
         m_saveData = new SaveData();
         if(saveFileName.Length == 0) m_savePath = Application.dataPath + "/save.mem";
@@ -49,30 +47,51 @@ public class GameController : MonoBehaviour
     }
 #endregion Monobehavior
 
-    public  IEnumerator GameOver()
+    public void GameOver()
     {
+        // Stop input affecting the player or the camera.
+        Time.timeScale = 0.0f;
+
+        PlayerController.pc.Enable(false);
+        CameraController.cc.Pause();
+
+        m_gameState = GameState.GameOver;
+
         // @TODO there has to be a "Game Over screen" shown here
-
-        while (!Input.GetButtonDown("Warp")) yield return null;
-
-        // Return to the main menu
-        SceneManager.LoadScene(0);
     }
 
-    private void HandleInput()
+    void HandleInput()
     {
-        if (Input.GetButtonDown("Pause") && m_isPaused) Resume();
-        else if (Input.GetButtonDown("Pause") && !m_isPaused && 
-           CameraController.cc.IsDefault() && 
-           !PlayerController.pc.isMoving) Pause();
+        switch(m_gameState)
+        {
+            case GameState.Paused:
+                if (Input.GetButtonDown("Pause")) Resume();
+                break;
+            case GameState.GameOver:
+                if(Input.GetButtonDown("Submit")) SceneManager.LoadScene(0);
+                break;
+            case GameState.Won:
+                if (Input.GetButtonDown("Submit")) NextLevel();
+                break;
+            case GameState.Lost:
+                if (Input.GetButtonDown("Submit"))
+                    { LevelController.lc.Restart(); Resume(); }
+                break;
+            default:
+                if (Input.GetButtonDown("Pause")    &&
+                    CameraController.cc.IsDefault() &&
+                    !PlayerController.pc.isMoving)
+                        Pause();
+                break;
+        }
     }
 
-    public  bool IsPaused()
+    public bool IsPaused()
     {
-        return m_isPaused;
+        return m_gameState == GameState.Paused;
     }
 
-    public  void LoadGame()
+    public void LoadGame()
     {
         if (!File.Exists(m_savePath))
             return;
@@ -85,82 +104,26 @@ public class GameController : MonoBehaviour
         stream.Close();
     }
 
-    public  IEnumerator Lose()
+    public void Lost()
     {
         // Stop input affecting the player or the camera.
-        Pause(false);
-        PlayerController.pc.Disable();
+        Time.timeScale = 0.0f;
 
-        // Stop time
-        Time.timeScale = 0f;
-
-        // Set a pose for the camera as background for the score screen. 
+        UIController.uic.PauseScreen(false);
+        PlayerController.pc.Enable(false);
         CameraController.cc.Pause();
+
+        m_gameState = GameState.Lost;
 
         // Apply the points penatly and check for game over
         m_saveData.totalPoints -= LevelController.lc.GetPoints();
-        if (m_saveData.totalPoints < 0) { StartCoroutine(GameOver()); yield break; }
+        //if (m_saveData.totalPoints < 0) GameOver(); // DEBUG switched this off for debugging
 
-        // @TODO there has to be a "Died screen" shown here
-
-        while (!Input.GetButtonDown("Warp")) yield return null;
-
-        Resume();
-
-        // Restart the level
-        LevelController.lc.Restart();
+        // else @TODO there has to be a "Died screen" shown here
     }
 
-    public  void Pause(bool showMenu = true)
+    public void NextLevel()
     {
-        m_isPaused     = true;
-        Time.timeScale = 0.0f;
-
-        CameraController.cc.Pause();
-        if(showMenu) pauseMenu.SetActive(true);
-    }
-
-    public  void Quit()
-    {
-        // Go back to the main menu
-        SceneManager.LoadScene(0);
-    }
-
-    public  void Resume()
-    {
-        m_isPaused     = false;
-        Time.timeScale = 1.0f;
-
-        CameraController.cc.Resume();
-        pauseMenu.SetActive(false);
-    }
-
-    public  void SaveGame()
-    {
-        BinaryFormatter formatter = new BinaryFormatter();
-        FileStream stream = new FileStream(m_savePath, FileMode.Create);
-
-        formatter.Serialize(stream, m_saveData);
-
-        stream.Close();
-    }
-
-    public  IEnumerator Win()
-    {
-        // Stop input affecting the player or the camera.
-        Pause(false);
-        PlayerController.pc.Disable();
-
-        // Stop time
-        Time.timeScale = 0f;
-
-        // Set a pose for the camera as background for the score screen. 
-        CameraController.cc.Pause();
-
-        // @TODO there has to be a "Win screen" shown here
-
-        while (!Input.GetButtonDown("Warp")) yield return null;
-
         // Save stats
         m_saveData.pointsPerLevel.Add(LevelController.lc.GetPoints());
         m_saveData.totalPoints += LevelController.lc.GetPoints();
@@ -174,5 +137,54 @@ public class GameController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         else
             SceneManager.LoadScene(0);
+    }
+
+    public void Pause()
+    {
+        m_gameState    = GameState.Paused;
+        Time.timeScale = 0.0f;
+
+        PlayerController.pc.Enable(false);
+        CameraController.cc.Pause();
+        UIController.uic.PauseScreen(true);
+    }
+
+    public void Quit()
+    {
+        // Go back to the main menu
+        SceneManager.LoadScene(0);
+    }
+
+    public void Resume()
+    {
+        m_gameState    = GameState.Default;
+        Time.timeScale = 1.0f;
+
+        CameraController.cc.Resume();
+        PlayerController.pc.Enable(true);
+        UIController.uic.PauseScreen(false);
+    }
+
+    public void SaveGame()
+    {
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream stream         = new FileStream(m_savePath, FileMode.Create);
+
+        formatter.Serialize(stream, m_saveData);
+
+        stream.Close();
+    }
+
+    public void Win()
+    {
+        // Stop input affecting the player or the camera.
+        Time.timeScale = 0.0f;
+
+        PlayerController.pc.Enable(false);
+        CameraController.cc.Pause();
+
+        m_gameState = GameState.Won;
+        
+        // @TODO there has to be a "Win screen" shown here
     }
 }

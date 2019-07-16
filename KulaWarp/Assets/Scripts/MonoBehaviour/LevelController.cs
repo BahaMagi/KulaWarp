@@ -67,7 +67,7 @@ public class LevelController : MonoBehaviour
 
     public void OnExitEnter()
     {// Invoked by the TriggerBase script attached to the exit. 
-        if (m_curCrys >= targetCryCount) StartCoroutine(GameController.gc.Win());
+        if (m_curCrys >= targetCryCount) GameController.gc.Win();
     }
 
     public void Pause()
@@ -83,9 +83,12 @@ public class LevelController : MonoBehaviour
         m_curTime = 0; m_curCrys = 0; m_points  = 0;
         Physics.gravity = -gravity * startUp;
 
+        UIController.uic.ResetCrystals();
+        ActivateExit();
+
         // Reset all objects that have registerd with the level, 
         // e.g. player, camera, pickups, crystals, ... 
-        foreach(ObjectBase o in m_objList) o.Reset();
+        foreach (ObjectBase o in m_objList) o.Reset();
     }
 
     public void Resume()

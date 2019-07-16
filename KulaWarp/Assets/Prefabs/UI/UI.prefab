@@ -61,7 +61,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
-  m_SubmitButton: Warp
+  m_SubmitButton: Submit
   m_CancelButton: Cancel
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
@@ -216,17 +216,23 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4108570846448198099, guid: 78ad0040c41b1544a993e78114f7b7ae,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 4108570846448198096, guid: 78ad0040c41b1544a993e78114f7b7ae,
+    - target: {fileID: 4108570846936677496, guid: 78ad0040c41b1544a993e78114f7b7ae,
         type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 4108570846936677496, guid: 78ad0040c41b1544a993e78114f7b7ae,
+    - target: {fileID: 4108570846936677499, guid: 78ad0040c41b1544a993e78114f7b7ae,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 54068309140363625, guid: 21ee87b15ba1f1d4991fb9d533235894,
+        type: 3}
+    - target: {fileID: 4108570846936677499, guid: 78ad0040c41b1544a993e78114f7b7ae,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Die
+      objectReference: {fileID: 0}
+    - target: {fileID: 4108570847034658729, guid: 78ad0040c41b1544a993e78114f7b7ae,
         type: 3}
       propertyPath: m_Controller
       value: 
@@ -235,11 +241,28 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
+      objectReference: {fileID: 7003762034347329243, guid: 710f3ebb285155948a1837581138c5b9,
+        type: 3}
+    - target: {fileID: 4108570847034658900, guid: 78ad0040c41b1544a993e78114f7b7ae,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Resume
       objectReference: {fileID: 0}
-    - target: {fileID: 4108570847034658729, guid: 78ad0040c41b1544a993e78114f7b7ae,
+    - target: {fileID: 4108570846448198096, guid: 78ad0040c41b1544a993e78114f7b7ae,
         type: 3}
       propertyPath: m_Controller
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4108570846448198099, guid: 78ad0040c41b1544a993e78114f7b7ae,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7003762034347329243, guid: 710f3ebb285155948a1837581138c5b9,
+        type: 3}
+    - target: {fileID: 4108570846448198099, guid: 78ad0040c41b1544a993e78114f7b7ae,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Quit
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ad0040c41b1544a993e78114f7b7ae, type: 3}
