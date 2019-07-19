@@ -9,13 +9,14 @@ public class CameraController : ObjectBase
     public float rotSpeed  = 0.5f,  tiltSpeed = 0.5f, followSpeed    = 1.0f;
 
     public enum CamState {Default, RotLeft, RotRight, RotBack, GravChange, Pause, Anim};
-    [HideInInspector] public CamState camState = CamState.Default;
+    [ReadOnly] public CamState camState = CamState.Default;
 
     private Animator m_anim;
     private AnimatorOverrideController m_animOverrideCtrl;
     private int m_reset_trigger_ID;
 
     private Vector3 m_playerPos, m_up, m_lookAt, m_dir;
+    private Vector3 m_velocity = Vector3.zero;
     private int     m_tilt = 0;
     private float   m_dirOffset, m_upOffset;
 
@@ -50,7 +51,9 @@ public class CameraController : ObjectBase
 
         // If the player is not falling, compensate for movement in the Up component 
         // due to animations by snapping it back to the grid. 
-        if (!PlayerController.pc.isFalling) m_playerPos = m_playerPos.SnapToGridUp(PlayerController.pc.world_up);
+        if (!(PlayerController.pc.state == PlayerController.PlayerState.Falling) &&
+            camState != CamState.GravChange)
+            m_playerPos = m_playerPos.SnapToGridUp(PlayerController.pc.world_up);
 
         // Set m_dir, m_up and m_pos depening on 
         if (camState == CamState.Default)         Follow();
@@ -62,7 +65,9 @@ public class CameraController : ObjectBase
         // Tilt if a tilt button is pressed or interpolate back to normal position
         Tilt();
 
-        transform.position = m_playerPos + m_dir * m_dirOffset + m_upOffset * m_up;
+        Vector3 target = m_playerPos + m_dir * m_dirOffset + m_upOffset * m_up;
+        transform.position = target;
+        //transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime*followSpeed);
         transform.LookAt(m_lookAt, m_up);
     }
 
@@ -75,12 +80,12 @@ public class CameraController : ObjectBase
 
     bool CanRotate()
     {
-        return IsDefault() && !PlayerController.pc.isMoving && !PlayerController.pc.isWarping && !PlayerController.pc.isFalling;
+        return IsDefault() && (PlayerController.pc.state == PlayerController.PlayerState.Idle);
     }
 
     bool CanTilt()
     {
-        return !PlayerController.pc.isFalling;
+        return !(PlayerController.pc.state == PlayerController.PlayerState.Falling);
     }
 
     void Follow()
@@ -97,12 +102,13 @@ public class CameraController : ObjectBase
         Vector3 target_up  = PlayerController.pc.world_up;
         Vector3 target_dir = PlayerController.pc.world_direction;
 
-        m_dir    = Vector3.RotateTowards(m_dir, target_dir, Time.deltaTime * rotSpeed * 2, 0.0f);
-        m_up     = Vector3.RotateTowards(m_up, target_up, Time.deltaTime * rotSpeed * 2, 0.0f);
+        m_dir    = Vector3.RotateTowards(m_dir, target_dir, Time.deltaTime * rotSpeed * 2.0f, 0.0f);
+        m_up     = Vector3.RotateTowards(m_up, target_up, Time.deltaTime * rotSpeed * 2.0f, 0.0f);
         m_lookAt = m_playerPos + lookAtUpOffset * m_up;
 
         // As this is triggered by the PlayerController the pc also takes care of the world_dir/up changes. 
-        if (Vector3.Distance(m_dir, target_dir) < epsilon && Vector3.Distance(m_up, target_up) < epsilon)
+        if ((m_dir - target_dir).sqrMagnitude < epsilon && 
+            (m_up - target_up).sqrMagnitude < epsilon)
             camState = CamState.Default;
     }
 
@@ -155,11 +161,11 @@ public class CameraController : ObjectBase
         else // Camstate.RotBack
         {
             target = -PlayerController.pc.world_direction;
-            m_dir          = Vector3.RotateTowards(m_dir, target, Time.deltaTime * 2*rotSpeed, 0.0f);
+            m_dir  = Vector3.RotateTowards(m_dir, target, Time.deltaTime * 2 * rotSpeed, 0.0f);
         }
 
-        // If the new position has been reached, go back to Default state
-        if (Vector3.Distance(m_dir, target) < epsilon)
+        // If the new position has been reached, go back to Default state   
+        if ((m_dir - target).sqrMagnitude < epsilon)
         {
             PlayerController.pc.world_direction = target;
             camState = CamState.Default;

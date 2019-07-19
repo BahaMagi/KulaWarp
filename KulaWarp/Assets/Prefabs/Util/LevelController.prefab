@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b27f36c9508534645a09eb255bba2aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravity: 9.81
+  gravity: 20
   timeLimit: 120
   boxSize: 1
   targetCryCount: 1
@@ -51,3 +51,6 @@ MonoBehaviour:
   startUp: {x: 0, y: 1, z: 0}
   startDir: {x: -1, y: 0, z: 0}
   exit: {fileID: 3566850433447823931, guid: 9e015a55e43877b46859c824f0e126cc, type: 3}
+  cameraIntroAnimation: {fileID: 0}
+  pauseCamPos: {x: 1.5, y: 6.5, z: -6}
+  pauseCamLookAt: {x: 0, y: 0, z: 0}

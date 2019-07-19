@@ -80,7 +80,7 @@ public class GameController : MonoBehaviour
             default:
                 if (Input.GetButtonDown("Pause")    &&
                     CameraController.cc.IsDefault() &&
-                    !PlayerController.pc.isMoving)
+                    !(PlayerController.pc.state == PlayerController.PlayerState.Moving))
                         Pause();
                 break;
         }
