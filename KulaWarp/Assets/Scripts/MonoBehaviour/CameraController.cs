@@ -38,6 +38,7 @@ public class CameraController : ObjectBase
         m_reset_trigger_ID = Animator.StringToHash("reset");
 
         m_dirOffset = dirOffset; m_upOffset = upOffset;
+        m_dir = LevelController.lc.startDir; m_up = LevelController.lc.startUp;
 
         LevelController.lc.Register(this); // This makes sure Reset() is called upon a level restart.
     }
