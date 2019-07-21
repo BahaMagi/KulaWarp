@@ -41,11 +41,12 @@ public class UIController : ObjectBase
         m_pauseMenuQuitBtn.GetComponent<Button>().onClick.AddListener(delegate { m_quitClicked = true; });
         m_pauseMenuRestartBtn.GetComponent<Button>().onClick.AddListener(delegate { m_restartClicked = true; });
 
+        // Make sure the Continue Button is immediately selected in the pause screen
+        m_pauseMenuContinueBtn.GetComponent<Button>().Select();
+        m_pauseMenuContinueBtn.GetComponent<Button>().OnSelect(null);
+
         // Disable the Pause Screen
         m_pauseMenu.SetActive(false);
-
-        // Make sure the Continue Button is immediately selected in the pause screen
-        m_es.SetSelectedGameObject(m_pauseMenuContinueBtn);
 
         LevelController.lc.Register(this);
     }
