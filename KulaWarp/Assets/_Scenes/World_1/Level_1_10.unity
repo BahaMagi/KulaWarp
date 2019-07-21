@@ -1074,13 +1074,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 642938435}
-  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
-  m_LocalPosition: {x: 1, y: -2.3, z: -1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: -2, z: -1}
   m_LocalScale: {x: 0.013570007, y: 0.108570054, z: 0.0135699995}
   m_Children: []
   m_Father: {fileID: 245647777}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &642938437
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1609,7 +1609,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1012479863}
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 1.7, y: 3, z: -4}
+  m_LocalPosition: {x: 2, y: 3, z: -4}
   m_LocalScale: {x: 0.013571599, y: 0.108572826, z: 0.013571603}
   m_Children: []
   m_Father: {fileID: 245647777}
@@ -1754,13 +1754,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1035232169}
-  m_LocalRotation: {x: 1, y: -0, z: -0, w: 0}
-  m_LocalPosition: {x: 1, y: 3.7, z: -2}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 4, z: -2}
   m_LocalScale: {x: 0.0135699995, y: 0.108569995, z: 0.0135699995}
   m_Children: []
   m_Father: {fileID: 245647777}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1035232171
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2297,8 +2297,8 @@ Transform:
   - {fileID: 1291245619}
   - {fileID: 953317705}
   - {fileID: 199388116}
-  - {fileID: 2025407940}
   - {fileID: 1421332553}
+  - {fileID: 2025407940}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2333,7 +2333,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 3}
   m_Children: []
   m_Father: {fileID: 1414627752}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1421332554
 BoxCollider:

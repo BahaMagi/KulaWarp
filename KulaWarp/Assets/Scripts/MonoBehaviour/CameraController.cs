@@ -9,7 +9,7 @@ public class CameraController : ObjectBase
     public float rotSpeed  = 0.5f,  tiltSpeed = 0.5f, followSpeed    = 1.0f;
 
     public enum CamState {Default, RotLeft, RotRight, RotBack, GravChange, Pause, Anim};
-    [ReadOnly] public CamState camState = CamState.Default;
+    [ReadOnly] public CamState camState = CamState.Anim;
 
     private Animator m_anim;
     private AnimatorOverrideController m_animOverrideCtrl;
@@ -20,7 +20,7 @@ public class CameraController : ObjectBase
     private int     m_tilt = 0;
     private float   m_dirOffset, m_upOffset;
 
-    private bool m_keyDown = false; // Axis Input does not provide GetXXDown() so this acts as replacement
+    private bool isIntroOver = false, m_keyDown = false; // Axis Input does not provide GetXXDown() so this acts as replacement
 
 #region Base_Classes
     void Awake()
@@ -75,6 +75,7 @@ public class CameraController : ObjectBase
 
     public override void Reset()
     {
+        camState = CamState.Anim;
         m_anim.SetTrigger(m_reset_trigger_ID);
     }
 
