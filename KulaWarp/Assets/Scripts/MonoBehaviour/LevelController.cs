@@ -89,6 +89,8 @@ public class LevelController : MonoBehaviour
         // Reset all objects that have registerd with the level, 
         // e.g. player, camera, pickups, crystals, ... 
         foreach (ObjectBase o in m_objList) o.Reset();
+
+        GameController.gc.Resume();
     }
 
     public void Resume()

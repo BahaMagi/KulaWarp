@@ -18,7 +18,7 @@ public class PlayerController : ObjectBase
 
     public GameObject player_sphere;
 
-    public float speed = 3.5f, easeInTime = 0.3f;
+    public float speed = 3.5f, easeInTime = 0.3f; // Max speed of the player and duration of the EaseIn to the rolling movement.
 
     [ReadOnly] public PlayerState  state;
     [ReadOnly] public AnimState    animState;
@@ -113,7 +113,7 @@ public class PlayerController : ObjectBase
         if ((sm.currentState.stateName == (int)PlayerState.GravityChange) ||
             (sm.currentState.stateName == (int)PlayerState.Warping) ||
             (sm.currentState.stateName == (int)PlayerState.Falling) ||
-            !CameraController.cc.IsDefault())
+            !CameraController.cc.IsDefault() || GameController.gc.IsPaused())
             return false;
 
         // If there is something in front it is always possible to move. 
@@ -134,7 +134,8 @@ public class PlayerController : ObjectBase
     bool CanWarp()
     {
         if (!CameraController.cc.IsDefault() || state == PlayerState.Warping ||
-            state == PlayerState.Falling     || state == PlayerState.GravityChange)
+            state == PlayerState.Falling     || state == PlayerState.GravityChange ||
+            GameController.gc.IsPaused())
             return false;
 
         // If the player is moving or forward is pressed when the player cannot move,

@@ -14,7 +14,8 @@ public class UIController : ObjectBase
     public GameObject scoreTMP, timeTMP;
 
     private EventSystem m_es;
-    private GameObject  m_pauseMenuContinueBtn, m_pauseMenu;
+    private GameObject  m_pauseMenuContinueBtn, m_pauseMenuQuitBtn, m_pauseMenuRestartBtn, m_pauseMenu;
+    private bool        m_continueClicked, m_quitClicked, m_restartClicked;
 
     private TextMeshProUGUI  m_scoreText, m_timeText;
     private List<GameObject> m_crystals;
@@ -26,6 +27,10 @@ public class UIController : ObjectBase
 
         LoadComponents();
 
+        m_pauseMenuContinueBtn.GetComponent<Button>().onClick.AddListener(delegate { m_continueClicked = true; });
+        m_pauseMenuQuitBtn.GetComponent<Button>    ().onClick.AddListener(delegate { m_quitClicked     = true; });
+        m_pauseMenuRestartBtn.GetComponent<Button> ().onClick.AddListener(delegate { m_restartClicked  = true; });
+
         // Instantiate Crystal sprites at the bottom left corner of the screen
         m_crystals = new List<GameObject>();
         for (int i = 0; i < LevelController.lc.targetCryCount; i++)
@@ -35,6 +40,17 @@ public class UIController : ObjectBase
         }
 
         m_pauseMenu.SetActive(false);
+    }
+
+    void LateUpdate()
+    {
+        if (m_continueClicked) GameController.gc.Resume();
+        if (m_quitClicked)     GameController.gc.Quit();
+        if (m_restartClicked)  LevelController.lc.Restart();
+
+        m_continueClicked = false;
+        m_quitClicked     = false;
+        m_restartClicked  = false;
     }
 
     public void ColorCrystal(int count, bool color = true)
@@ -56,6 +72,8 @@ public class UIController : ObjectBase
 
         m_es                   = GameObject.Find("EventSystem").GetComponent<EventSystem>();
         m_pauseMenuContinueBtn = GameObject.Find("Continue Button");
+        m_pauseMenuQuitBtn     = GameObject.Find("Quit Button");
+        m_pauseMenuRestartBtn  = GameObject.Find("Restart Button");
         m_pauseMenu            = GameObject.Find("PauseMenuCanvas");
     }
 
@@ -84,6 +102,4 @@ public class UIController : ObjectBase
     {
         m_scoreText.text = "Score: " + score.ToString("000000");
     }
-
-    
 }

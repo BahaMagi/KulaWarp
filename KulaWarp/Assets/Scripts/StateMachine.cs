@@ -91,13 +91,6 @@ public abstract class State
             if (t.condition())
                 t.Trigger();
     }
-
-    public void OnUpdateState()
-    {
-        CheckTransitions();
-
-        UpdateState();
-    }
 }
 
 public class Transition

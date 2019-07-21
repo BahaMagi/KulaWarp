@@ -66,9 +66,11 @@ public class CameraController : ObjectBase
         Tilt();
 
         Vector3 target = m_playerPos + m_dir * m_dirOffset + m_upOffset * m_up;
-        transform.position = target;
-        //transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime*followSpeed);
-        transform.LookAt(m_lookAt, m_up);
+        if (PlayerController.pc.state != PlayerController.PlayerState.Warping)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * followSpeed);
+            transform.LookAt(m_lookAt, m_up);
+        }
     }
 
     public override void Reset()
@@ -102,8 +104,8 @@ public class CameraController : ObjectBase
         Vector3 target_up  = PlayerController.pc.world_up;
         Vector3 target_dir = PlayerController.pc.world_direction;
 
-        m_dir    = Vector3.RotateTowards(m_dir, target_dir, Time.deltaTime * rotSpeed * 2.0f, 0.0f);
-        m_up     = Vector3.RotateTowards(m_up, target_up, Time.deltaTime * rotSpeed * 2.0f, 0.0f);
+        m_dir    = Vector3.RotateTowards(m_dir, target_dir, Time.deltaTime * rotSpeed, 0.0f);
+        m_up     = Vector3.RotateTowards(m_up, target_up, Time.deltaTime * rotSpeed, 0.0f);
         m_lookAt = m_playerPos + lookAtUpOffset * m_up;
 
         // As this is triggered by the PlayerController the pc also takes care of the world_dir/up changes. 
