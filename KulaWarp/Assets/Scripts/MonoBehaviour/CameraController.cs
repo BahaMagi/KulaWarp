@@ -70,6 +70,7 @@ public class CameraController : ObjectBase
         if (PlayerController.pc.state != PlayerController.PlayerState.Warping)
         {
             transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * followSpeed);
+            //transform.position = Vector3.SmoothDamp(transform.position, target, ref m_velocity, followSpeed);
             transform.LookAt(m_lookAt, m_up);
         }
     }
