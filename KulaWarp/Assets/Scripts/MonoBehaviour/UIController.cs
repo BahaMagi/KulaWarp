@@ -27,10 +27,6 @@ public class UIController : ObjectBase
 
         LoadComponents();
 
-        m_pauseMenuContinueBtn.GetComponent<Button>().onClick.AddListener(delegate { m_continueClicked = true; });
-        m_pauseMenuQuitBtn.GetComponent<Button>    ().onClick.AddListener(delegate { m_quitClicked     = true; });
-        m_pauseMenuRestartBtn.GetComponent<Button> ().onClick.AddListener(delegate { m_restartClicked  = true; });
-
         // Instantiate Crystal sprites at the bottom left corner of the screen
         m_crystals = new List<GameObject>();
         for (int i = 0; i < LevelController.lc.targetCryCount; i++)
@@ -39,7 +35,17 @@ public class UIController : ObjectBase
             m_crystals[i].transform.SetParent(transform.GetChild(0).transform, false);
         }
 
+        // Add Listeners to the button clicks. These are just setting flags such that the actual game logic can 
+        // happen in LateUpdate(). Otherwise, GetButtonDown affects more than intended. 
+        m_pauseMenuContinueBtn.GetComponent<Button>().onClick.AddListener(delegate { m_continueClicked = true; });
+        m_pauseMenuQuitBtn.GetComponent<Button>().onClick.AddListener(delegate { m_quitClicked = true; });
+        m_pauseMenuRestartBtn.GetComponent<Button>().onClick.AddListener(delegate { m_restartClicked = true; });
+
+        // Disable the Pause Screen
         m_pauseMenu.SetActive(false);
+
+        // Make sure the Continue Button is immediately selected in the pause screen
+        m_es.SetSelectedGameObject(m_pauseMenuContinueBtn);
     }
 
     void LateUpdate()
