@@ -60,7 +60,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 54068309140363625, guid: 21ee87b15ba1f1d4991fb9d533235894,
           type: 3}
-        m_MethodName: OnObstacleEnter
+        m_MethodName: Die
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

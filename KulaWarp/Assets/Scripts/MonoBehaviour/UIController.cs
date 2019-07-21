@@ -14,7 +14,8 @@ public class UIController : ObjectBase
     public GameObject scoreTMP, timeTMP;
 
     private EventSystem m_es;
-    private GameObject  m_pauseMenuContinueBtn, m_pauseMenu;
+    private GameObject  m_pauseMenuContinueBtn, m_pauseMenuQuitBtn, m_pauseMenuRestartBtn, m_pauseMenu;
+    private bool        m_continueClicked, m_quitClicked, m_restartClicked;
 
     private TextMeshProUGUI  m_scoreText, m_timeText;
     private List<GameObject> m_crystals;
@@ -34,7 +35,30 @@ public class UIController : ObjectBase
             m_crystals[i].transform.SetParent(transform.GetChild(0).transform, false);
         }
 
+        // Add Listeners to the button clicks. These are just setting flags such that the actual game logic can 
+        // happen in LateUpdate(). Otherwise, GetButtonDown affects more than intended. 
+        m_pauseMenuContinueBtn.GetComponent<Button>().onClick.AddListener(delegate { m_continueClicked = true; });
+        m_pauseMenuQuitBtn.GetComponent<Button>().onClick.AddListener(delegate { m_quitClicked = true; });
+        m_pauseMenuRestartBtn.GetComponent<Button>().onClick.AddListener(delegate { m_restartClicked = true; });
+
+        // Disable the Pause Screen
         m_pauseMenu.SetActive(false);
+
+        // Make sure the Continue Button is immediately selected in the pause screen
+        m_es.SetSelectedGameObject(m_pauseMenuContinueBtn);
+
+        LevelController.lc.Register(this);
+    }
+
+    void LateUpdate()
+    {
+        if (m_continueClicked) GameController.gc.Resume();
+        if (m_quitClicked)     GameController.gc.Quit();
+        if (m_restartClicked)  LevelController.lc.Restart();
+
+        m_continueClicked = false;
+        m_quitClicked     = false;
+        m_restartClicked  = false;
     }
 
     public void ColorCrystal(int count, bool color = true)
@@ -56,6 +80,8 @@ public class UIController : ObjectBase
 
         m_es                   = GameObject.Find("EventSystem").GetComponent<EventSystem>();
         m_pauseMenuContinueBtn = GameObject.Find("Continue Button");
+        m_pauseMenuQuitBtn     = GameObject.Find("Quit Button");
+        m_pauseMenuRestartBtn  = GameObject.Find("Restart Button");
         m_pauseMenu            = GameObject.Find("PauseMenuCanvas");
     }
 
@@ -71,8 +97,7 @@ public class UIController : ObjectBase
     {
         Score(0);
 
-        for (int i = 0; i < LevelController.lc.targetCryCount; i++)
-            ColorCrystal(i, false);
+        ResetCrystals();
     }
 
     public void ResetCrystals()
@@ -84,6 +109,4 @@ public class UIController : ObjectBase
     {
         m_scoreText.text = "Score: " + score.ToString("000000");
     }
-
-    
 }

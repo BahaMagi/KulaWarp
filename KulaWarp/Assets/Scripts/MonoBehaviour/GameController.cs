@@ -18,8 +18,8 @@ public class GameController : MonoBehaviour
 {
     [HideInInspector] public static GameController gc;
 
-    private enum GameState { Default, Paused, GameOver, Won, Lost };
-    private GameState m_gameState = GameState.Default;
+    public enum GameState { Default, Paused, GameOver, Won, Lost };
+    [ReadOnly] public GameState m_gameState = GameState.Default;
     private SaveData  m_saveData;
     private string    m_savePath;
 
@@ -41,7 +41,7 @@ public class GameController : MonoBehaviour
         else m_savePath = Application.dataPath + saveFileName;
     }
 
-    void Update()
+    void LateUpdate()
     {
         HandleInput();
     }
@@ -80,7 +80,7 @@ public class GameController : MonoBehaviour
             default:
                 if (Input.GetButtonDown("Pause")    &&
                     CameraController.cc.IsDefault() &&
-                    !PlayerController.pc.isMoving)
+                    PlayerController.pc.state == PlayerController.PlayerState.Idle)
                         Pause();
                 break;
         }
@@ -151,6 +151,8 @@ public class GameController : MonoBehaviour
 
     public void Quit()
     {
+        Resume();
+
         // Go back to the main menu
         SceneManager.LoadScene(0);
     }

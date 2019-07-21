@@ -17,6 +17,8 @@ public class PickUpController : ObjectBase
         // Initialize the animations randomly to have each pickup start the animation at a different point.
         m_idlePos = transform.position;
         m_time    = Random.Range(0, 6);
+
+        transform.rotation = Quaternion.FromToRotation(Vector3.up, up);
         transform.Rotate(new Vector3(0, Random.Range(0, 180), 0));
 
         LevelController.lc.Register(this);

@@ -83,12 +83,13 @@ public class LevelController : MonoBehaviour
         m_curTime = 0; m_curCrys = 0; m_points  = 0;
         Physics.gravity = -gravity * startUp;
 
-        UIController.uic.ResetCrystals();
         ActivateExit();
 
         // Reset all objects that have registerd with the level, 
         // e.g. player, camera, pickups, crystals, ... 
         foreach (ObjectBase o in m_objList) o.Reset();
+
+        GameController.gc.Resume();
     }
 
     public void Resume()

@@ -102,7 +102,7 @@ MonoBehaviour:
   lookAtUpOffset: 0.71762
   rotSpeed: 6.5
   tiltSpeed: 5
-  followSpeed: 1
+  followSpeed: 10
   camState: 0
 --- !u!95 &6116890864164938284
 Animator:
