@@ -48,26 +48,36 @@ public class PlayerController : ObjectBase
         if (pc == null) pc = this;
         else if (pc != this) Destroy(gameObject);
 
+        // Load references to game objects and components
         LoadComponents();
 
+        // Animator related constants
         m_isMoving_ID = Animator.StringToHash("isMoving"); // @TODO Check if there is another way of doing this that is not string search based. 
         m_impact_ID   = Animator.StringToHash("impact");
         m_warp_ID     = Animator.StringToHash("warp");
 
+        // Precalculate constants
         m_envLayerMask = 1 << 10;
-
         sphereRadius   = m_sphereCollider_player.radius * player_sphere.transform.lossyScale.x;
         m_circum       = 2 * Mathf.PI * sphereRadius;
         m_rotConst     = 360.0f / m_circum;
         m_angularSpeed = 90.0f * pc.speed / (LevelController.lc.boxSize * 0.5f);
 
-        m_RotationAngles = Vector3.zero;
-
+        // Initiate the game state
         world_up        = LevelController.lc.startUp;
         world_direction = LevelController.lc.startDir;
 
         InitStateMachine();
 
+        // Rotate the sphere once at the start to make it consistent
+        m_RotationAngles = Vector3.zero;
+
+        float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
+        float dTheta = targetTheta - m_RotationAngles.getComponent(world_direction);
+        m_RotationAngles.setComponent(world_direction, targetTheta);
+        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), dTheta * world_direction.getComponent(world_direction));
+
+        // Register this object with the LevelController so it is reset on a restart
         LevelController.lc.Register(this);
     }
 
@@ -89,6 +99,14 @@ public class PlayerController : ObjectBase
         m_rb.velocity   = Vector3.zero; m_rb.angularVelocity = Vector3.zero;
 
         player_sphere.SetActive(true);
+
+        // Rotate the sphere once at the start to make it consistent
+        m_RotationAngles = Vector3.zero;
+
+        float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
+        float dTheta      = targetTheta - m_RotationAngles.getComponent(world_direction);
+        m_RotationAngles.setComponent(world_direction, targetTheta);
+        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), dTheta * world_direction.getComponent(world_direction));
     }
 
     // PlayerController:

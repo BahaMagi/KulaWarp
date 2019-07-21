@@ -20,7 +20,7 @@ public class CameraController : ObjectBase
     private int     m_tilt = 0;
     private float   m_dirOffset, m_upOffset;
 
-    private bool isIntroOver = false, m_keyDown = false; // Axis Input does not provide GetXXDown() so this acts as replacement
+    private bool m_keyDown = false; // Axis Input does not provide GetXXDown() so this acts as replacement
 
 #region Base_Classes
     void Awake()
