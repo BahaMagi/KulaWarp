@@ -73,11 +73,7 @@ public class PlayerController : ObjectBase
 
     void Update()
     {
-        sm.currentState.CheckTransitions(); // Has to be done in Update() to receive all input.
-    }
-
-    void FixedUpdate()
-    {
+        sm.currentState.CheckTransitions();
         sm.Update();
     }
 
