@@ -46,6 +46,8 @@ public class UIController : ObjectBase
 
         // Make sure the Continue Button is immediately selected in the pause screen
         m_es.SetSelectedGameObject(m_pauseMenuContinueBtn);
+
+        LevelController.lc.Register(this);
     }
 
     void LateUpdate()
@@ -95,8 +97,7 @@ public class UIController : ObjectBase
     {
         Score(0);
 
-        for (int i = 0; i < LevelController.lc.targetCryCount; i++)
-            ColorCrystal(i, false);
+        ResetCrystals();
     }
 
     public void ResetCrystals()
