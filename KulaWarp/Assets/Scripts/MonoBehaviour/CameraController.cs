@@ -8,6 +8,8 @@ public class CameraController : ObjectBase
     public float dirOffset = -1.6f, upOffset  = 1.3f, lookAtUpOffset = 0.71762f;
     public float rotSpeed  = 0.5f,  tiltSpeed = 0.5f, followSpeed    = 1.0f;
 
+    private float rotProgress = 0.0f;
+
     public enum CamState {Default, RotLeft, RotRight, RotBack, GravChange, Pause, Anim};
     [ReadOnly] public CamState camState = CamState.Anim;
 
@@ -69,8 +71,17 @@ public class CameraController : ObjectBase
         Vector3 target = m_playerPos + m_dir * m_dirOffset + m_upOffset * m_up;
         if (PlayerController.pc.state != PlayerController.PlayerState.Warping)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * followSpeed);
-            //transform.position = Vector3.SmoothDamp(transform.position, target, ref m_velocity, followSpeed);
+            float localFollowSpeed = followSpeed;
+            if (camState <= CamState.RotBack) {
+                // If the follow speed is too slow during the rotation the camera
+                // won't able to follow the rotate path. Instead it'll lag behind,
+                // basically cutting the corner and zooming close to the player.
+                // Not sure about the best way to handle this.
+                localFollowSpeed = followSpeed * 4.0f;
+            }
+
+            transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * localFollowSpeed);
+            // transform.position = Vector3.SmoothDamp(transform.position, target, ref m_velocity, followSpeed);
             transform.LookAt(m_lookAt, m_up);
         }
     }
@@ -152,28 +163,30 @@ public class CameraController : ObjectBase
         camState = CamState.Default;
     }
 
+
     void Rotate()
     {
-        float epsilon = 0.001f;
-        Vector3 target;
+        rotProgress += Time.deltaTime * rotSpeed;
+        rotProgress = Mathf.Clamp(rotProgress, 0.0f, 1.0f);
 
-        if (camState == CamState.RotLeft || camState == CamState.RotRight)
-        { 
-            int     dir    = camState == CamState.RotLeft ? -1 : 1;
-            target = dir * Vector3.Cross(PlayerController.pc.world_up, PlayerController.pc.world_direction);
-            m_dir          = Vector3.RotateTowards(m_dir, target, Time.deltaTime * rotSpeed, 0.0f);
-        }
-        else // Camstate.RotBack
-        {
-            target = -PlayerController.pc.world_direction;
-            m_dir  = Vector3.RotateTowards(m_dir, target, Time.deltaTime * 2 * rotSpeed, 0.0f);
+        float targetAngle = 0.0f;
+        switch (camState) {
+            case CamState.RotLeft:  targetAngle = -90.0f; break;
+            case CamState.RotRight: targetAngle =  90.0f; break;
+            case CamState.RotBack:  targetAngle = 180.0f; break;
         }
 
-        // If the new position has been reached, go back to Default state   
-        if ((m_dir - target).sqrMagnitude < epsilon)
+        // Apply interpolated rotation
+        Quaternion q = Quaternion.AngleAxis(rotProgress * targetAngle, PlayerController.pc.world_up);
+        m_dir = q * PlayerController.pc.world_direction;
+
+        // If the new position has been reached, go back to Default state
+        if (rotProgress >= 1.0f)
         {
-            PlayerController.pc.world_direction = target;
+            PlayerController.pc.world_direction = Vector3Int.RoundToInt(m_dir);
+
             camState = CamState.Default;
+            rotProgress = 0.0f;
         }
     }
 
