@@ -18,7 +18,6 @@ public class CameraController : ObjectBase
     private int m_reset_trigger_ID;
 
     private Vector3 m_playerPos, m_up, m_lookAt, m_dir;
-    private Vector3 m_velocity = Vector3.zero;
     private int     m_tilt = 0;
     private float   m_dirOffset, m_upOffset;
 
@@ -71,17 +70,11 @@ public class CameraController : ObjectBase
         Vector3 target = m_playerPos + m_dir * m_dirOffset + m_upOffset * m_up;
         if (PlayerController.pc.state != PlayerController.PlayerState.Warping)
         {
-            float localFollowSpeed = followSpeed;
-            if (camState <= CamState.RotBack) {
-                // If the follow speed is too slow during the rotation the camera
-                // won't able to follow the rotate path. Instead it'll lag behind,
-                // basically cutting the corner and zooming close to the player.
-                // Not sure about the best way to handle this.
-                localFollowSpeed = followSpeed * 4.0f;
-            }
+            if (camState > CamState.Default && camState <= CamState.RotBack)
+                transform.position = target;
+            else
+                transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * followSpeed);
 
-            transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * localFollowSpeed);
-            // transform.position = Vector3.SmoothDamp(transform.position, target, ref m_velocity, followSpeed);
             transform.LookAt(m_lookAt, m_up);
         }
     }
@@ -163,11 +156,10 @@ public class CameraController : ObjectBase
         camState = CamState.Default;
     }
 
-
     void Rotate()
     {
         rotProgress += Time.deltaTime * rotSpeed;
-        rotProgress = Mathf.Clamp(rotProgress, 0.0f, 1.0f);
+        rotProgress  = Mathf.Clamp(rotProgress, 0.0f, 1.0f);
 
         float targetAngle = 0.0f;
         switch (camState) {
@@ -185,7 +177,7 @@ public class CameraController : ObjectBase
         {
             PlayerController.pc.world_direction = Vector3Int.RoundToInt(m_dir);
 
-            camState = CamState.Default;
+            camState    = CamState.Default;
             rotProgress = 0.0f;
         }
     }

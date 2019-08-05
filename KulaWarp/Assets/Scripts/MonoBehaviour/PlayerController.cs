@@ -17,21 +17,21 @@ public class PlayerController : ObjectBase
     public float speed = 3.5f, easeInTime = 0.3f; // Max speed of the player and duration of the EaseIn to the rolling movement.
 
     [ReadOnly] public PlayerState state;
-    [ReadOnly] public AnimState animState;
-    [ReadOnly] public Vector3 world_direction, world_up; // Current World and Camera forwarwards/up direction
+    [ReadOnly] public AnimState   animState;
+    [ReadOnly] public Vector3     world_direction, world_up; // Current World and Camera forwarwards/up direction
 
     [HideInInspector] public StateMachine sm;
-    [HideInInspector] public float sphereRadius;
+    [HideInInspector] public float        sphereRadius;
 
     private SphereCollider m_sphereCollider_player;
-    private Animator m_animator;
-    private Rigidbody m_rb;
+    private Animator       m_animator;
+    private Rigidbody      m_rb;
 
     // Animator trigger IDs:
     private int m_isMoving_ID, m_impact_ID, m_warp_ID;
 
-    private int m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
-    private float m_circum, m_rotConst, m_angularSpeed; // Circumference of player sphere and precomputed constants to speed up computation
+    private int     m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
+    private float   m_circum, m_rotConst, m_angularSpeed; // Circumference of player sphere and precomputed constants to speed up computation
     private Vector3 m_RotationAngles; // Stores the current rotation angles of the sphere in world axis coordinates
 
     public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange };
@@ -194,15 +194,15 @@ public class PlayerController : ObjectBase
     {
         sm = new StateMachine(gameObject);
 
-        Idle idle = new Idle(sm);
-        Moving mov = new Moving(sm);
+        Idle idle          = new Idle(sm);
+        Moving mov         = new Moving(sm);
         GravityChange grav = new GravityChange(sm);
-        Warping warp = new Warping(sm);
-        Falling fall = new Falling(sm);
+        Warping warp       = new Warping(sm);
+        Falling fall       = new Falling(sm);
 
-        Func<bool> transIdle_Mov = (() => (Input.GetAxisRaw("Vertical") == 1 && CanMove()));
+        Func<bool> transIdle_Mov  = (() => (Input.GetAxisRaw("Vertical") == 1 && CanMove()));
         Func<bool> transIdle_Warp = (() => (Input.GetButtonDown("Warp") && CanWarp()));
-        Func<bool> transMov_Idle = (() => mov.Arrived());
+        Func<bool> transMov_Idle  = (() => mov.Arrived());
         Func<bool> transFall_Idle = (() => fall.hit);
 
         // From Idle
@@ -270,8 +270,8 @@ public class PlayerController : ObjectBase
         public Vector3 newDir, boxDir;
 
         private Vector3 m_target;
-        private float m_t, m_hoverTime = 0.3f;
-        private bool m_hovering;
+        private float   m_t, m_hoverTime = 0.3f;
+        private bool    m_hovering;
 
         public Warping(StateMachine sm) : base(sm)
         {
@@ -344,7 +344,7 @@ public class PlayerController : ObjectBase
 
     class Falling : State
     {
-        public bool hit { get; private set; }
+        public bool   hit { get; private set; }
         private float m_t, m_thres = 1.5f;
 
         public Falling(StateMachine sm) : base(sm)
@@ -379,9 +379,9 @@ public class PlayerController : ObjectBase
 
     class GravityChange : State
     {
-        private bool m_gradual; // Does the player BoxCollider have to be rotated gradually
+        private bool    m_gradual; // Does the player BoxCollider have to be rotated gradually
         private Vector3 m_dir, m_up, m_contactPoint;
-        private float m_t;
+        private float   m_t;
 
         private State pred;
 
@@ -402,11 +402,11 @@ public class PlayerController : ObjectBase
             {
                 if ((from as Moving).nextBlockLevel == -1)
                 {
-                    m_dir = -pc.world_up;
-                    m_up = pc.world_direction;
-                    m_gradual = true;
+                    m_dir          = -pc.world_up;
+                    m_up           = pc.world_direction;
+                    m_gradual      = true;
                     m_contactPoint = pc.transform.position - pc.world_up * pc.sphereRadius;
-                    m_t = 0.0f;
+                    m_t            = 0.0f;
 
                     pc.m_rb.useGravity = false; // Turn off gravity while rotating to avoid sliding.
                 }
@@ -424,9 +424,9 @@ public class PlayerController : ObjectBase
                 m_up = (pred as Warping).boxDir * -1;
             }
 
-            pc.world_up = m_up;
+            pc.world_up        = m_up;
             pc.world_direction = m_dir;
-            Physics.gravity = LevelController.lc.gravity * -pc.world_up;
+            Physics.gravity    = LevelController.lc.gravity * -pc.world_up;
 
             pc.m_rb.useGravity = true;
 
@@ -440,12 +440,16 @@ public class PlayerController : ObjectBase
         {
             if (!m_gradual)
             {
-                pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
-
-                if (pred.stateName == (int)PlayerState.Moving)
+                if (pred.stateName == (int)PlayerState.Moving && CameraController.cc.camState == CameraController.CamState.Default)
+                {
+                    pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
                     transitions[0].Trigger();
+                }
                 else if (pred.stateName == (int)PlayerState.Warping)
+                {
+                    pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
                     transitions[1].Trigger();
+                }
             }
             else
             {
@@ -468,9 +472,9 @@ public class PlayerController : ObjectBase
     {
         public int nextBlockLevel;
 
-        private bool m_easeIn = true, m_arrived = false;
+        private bool    m_easeIn = true, m_arrived = false;
         private Vector3 m_start, m_target;
-        private float m_t, m_easeInTime;
+        private float   m_t, m_easeInTime;
 
         public Moving(StateMachine sm) : base(sm)
         {
