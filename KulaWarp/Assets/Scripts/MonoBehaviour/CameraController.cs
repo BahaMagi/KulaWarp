@@ -162,7 +162,8 @@ public class CameraController : ObjectBase
         rotProgress  = Mathf.Clamp(rotProgress, 0.0f, 1.0f);
 
         float targetAngle = 0.0f;
-        switch (camState) {
+        switch (camState)
+        {
             case CamState.RotLeft:  targetAngle = -90.0f; break;
             case CamState.RotRight: targetAngle =  90.0f; break;
             case CamState.RotBack:  targetAngle = 180.0f; break;
@@ -170,7 +171,7 @@ public class CameraController : ObjectBase
 
         // Apply interpolated rotation
         Quaternion q = Quaternion.AngleAxis(rotProgress * targetAngle, PlayerController.pc.world_up);
-        m_dir = q * PlayerController.pc.world_direction;
+        m_dir        = q * PlayerController.pc.world_direction;
 
         // If the new position has been reached, go back to Default state
         if (rotProgress >= 1.0f)
