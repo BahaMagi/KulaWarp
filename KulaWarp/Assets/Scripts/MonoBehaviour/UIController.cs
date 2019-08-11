@@ -8,9 +8,10 @@ public class UIController : ObjectBase
 {
     [HideInInspector] public static UIController uic;
 
-    public GameObject crystalImgPrefab; // The prefab that holds the UI.Image component of the black and white crystal
-    public Sprite     crystalImgColor; // The sprite (= image file) of the colored crystal. 
-    public Sprite     crystalImgBnW; // The sprite (= image file) of the black and white crystal. 
+    public GameObject energyImgPrefab; // A prefab that holds the UI.Image component with the energy sprite in red.
+    public GameObject energyPanel; // The panel with the layout component that holds the enegery sprites
+    public Sprite     energyImgGreen; // The sprite (= image file) of the green energy. 
+    public Sprite     energyImgRed; // The sprite (= image file) of the red energy. 
     public GameObject scoreTMP, timeTMP;
 
     private EventSystem m_es;
@@ -18,7 +19,7 @@ public class UIController : ObjectBase
     private bool        m_continueClicked, m_quitClicked, m_restartClicked;
 
     private TextMeshProUGUI  m_scoreText, m_timeText;
-    private List<GameObject> m_crystals;
+    private List<GameObject> m_energy;
 
     void Awake()
     {
@@ -27,12 +28,12 @@ public class UIController : ObjectBase
 
         LoadComponents();
 
-        // Instantiate Crystal sprites at the bottom left corner of the screen
-        m_crystals = new List<GameObject>();
+        // Instantiate Energy sprites at the bottom left corner of the screen
+        m_energy = new List<GameObject>();
         for (int i = 0; i < LevelController.lc.targetCryCount; i++)
         {
-            m_crystals.Add(Instantiate(crystalImgPrefab, Vector3.zero, Quaternion.identity));
-            m_crystals[i].transform.SetParent(transform.GetChild(0).transform, false);
+            m_energy.Add(Instantiate(energyImgPrefab, Vector3.zero, Quaternion.identity));
+            m_energy[i].transform.SetParent(energyPanel.transform, false);
         }
 
         // Add Listeners to the button clicks. These are just setting flags such that the actual game logic can 
@@ -64,14 +65,14 @@ public class UIController : ObjectBase
 
     public void ColorCrystal(int count, bool color = true)
     {
-        if (count > m_crystals.Count) return;
+        if (count > m_energy.Count) return;
 
-        m_crystals[count - 1].GetComponent<Image>().sprite = color ? crystalImgColor : crystalImgBnW;
+        m_energy[count - 1].GetComponent<Image>().sprite = color ? energyImgGreen : energyImgRed;
     }
 
     public void DisplayTime(float time, float timelimit)
     {
-        m_timeText.text = (int)((timelimit - time) / 60) + ":" + (int)(timelimit - time) % 60;
+        m_timeText.text = (int)((timelimit - time) / 60) + ":" + ((int)(timelimit - time) % 60).ToString("00");
     }
 
     void LoadComponents()
@@ -98,16 +99,16 @@ public class UIController : ObjectBase
     {
         Score(0);
 
-        ResetCrystals();
+        ResetEnergy();
     }
 
-    public void ResetCrystals()
+    public void ResetEnergy()
     {
-        for (int i = 0; i < m_crystals.Count; i++) m_crystals[i].GetComponent<Image>().sprite = crystalImgBnW;
+        for (int i = 0; i < m_energy.Count; i++) m_energy[i].GetComponent<Image>().sprite = energyImgRed;
     }
 
     public void Score(int score)
     {
-        m_scoreText.text = "Score: " + score.ToString("000000");
+        m_scoreText.text = score.ToString();
     }
 }

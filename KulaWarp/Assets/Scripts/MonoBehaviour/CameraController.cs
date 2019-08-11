@@ -8,7 +8,7 @@ public class CameraController : ObjectBase
     public float dirOffset = -1.6f, upOffset  = 1.3f, lookAtUpOffset = 0.71762f;
     public float rotSpeed  = 0.5f,  tiltSpeed = 0.5f, followSpeed    = 1.0f;
 
-    private float rotProgress = 0.0f;
+    
 
     public enum CamState {Default, RotLeft, RotRight, RotBack, GravChange, Pause, Anim};
     [ReadOnly] public CamState camState = CamState.Anim;
@@ -17,9 +17,10 @@ public class CameraController : ObjectBase
     private AnimatorOverrideController m_animOverrideCtrl;
     private int m_reset_trigger_ID;
 
-    private Vector3 m_playerPos, m_up, m_lookAt, m_dir;
+    [ReadOnly] public Vector3 m_playerPos, m_up, m_lookAt, m_dir;
     private int     m_tilt = 0;
     private float   m_dirOffset, m_upOffset;
+    private float   m_rotProgress = 0.0f;
 
     private bool m_keyDown = false; // Axis Input does not provide GetXXDown() so this acts as replacement
 
@@ -72,6 +73,8 @@ public class CameraController : ObjectBase
         {
             if (camState > CamState.Default && camState <= CamState.RotBack)
                 transform.position = target;
+            else if (camState == CamState.GravChange)
+                transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * 1.5f * followSpeed);
             else
                 transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * followSpeed);
 
@@ -158,8 +161,8 @@ public class CameraController : ObjectBase
 
     void Rotate()
     {
-        rotProgress += Time.deltaTime * rotSpeed;
-        rotProgress  = Mathf.Clamp(rotProgress, 0.0f, 1.0f);
+        m_rotProgress += Time.deltaTime * rotSpeed;
+        m_rotProgress  = Mathf.Clamp(m_rotProgress, 0.0f, 1.0f);
 
         float targetAngle = 0.0f;
         switch (camState)
@@ -170,16 +173,16 @@ public class CameraController : ObjectBase
         }
 
         // Apply interpolated rotation
-        Quaternion q = Quaternion.AngleAxis(rotProgress * targetAngle, PlayerController.pc.world_up);
+        Quaternion q = Quaternion.AngleAxis(m_rotProgress * targetAngle, PlayerController.pc.world_up);
         m_dir        = q * PlayerController.pc.world_direction;
 
         // If the new position has been reached, go back to Default state
-        if (rotProgress >= 1.0f)
+        if (m_rotProgress >= 1.0f)
         {
             PlayerController.pc.world_direction = Vector3Int.RoundToInt(m_dir);
 
             camState    = CamState.Default;
-            rotProgress = 0.0f;
+            m_rotProgress = 0.0f;
         }
     }
 

@@ -49,27 +49,28 @@ public class PlayerController : ObjectBase
 
         // Animator related constants
         m_isMoving_ID = Animator.StringToHash("isMoving"); // @TODO Check if there is another way of doing this that is not string search based. 
-        m_impact_ID = Animator.StringToHash("impact");
-        m_warp_ID = Animator.StringToHash("warp");
+        m_impact_ID   = Animator.StringToHash("impact");
+        m_warp_ID     = Animator.StringToHash("warp");
 
         // Precalculate constants
         m_envLayerMask = 1 << 10;
-        sphereRadius = m_sphereCollider_player.radius * player_sphere.transform.lossyScale.x;
-        m_circum = 2 * Mathf.PI * sphereRadius;
-        m_rotConst = 360.0f / m_circum;
+        sphereRadius   = m_sphereCollider_player.radius * player_sphere.transform.lossyScale.x;
+        m_circum       = 2 * Mathf.PI * sphereRadius;
+        m_rotConst     = 360.0f / m_circum;
         m_angularSpeed = 90.0f * pc.speed / (LevelController.lc.boxSize * 0.5f);
 
         // Initiate the game state
-        world_up = LevelController.lc.startUp;
+        world_up        = LevelController.lc.startUp;
         world_direction = LevelController.lc.startDir;
 
+        // Setup Statemachine
         InitStateMachine();
 
-        // Rotate the sphere once at the start to make it consistent
+        // Rotate the sphere once at the start for consistency
         m_RotationAngles = Vector3.zero;
 
         float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        float dTheta = targetTheta - m_RotationAngles.getComponent(world_direction);
+        float dTheta      = targetTheta - m_RotationAngles.getComponent(world_direction);
         m_RotationAngles.setComponent(world_direction, targetTheta);
         player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), dTheta * world_direction.getComponent(world_direction));
 
@@ -85,22 +86,26 @@ public class PlayerController : ObjectBase
 
     public override void Reset()
     {
-        world_up = LevelController.lc.startUp;
-        world_direction = LevelController.lc.startDir;
+        // Reset game state
+        world_up           = LevelController.lc.startUp;
+        world_direction    = LevelController.lc.startDir;
         transform.position = LevelController.lc.startPos;
 
+        // Reset Statemachine
         sm.Reset();
 
+        // Reset physics
         m_rb.useGravity = true;
-        m_rb.velocity = Vector3.zero; m_rb.angularVelocity = Vector3.zero;
+        m_rb.velocity   = Vector3.zero; m_rb.angularVelocity = Vector3.zero;
 
+        // Re-enable gameobject
         player_sphere.SetActive(true);
 
-        // Rotate the sphere once at the start to make it consistent
+        // Rotate the sphere once at the start for consitency
         m_RotationAngles = Vector3.zero;
 
         float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        float dTheta = targetTheta - m_RotationAngles.getComponent(world_direction);
+        float dTheta      = targetTheta - m_RotationAngles.getComponent(world_direction);
         m_RotationAngles.setComponent(world_direction, targetTheta);
         player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), dTheta * world_direction.getComponent(world_direction));
     }
@@ -119,7 +124,8 @@ public class PlayerController : ObjectBase
         Vector3 frontDown = world_direction - world_up;
         bool isHitFront = Physics.Raycast(origin, frontDown, l, m_envLayerMask);
 
-        // The player can't start moving until the previous movement is finished.
+        // The player can't start moving if the previous movement isn't finished,
+        // the camera is moving or the game is paused.
         if ((sm.currentState.stateName == (int)PlayerState.GravityChange) ||
             (sm.currentState.stateName == (int)PlayerState.Warping) ||
             (sm.currentState.stateName == (int)PlayerState.Falling) ||
@@ -133,23 +139,25 @@ public class PlayerController : ObjectBase
         Vector3 world_left = Vector3.Cross(world_up, world_direction);
 
         Vector3 leftDown = world_left - world_up;
-        bool isHitLeft = Physics.Raycast(origin, leftDown, l, m_envLayerMask);
+        bool isHitLeft   = Physics.Raycast(origin, leftDown, l, m_envLayerMask);
 
         Vector3 rightDown = -world_left - world_up;
-        bool isHitRight = Physics.Raycast(origin, rightDown, l, m_envLayerMask);
+        bool isHitRight   = Physics.Raycast(origin, rightDown, l, m_envLayerMask);
 
         return !isHitLeft && !isHitRight;
     }
 
     bool CanWarp()
     {
+        // The player can't warp if the player is falling/warping/in a gravity transition,
+        // the camera is moving or the game is paused.
         if (!CameraController.cc.IsDefault() || state == PlayerState.Warping ||
             state == PlayerState.Falling || state == PlayerState.GravityChange ||
             GameController.gc.IsPaused())
             return false;
 
-        // If the player is moving or forward is pressed when the player cannot move,
-        // check two blocks in front of the player. 
+        // If the player is moving or forward is pressed when the player cannot move due to the 
+        // level geometry, check if two blocks in front of the player is occupied. 
         // The order of the hit items in the array is NOT guaranteed. So all have to be checked.
         // Also, only entry points are registered, no exit points. 
         // As such, if there is one further away than one box size it can only mean there is 
@@ -194,12 +202,14 @@ public class PlayerController : ObjectBase
     {
         sm = new StateMachine(gameObject);
 
+        // Create states
         Idle idle          = new Idle(sm);
         Moving mov         = new Moving(sm);
         GravityChange grav = new GravityChange(sm);
         Warping warp       = new Warping(sm);
         Falling fall       = new Falling(sm);
 
+        // Setup transitions
         Func<bool> transIdle_Mov  = (() => (Input.GetAxisRaw("Vertical") == 1 && CanMove()));
         Func<bool> transIdle_Warp = (() => (Input.GetButtonDown("Warp") && CanWarp()));
         Func<bool> transMov_Idle  = (() => mov.Arrived());
@@ -224,6 +234,7 @@ public class PlayerController : ObjectBase
         // From Warping
         warp.AddTransition(grav); // Warp -> grav, After Warp is done
 
+        // Put everything together
         sm.AddState(idle); // @TODO Check if it is necessary to store the states in the sm
         sm.AddState(mov);
         sm.AddState(warp);
@@ -237,8 +248,8 @@ public class PlayerController : ObjectBase
     void LoadComponents()
     {
         m_sphereCollider_player = player_sphere.GetComponent<SphereCollider>();
-        m_animator = GetComponent<Animator>();
-        m_rb = GetComponent<Rigidbody>();
+        m_animator              = GetComponent<Animator>();
+        m_rb                    = GetComponent<Rigidbody>();
     }
 
     // StateMachine:

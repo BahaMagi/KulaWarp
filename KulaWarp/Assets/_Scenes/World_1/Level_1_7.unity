@@ -1755,6 +1755,16 @@ PrefabInstance:
       propertyPath: m_textInfo.pageCount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6980180978031031349, guid: d6bea8ac70d87af4ebcc4b21c29e84ce,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 56.125
+      objectReference: {fileID: 0}
+    - target: {fileID: 6980180978031031349, guid: d6bea8ac70d87af4ebcc4b21c29e84ce,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -14.09375
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d6bea8ac70d87af4ebcc4b21c29e84ce, type: 3}
 --- !u!1001 &1116764835
@@ -3115,6 +3125,11 @@ PrefabInstance:
       propertyPath: cameraIntroAnimation
       value: 
       objectReference: {fileID: 7400000, guid: 02e3c35e193a1354190c00fbc607d16b, type: 2}
+    - target: {fileID: 3112335864343108892, guid: 540209a4b7b3aad429020536eac9b1b7,
+        type: 3}
+      propertyPath: timeLimit
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 3112335864343108893, guid: 540209a4b7b3aad429020536eac9b1b7,
         type: 3}
       propertyPath: m_LocalPosition.x
