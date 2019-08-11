@@ -472,6 +472,7 @@ public class PlayerController : ObjectBase
 
                 if (m_t >= 90)
                 {
+                    pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
                     pc.m_rb.useGravity = true;
                     transitions[0].Trigger();
                 }
