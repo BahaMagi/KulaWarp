@@ -35,7 +35,7 @@ public class PlayerController : ObjectBase
     private Vector3 m_RotationAngles; // Stores the current rotation angles of the sphere in world axis coordinates
 
     public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange };
-    public enum AnimState { Idle, Moving, FadeOut, FadeIn, Impact };
+    public enum AnimState   { Idle, Moving, FadeOut, FadeIn, Impact };
 
     // Base Classes ObjectBase and MonoBehaviour:
     void Awake()
@@ -69,10 +69,15 @@ public class PlayerController : ObjectBase
         // Rotate the sphere once at the start for consistency
         m_RotationAngles = Vector3.zero;
 
+        // Around world_dir axis
         float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        float dTheta      = targetTheta - m_RotationAngles.getComponent(world_direction);
         m_RotationAngles.setComponent(world_direction, targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), dTheta * world_direction.getComponent(world_direction));
+        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), targetTheta);
+
+        // Around world_dir x world_up axis
+        targetTheta = ((transform.position.getComponent(Vector3.Cross(world_up, world_direction)) % m_circum) * m_rotConst) - 180.0f;
+        m_RotationAngles.setComponent(Vector3.Cross(world_up, world_direction), targetTheta);
+        player_sphere.transform.RotateAround(player_sphere.transform.position, world_direction, targetTheta);
 
         // Register this object with the LevelController so it is reset on a restart
         LevelController.lc.Register(this);
