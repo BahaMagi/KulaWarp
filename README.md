@@ -21,7 +21,7 @@ If you would like to test a pre-built version of the game, here are some binarie
 ## Controls 
 The use of an Xbox 360° controller is recommended on Windows. However, due to different key mappings on Mac and Linux players will have to stick to keyboard for now. The controller mappings should be rather intuitive. But as there are no control options that contain the keyboard controls yet, this section explains the basic mappings. 
 
-The game is surprisingly simple. You can do but 3 things: **move**, **look around** and **warp**. However, they can be used in a myriad different ways. The game levels will introduce the different concepts one after the other to allow for an intuitive understanding and experimenting with the different mechanics. 
+The game is surprisingly simple. You can do but 3 things: **move**, **look around** and **warp**. However, they can be used in a myriad different ways. The game levels introduce the different concepts one after the other to allow for an intuitive understanding and experimenting with the different mechanics. 
 ### Move
 * *Arrow Keys* / *WASD* on keyboard
 * *Joy Stick* / *D-Pad* on controller
