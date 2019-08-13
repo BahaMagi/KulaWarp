@@ -23,7 +23,7 @@ The use of an Xbox 360° controller is recommended on Windows. However, due to d
 
 The game is surprisingly simple. You can do but 3 things: **move**, **look around** and **warp**. However, they can be used in a myriad different ways. The game levels will introduce the different concepts one after the other to allow for an intuitive understanding and experimenting with the different mechanics. 
 ### Move
-* *Arrow Keys* / *wasd* on keyboard
+* *Arrow Keys* / *WASD* on keyboard
 * *Joy Stick* / *D-Pad* on controller
 Moves you one block forwards or rotates the camera around the player.
 ### Look Around
@@ -40,5 +40,5 @@ Warps the player sphere two blocks forwards or upwards. If there is a block dire
 Assets in this project were mostly created by the developer for this project with tools like Photoshop and Blender. In addition to that, inspiration and samples were taken from 
 * The Unity [Asset store](https://assetstore.unity.com/), i.e. the skyboxes,
 * [Poliigon]( https://www.poliigon.com/), i.e. textures which are in the files but not yet in the game
-* [FlatIcon](https://www.flaticon.com/], i.e. images which were either directly used or incorporated into the UI. 
+* [FlatIcon](https://www.flaticon.com/), i.e. images which were either directly used or incorporated into the UI. 
 All third party assets are temporary. They will be replaced with self-made assets once more development time can be invested into asset creating or once I stumble upon a friendly graphics designer who is willing to support my cause. 
