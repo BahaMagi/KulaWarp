@@ -25,14 +25,17 @@ The game is surprisingly simple. You can do but 3 things: **move**, **look aroun
 ### Move
 * *Arrow Keys* / *WASD* on keyboard
 * *Joy Stick* / *D-Pad* on controller
+
 Moves you one block forwards or rotates the camera around the player.
 ### Look Around
 * *Q* + *E* on keyboard 
 * *LT* + *RT* on controller 
+
 Tilts the camera up or down to allow viewing the level from a different angle.
 ### Warp
 * *Space* on keyboard
 * *A* on controller
+
 Warps the player sphere two blocks forwards or upwards. If there is a block directly next to the destination (not diagonally) the direction of gravity will change to allow the sphere to continue on that block. 
 ## Future Work
  As mentioned above, the game is still under heavy development. The [Issues] () section on this GitHub provides a small overview of known bugs, desired features and dreaded tasks which are yet on the TODO list for this project.
