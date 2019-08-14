@@ -45,4 +45,4 @@ Assets in this project were mostly created by the developer for this project wit
 * The Unity [Asset store](https://assetstore.unity.com/), i.e. the skyboxes,
 * [Poliigon](https://www.poliigon.com/), i.e. textures which are in the files but not yet in the game
 * [FlatIcon](https://www.flaticon.com/), i.e. images which were either directly used or incorporated into the UI. 
-All third party assets are temporary. They will be replaced with self-made assets once more development time can be invested into asset creating or once I stumble upon a friendly graphics designer who is willing to support my cause. 
+All third party assets are temporary. They will be replaced with self-made assets once more development time can be invested into asset creation or once I stumble upon a friendly graphics designer who is willing to support my cause. 
