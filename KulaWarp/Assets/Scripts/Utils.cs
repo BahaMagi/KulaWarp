@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
+/**
+* Base class used for all objects that are supposed to be reset when the level restarts. 
+*/
 public abstract class ObjectBase : MonoBehaviour
 {
     public abstract void Reset();
@@ -164,6 +167,10 @@ static class ExtensionMethods
 }
 
 
+/** 
+ * Provide the [ReadOnly] PropertyDrawer to show variables in the inspector 
+ * in a read only fashion. 
+*/
 public class ReadOnlyAttribute : PropertyAttribute
 {
 
@@ -173,12 +180,14 @@ public class ReadOnlyAttribute : PropertyAttribute
 [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
 public class ReadOnlyDrawer : PropertyDrawer
 {
+    // Override Height to prevent overlapping property fields in the inspector
     public override float GetPropertyHeight(SerializedProperty property,
                                             GUIContent label)
     {
         return EditorGUI.GetPropertyHeight(property, label, true);
     }
 
+    // Disable input
     public override void OnGUI(Rect position,
                                SerializedProperty property,
                                GUIContent label)

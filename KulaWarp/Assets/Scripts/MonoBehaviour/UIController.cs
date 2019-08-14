@@ -4,54 +4,66 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
+/**
+* Handles all UI elements in the HUD as well as the pause menu. It takes care of displaying these
+* elements but the game logic when they are displayed is handled by the LevelController and the 
+* GameController. 
+*/
 public class UIController : ObjectBase
 {
     [HideInInspector] public static UIController uic;
 
-    public GameObject crystalImgPrefab; // The prefab that holds the UI.Image component of the black and white crystal
-    public Sprite     crystalImgColor; // The sprite (= image file) of the colored crystal. 
-    public Sprite     crystalImgBnW; // The sprite (= image file) of the black and white crystal. 
-    public GameObject scoreTMP, timeTMP;
+    public GameObject energyImgPrefab; // A prefab that holds the UI.Image component with the energy sprite in red.
+    public GameObject energyPanel; // The panel with the layout component that holds the enegery sprites
+    public Sprite     energyImgGreen; // The sprite (= image file) of the green energy. 
+    public Sprite     energyImgRed; // The sprite (= image file) of the red energy. 
+    public GameObject scoreTMP, timeTMP; // TextMeshPro components for score and time display
 
     private EventSystem m_es;
     private GameObject  m_pauseMenuContinueBtn, m_pauseMenuQuitBtn, m_pauseMenuRestartBtn, m_pauseMenu;
     private bool        m_continueClicked, m_quitClicked, m_restartClicked;
 
     private TextMeshProUGUI  m_scoreText, m_timeText;
-    private List<GameObject> m_crystals;
+    private List<GameObject> m_energy;
 
+    // Base Classes ObjectBase and MonoBehaviour:
     void Awake()
     {
+        // Make this a public singelton
         if (uic == null) uic = this;
         else if (uic != this) Destroy(gameObject);
 
+        // Load references to game objects and components
         LoadComponents();
 
-        // Instantiate Crystal sprites at the bottom left corner of the screen
-        m_crystals = new List<GameObject>();
-        for (int i = 0; i < LevelController.lc.targetCryCount; i++)
+        // Instantiate Energy sprites at the bottom left corner of the screen
+        m_energy = new List<GameObject>();
+        for (int i = 0; i < LevelController.lc.targetEnergyCount; i++)
         {
-            m_crystals.Add(Instantiate(crystalImgPrefab, Vector3.zero, Quaternion.identity));
-            m_crystals[i].transform.SetParent(transform.GetChild(0).transform, false);
+            m_energy.Add(Instantiate(energyImgPrefab, Vector3.zero, Quaternion.identity));
+            m_energy[i].transform.SetParent(energyPanel.transform, false);
         }
 
         // Add Listeners to the button clicks. These are just setting flags such that the actual game logic can 
-        // happen in LateUpdate(). Otherwise, GetButtonDown affects more than intended. 
+        // happen in LateUpdate(). Otherwise, GetButtonDown would be resolved before Update(). 
         m_pauseMenuContinueBtn.GetComponent<Button>().onClick.AddListener(delegate { m_continueClicked = true; });
-        m_pauseMenuQuitBtn.GetComponent<Button>().onClick.AddListener(delegate { m_quitClicked = true; });
-        m_pauseMenuRestartBtn.GetComponent<Button>().onClick.AddListener(delegate { m_restartClicked = true; });
+        m_pauseMenuQuitBtn.GetComponent<Button>().onClick.AddListener    (delegate { m_quitClicked     = true; });
+        m_pauseMenuRestartBtn.GetComponent<Button>().onClick.AddListener (delegate { m_restartClicked  = true; });
+
+        // Make sure the Continue Button is immediately selected in the pause screen
+        m_pauseMenuContinueBtn.GetComponent<Button>().Select();
+        m_pauseMenuContinueBtn.GetComponent<Button>().OnSelect(null);
 
         // Disable the Pause Screen
         m_pauseMenu.SetActive(false);
 
-        // Make sure the Continue Button is immediately selected in the pause screen
-        m_es.SetSelectedGameObject(m_pauseMenuContinueBtn);
-
+        // Register this object with the LevelController so it is reset on a restart
         LevelController.lc.Register(this);
     }
 
     void LateUpdate()
     {
+        // Resolve Menu Button clicks
         if (m_continueClicked) GameController.gc.Resume();
         if (m_quitClicked)     GameController.gc.Quit();
         if (m_restartClicked)  LevelController.lc.Restart();
@@ -61,16 +73,26 @@ public class UIController : ObjectBase
         m_restartClicked  = false;
     }
 
-    public void ColorCrystal(int count, bool color = true)
+    public override void Reset()
     {
-        if (count > m_crystals.Count) return;
+        Score(0);
 
-        m_crystals[count - 1].GetComponent<Image>().sprite = color ? crystalImgColor : crystalImgBnW;
+        ResetEnergy();
+    }
+
+    // UIController:
+
+    public void ColorEnergy(int count, bool turnOn = true)
+    {
+        // For now, dont allow more energy than needed to activate the exit
+        if (count > m_energy.Count) return;
+
+        m_energy[count - 1].GetComponent<Image>().sprite = turnOn ? energyImgGreen : energyImgRed;
     }
 
     public void DisplayTime(float time, float timelimit)
     {
-        m_timeText.text = (int)((timelimit - time) / 60) + ":" + (int)(timelimit - time) % 60;
+        m_timeText.text = (int)((timelimit - time) / 60) + ":" + ((int)(timelimit - time) % 60).ToString("00");
     }
 
     void LoadComponents()
@@ -89,24 +111,18 @@ public class UIController : ObjectBase
     {
         m_pauseMenu.SetActive(show);
 
+        // Ensure that the Continue Button is the default selection
         if (show) m_es.SetSelectedGameObject(m_pauseMenuContinueBtn);
         else m_es.SetSelectedGameObject(null);
     }
 
-    public override void Reset()
+    public void ResetEnergy()
     {
-        Score(0);
-
-        ResetCrystals();
-    }
-
-    public void ResetCrystals()
-    {
-        for (int i = 0; i < m_crystals.Count; i++) m_crystals[i].GetComponent<Image>().sprite = crystalImgBnW;
+        for (int i = 0; i < m_energy.Count; i++) m_energy[i].GetComponent<Image>().sprite = energyImgRed;
     }
 
     public void Score(int score)
     {
-        m_scoreText.text = "Score: " + score.ToString("000000");
+        m_scoreText.text = score.ToString();
     }
 }

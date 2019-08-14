@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player_sphere: {fileID: 54068310053535782}
-  speed: 3.5
+  speed: 3.8
   easeInTime: 0.3
   state: 0
   animState: 0
