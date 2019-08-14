@@ -11,13 +11,14 @@ Kula World was chosen as convenient target due to its comparatively small scope.
 
 The project is ongoing and very far from being finished. However, it demonstrates design concepts and skills used to develop the game thus far. 
 ## Getting Started
-The game was developed with [Unity 2019.1.7f1 Personal](https://unity3d.com/de/get-unity/download/archive). All files necessary to build the game yourself should be included in the repository. 	
+The game was developed with [Unity 2019.1.7f1 Personal](https://unity3d.com/de/get-unity/download/archive). All files necessary to build the game yourself should be included in the repository. In order to display all objects properly, [Blender] (https://www.blender.org/download/) might be required.	
 
-If you would like to test a pre-built version of the game, here are some binaries compiled on August, 13th 2019 from the master branch:
-* Windows
-* Mac OS 
-* Linux
+If you would like to test a pre-built version of the game, here are some binaries compiled on August, 14th 2019 from the master branch:
+* [Windows](https://www.dropbox.com/s/elskrk1usktkcg8/KulaWarp_WindowsBuild.rar?dl=0)
+* [Mac OS ] (https://www.dropbox.com/s/lyerriojb8spn26/KulaWarp_Mac_Build.app.zip?dl=0)
+* [Linux] (https://www.dropbox.com/sh/ijsg46bt71zpuaj/AADvI8QkZlIXeijh3UoiOdG2a?dl=0)
 
+If you are interested how the project developed since then, feel free to roam the dev branch. 
 ## Controls 
 The use of an Xbox 360° controller is recommended on Windows. However, due to different key mappings on Mac and Linux players will have to stick to keyboard for now. The controller mappings should be rather intuitive. But as there are no control options that contain the keyboard controls yet, this section explains the basic mappings. 
 
