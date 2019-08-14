@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 
-
+/**
+* Provides a smooth, rotatable (in 90° steps) follow camera that can be tilted up and down to allow 
+* for a different viewing angle. @TODO This class will be turned into a StateMachine like the PlayerController
+*/
 public class CameraController : ObjectBase
 {
     public static CameraController cc;
 
     public float dirOffset = -1.6f, upOffset  = 1.3f, lookAtUpOffset = 0.71762f;
     public float rotSpeed  = 0.5f,  tiltSpeed = 0.5f, followSpeed    = 1.0f;
-
-    
 
     public enum CamState {Default, RotLeft, RotRight, RotBack, GravChange, Pause, Anim};
     [ReadOnly] public CamState camState = CamState.Anim;
@@ -24,7 +25,8 @@ public class CameraController : ObjectBase
 
     private bool m_keyDown = false; // Axis Input does not provide GetXXDown() so this acts as replacement
 
-#region Base_Classes
+    // Base Classes ObjectBase and MonoBehaviour:
+
     void Awake()
     {
         // Make this a public singelton
@@ -39,10 +41,13 @@ public class CameraController : ObjectBase
 
         m_reset_trigger_ID = Animator.StringToHash("reset");
 
+        // Initialize camera offsets. They are stored in separate variable as they will be changed 
+        // repeatedly and the public versions act as reference. 
         m_dirOffset = dirOffset; m_upOffset = upOffset;
-        m_dir = LevelController.lc.startDir; m_up = LevelController.lc.startUp;
+        m_dir       = LevelController.lc.startDir; m_up = LevelController.lc.startUp;
 
-        LevelController.lc.Register(this); // This makes sure Reset() is called upon a level restart.
+        // Register this object with the LevelController so it is reset on a restart
+        LevelController.lc.Register(this);
     }
 
     void LateUpdate()
@@ -68,6 +73,7 @@ public class CameraController : ObjectBase
         // Tilt if a tilt button is pressed or interpolate back to normal position
         Tilt();
 
+        // Set the new camera position and LookAt
         Vector3 target = m_playerPos + m_dir * m_dirOffset + m_upOffset * m_up;
         if (PlayerController.pc.state != PlayerController.PlayerState.Warping)
         {
@@ -84,19 +90,21 @@ public class CameraController : ObjectBase
 
     public override void Reset()
     {
+        // Play the camera intro animation again when level is reset
         camState = CamState.Anim;
-        m_anim.SetTrigger(m_reset_trigger_ID);
+        m_anim.SetTrigger(m_reset_trigger_ID); 
     }
 
-#endregion Base_Classes
+    // CameraController:
 
     bool CanRotate()
-    {
+    {// The Camera can rotate whenever the player is NOT moving in any way
         return IsDefault() && (PlayerController.pc.state == PlayerController.PlayerState.Idle);
     }
 
     bool CanTilt()
-    {
+    {// The Camera can tilt whenever the player is not falling. That means, the camera can tile while the player
+     // is moving!
         return !(PlayerController.pc.state == PlayerController.PlayerState.Falling);
     }
 
@@ -114,6 +122,11 @@ public class CameraController : ObjectBase
         Vector3 target_up  = PlayerController.pc.world_up;
         Vector3 target_dir = PlayerController.pc.world_direction;
 
+        // Rotate current direction and up vector one step towards the target vectors. 
+        // This will be called once per Update() and is finished once the distance to the target vectors is 
+        // smaller than epsilon.
+        // @TODO This will be replaced with Quaternion rotation. Also this will be linked to the 
+        //       PlayerController State to prevent the camera from blocking input.
         m_dir    = Vector3.RotateTowards(m_dir, target_dir, Time.deltaTime * rotSpeed, 0.0f);
         m_up     = Vector3.RotateTowards(m_up, target_up, Time.deltaTime * rotSpeed, 0.0f);
         m_lookAt = m_playerPos + lookAtUpOffset * m_up;
@@ -172,7 +185,8 @@ public class CameraController : ObjectBase
             case CamState.RotBack:  targetAngle = 180.0f; break;
         }
 
-        // Apply interpolated rotation
+        // Apply interpolated rotation for one step. This will be called once per Update() 
+        // until the target angle has been reached. 
         Quaternion q = Quaternion.AngleAxis(m_rotProgress * targetAngle, PlayerController.pc.world_up);
         m_dir        = q * PlayerController.pc.world_direction;
 
@@ -189,11 +203,12 @@ public class CameraController : ObjectBase
     void Tilt()
     { // @TODO make the tilt positions inspector variables as well
         float target_dir = dirOffset, target_up = upOffset;
-        if (m_tilt == -1)
-        { target_dir = -0.01f; target_up = upOffset; }
-        else if(m_tilt == 1)
-        { target_dir = -0.7f; target_up = 0.2f; }
 
+        if (m_tilt == -1)   { target_dir = -0.01f; target_up = upOffset; } // Tilt down
+        else if(m_tilt == 1){ target_dir = -0.7f;  target_up = 0.2f; } // Tilt Up
+
+        // Move the camera towards the new position. No rotation has to be done as the LookAt will 
+        // ensure that the camera keeps facing the LookAt position above the player. 
         m_dirOffset = Mathf.MoveTowards(m_dirOffset, target_dir, Time.deltaTime * tiltSpeed);
         m_upOffset  = Mathf.MoveTowards(m_upOffset,  target_up,  Time.deltaTime * tiltSpeed);
     }

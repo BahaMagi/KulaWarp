@@ -6,36 +6,48 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+
+/**
+* Game data that is saved and reloaded to a file. 
+*/
 [System.Serializable]
 public class SaveData
 {
     public int totalPoints = 0;
-    public int curLevel = 0;
+    public int curLevel    = 0;
+
     public List<int> pointsPerLevel = new List<int>();
 }
 
+/**
+* The GameController manages the overall game. That includes starting, ending and pausing the levels,
+* keeping track of the total score and, thus, the winning and losing condition and saving the game 
+* data to restore it later.
+*/
 public class GameController : MonoBehaviour
 {
     [HideInInspector] public static GameController gc;
 
     public enum GameState { Default, Paused, GameOver, Won, Lost };
     [ReadOnly] public GameState m_gameState = GameState.Default;
+
+    public string saveFileName;
+
     private SaveData  m_saveData;
     private string    m_savePath;
 
-    public string     saveFileName;
- 
-#region Monobehavior
+    // Base Class MonoBehaviour:
     void Awake()
     {
         // Make this a public singelton
         if (gc == null)
         {
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // This object is scene persistent
             gc = this;
         }
         else if (gc != this) Destroy(gameObject);
 
+        // Initialize save file path
         m_saveData = new SaveData();
         if(saveFileName.Length == 0) m_savePath = Application.dataPath + "/save.mem";
         else m_savePath = Application.dataPath + saveFileName;
@@ -45,7 +57,8 @@ public class GameController : MonoBehaviour
     {
         HandleInput();
     }
-#endregion Monobehavior
+
+    // GameController:
 
     public void GameOver()
     {
@@ -142,7 +155,7 @@ public class GameController : MonoBehaviour
     public void Pause()
     {
         m_gameState    = GameState.Paused;
-        Time.timeScale = 0.0f;
+        Time.timeScale = 0.0f; // Freeze time such that everything that relies on Time.DeltaTime does not continue 
 
         PlayerController.pc.Enable(false);
         CameraController.cc.Pause();
@@ -160,7 +173,7 @@ public class GameController : MonoBehaviour
     public void Resume()
     {
         m_gameState    = GameState.Default;
-        Time.timeScale = 1.0f;
+        Time.timeScale = 1.0f; // Resume time 
 
         CameraController.cc.Resume();
         PlayerController.pc.Enable(true);

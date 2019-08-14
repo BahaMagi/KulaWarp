@@ -1,8 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/**
+* Handles MainMenu events. 
+*/
 public class MainMenuController : MonoBehaviour
 {
     public void Play()
@@ -12,10 +13,10 @@ public class MainMenuController : MonoBehaviour
 
     public void Quit()
     {
-        // @TODO Temp solution for testing in the editor until the game has a menu
+        // @TODO Temp solution for testing in the editor
 #if UNITY_EDITOR
         // Application.Quit() does not work in the editor so
-        // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
+        // UnityEditor.EditorApplication.isPlaying needs to be set to false to end the game
         UnityEditor.EditorApplication.isPlaying = false;
 #else
          Application.Quit();

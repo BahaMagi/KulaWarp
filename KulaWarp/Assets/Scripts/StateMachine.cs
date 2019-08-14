@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class StateMachine
@@ -9,7 +8,7 @@ public class StateMachine
     public State      defaultState { get; private set; }
     public GameObject owner;
 
-    private List<State> states;
+    private List<State> states; // @TODO check if this list is really needed...
 
     public StateMachine(GameObject o)
     {

@@ -38,6 +38,7 @@ public class PlayerController : ObjectBase
     public enum AnimState   { Idle, Moving, FadeOut, FadeIn, Impact };
 
     // Base Classes ObjectBase and MonoBehaviour:
+
     void Awake()
     {
         // Make this a public singelton
@@ -395,7 +396,7 @@ public class PlayerController : ObjectBase
 
     class GravityChange : State
     {
-        private bool    m_gradual; // Does the player BoxCollider have to be rotated gradually
+        private bool    m_gradual; // Does the player BoxCollider have to be rotated gradually, i.e. all but moving up
         private Vector3 m_dir, m_up, m_contactPoint;
         private float   m_t;
 
