@@ -107,13 +107,18 @@ public class PlayerController : ObjectBase
         // Re-enable gameobject
         player_sphere.SetActive(true);
 
-        // Rotate the sphere once at the start for consitency
+        // Rotate the sphere once at the start for consistency
         m_RotationAngles = Vector3.zero;
 
+        // Around world_dir axis
         float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        float dTheta      = targetTheta - m_RotationAngles.getComponent(world_direction);
         m_RotationAngles.setComponent(world_direction, targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), dTheta * world_direction.getComponent(world_direction));
+        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), targetTheta);
+
+        // Around world_dir x world_up axis
+        targetTheta = ((transform.position.getComponent(Vector3.Cross(world_up, world_direction)) % m_circum) * m_rotConst) - 180.0f;
+        m_RotationAngles.setComponent(Vector3.Cross(world_up, world_direction), targetTheta);
+        player_sphere.transform.RotateAround(player_sphere.transform.position, world_direction, targetTheta);
     }
 
     // PlayerController:

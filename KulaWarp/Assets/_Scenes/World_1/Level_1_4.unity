@@ -3025,6 +3025,11 @@ PrefabInstance:
       propertyPath: cameraIntroAnimation
       value: 
       objectReference: {fileID: 7400000, guid: 4f2931f78393b7f4babdcbc2beae59bc, type: 2}
+    - target: {fileID: 3112335864343108892, guid: 540209a4b7b3aad429020536eac9b1b7,
+        type: 3}
+      propertyPath: targetEnergyCount
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3112335864343108893, guid: 540209a4b7b3aad429020536eac9b1b7,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3950,40 +3955,40 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 286191024}
   - {fileID: 498620621}
   - {fileID: 1271369160}
   - {fileID: 90523}
   - {fileID: 400004394}
+  - {fileID: 238288322}
   - {fileID: 398409906}
   - {fileID: 637124283}
   - {fileID: 2114608699}
+  - {fileID: 803885104}
   - {fileID: 670892897}
   - {fileID: 141116069}
   - {fileID: 768908542}
+  - {fileID: 1365984435}
   - {fileID: 678838412}
+  - {fileID: 1581760724}
   - {fileID: 266900970}
   - {fileID: 613644258}
+  - {fileID: 1237065045}
   - {fileID: 118860100}
-  - {fileID: 1365984435}
+  - {fileID: 943704108}
+  - {fileID: 1657822386}
   - {fileID: 563160895}
   - {fileID: 379976187}
-  - {fileID: 1237065045}
-  - {fileID: 238288322}
   - {fileID: 1512895495}
+  - {fileID: 144026173}
+  - {fileID: 1159154}
+  - {fileID: 1526733758}
+  - {fileID: 290419758}
   - {fileID: 826377239}
+  - {fileID: 2058256414}
   - {fileID: 1504993042}
   - {fileID: 272555468}
   - {fileID: 292182429}
-  - {fileID: 1581760724}
-  - {fileID: 286191024}
-  - {fileID: 943704108}
-  - {fileID: 803885104}
-  - {fileID: 1657822386}
-  - {fileID: 144026173}
-  - {fileID: 1159154}
-  - {fileID: 290419758}
-  - {fileID: 1526733758}
-  - {fileID: 2058256414}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
