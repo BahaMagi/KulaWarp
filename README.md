@@ -15,7 +15,6 @@ The game was developed with [Unity 2019.1.7f1 Personal](https://unity3d.com/de/g
 
 If you would like to test a pre-built version of the game, here are some binaries compiled on August, 14th 2019 from the master branch:
 * [Windows](https://www.dropbox.com/s/elskrk1usktkcg8/KulaWarp_WindowsBuild.rar?dl=0)
-* [Mac OS ](https://www.dropbox.com/s/lyerriojb8spn26/KulaWarp_Mac_Build.app.zip?dl=0)
 * [Linux](https://www.dropbox.com/sh/ijsg46bt71zpuaj/AADvI8QkZlIXeijh3UoiOdG2a?dl=0)
 
 If you are interested how the project developed since then, feel free to roam the dev branch. 
