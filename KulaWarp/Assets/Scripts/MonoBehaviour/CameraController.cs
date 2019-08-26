@@ -85,6 +85,8 @@ public class CameraController : ObjectBase
         Func<bool> transDef_Warp   = (() => false);
         Func<bool> transDef_Grav   = (() => m_gravChangeTrigger);
         Func<bool> transDef_Anim   = (() => m_resetSM);
+        Func<bool> transDef_Fall   = (() => PlayerController.pc.state == PlayerController.PlayerState.Falling);
+        Func<bool> transFall_Def   = (() => PlayerController.pc.state != PlayerController.PlayerState.Falling);
         Func<bool> transDef_Pause  = (() => !GameController.gc.IsDefault());
         Func<bool> transPause_Def  = (() =>  GameController.gc.IsDefault());
 
@@ -94,6 +96,7 @@ public class CameraController : ObjectBase
         def.AddTransition(anim,  transDef_Anim);
         def.AddTransition(grav,  transDef_Grav);
         def.AddTransition(pause, transDef_Pause);
+        def.AddTransition(fall,  transDef_Fall);
 
         // From Rot
         rot.AddTransition(def);
@@ -109,6 +112,9 @@ public class CameraController : ObjectBase
 
         // From Anim
         anim.AddTransition(def);
+
+        // From Fall
+        fall.AddTransition(def, transFall_Def);
 
         // Set the default state = starting state of the sm
         sm.SetDefaultState(def);
@@ -396,7 +402,7 @@ public class CameraController : ObjectBase
     {
         public Falling(StateMachine sm) : base(sm)
         {
-            stateName = (int)CamState.Falling;
+            stateName = (int)CamState.Default;
         }
 
         public override void OnEnterState(State from)
@@ -415,7 +421,7 @@ public class CameraController : ObjectBase
             // Set new target camera and lookAt positions
             cc.m_playerPos = PlayerController.pc.gameObject.transform.position;
             cc.m_targetPos = cc.m_playerPos + cc.m_dir * cc.m_dirOffset + cc.m_upOffset * cc.m_up;
-            cc.m_lookAt = cc.m_playerPos + cc.lookAtUpOffset * cc.m_up;
+            cc.m_lookAt    = cc.m_playerPos + cc.lookAtUpOffset * cc.m_up;
 
             // Tilt if a tilt button is pressed or interpolate back to normal position
             cc.Tilt();
