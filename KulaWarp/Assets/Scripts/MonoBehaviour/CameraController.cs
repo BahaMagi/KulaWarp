@@ -27,7 +27,7 @@ public class CameraController : ObjectBase
     private Vector3 m_playerPos, m_targetPos, m_lookAt;
     private Vector3 m_up, m_dir;
     private float   m_dirOffset, m_upOffset;
-    private bool    m_resetSM = false, m_gravChangeTrigger = false;
+    private bool    m_resetSM = false, m_gravChangeTrigger = false, m_endIntro = false;
 
     // Base Classes ObjectBase and MonoBehaviour:
 
@@ -82,13 +82,15 @@ public class CameraController : ObjectBase
 
         //Setup triggered transitions
         Func<bool> transDef_Rot    = (() => (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") == -1) && CanRotate());
-        Func<bool> transDef_Warp   = (() => false);
+        Func<bool> transDef_Warp   = (() => PlayerController.pc.state == PlayerController.PlayerState.Warping);
         Func<bool> transDef_Grav   = (() => m_gravChangeTrigger);
         Func<bool> transDef_Anim   = (() => m_resetSM);
         Func<bool> transDef_Fall   = (() => PlayerController.pc.state == PlayerController.PlayerState.Falling);
         Func<bool> transFall_Def   = (() => PlayerController.pc.state != PlayerController.PlayerState.Falling);
         Func<bool> transDef_Pause  = (() => !GameController.gc.IsDefault());
         Func<bool> transPause_Def  = (() =>  GameController.gc.IsDefault());
+        Func<bool> transWarp_Grav  = (() => PlayerController.pc.state != PlayerController.PlayerState.Warping);
+        Func<bool> transAnim_Def   = (() => m_endIntro);
 
         // From Def
         def.AddTransition(rot,   transDef_Rot);
@@ -102,7 +104,7 @@ public class CameraController : ObjectBase
         rot.AddTransition(def);
 
         // From Warp
-        warp.AddTransition(grav);
+        warp.AddTransition(grav, transWarp_Grav);
 
         // From GravChange
         grav.AddTransition(def);
@@ -111,14 +113,14 @@ public class CameraController : ObjectBase
         pause.AddTransition(def,  transPause_Def);
 
         // From Anim
-        anim.AddTransition(def);
+        anim.AddTransition(def, transAnim_Def);
 
         // From Fall
         fall.AddTransition(def, transFall_Def);
 
-        // Set the default state = starting state of the sm
-        sm.SetDefaultState(def);
-        sm.ChangeState(def);
+        // Set the default state, i.e. the starting state of the sm
+        sm.SetDefaultState(anim);
+        sm.ChangeState(anim);
     }
 
     void Tilt()
@@ -143,6 +145,11 @@ public class CameraController : ObjectBase
     public void TriggerGravChange()
     {
         m_gravChangeTrigger = true;
+    }
+
+    public void EndIntro()
+    {
+        m_endIntro = true;
     }
 
     // State Machine: 
@@ -259,13 +266,26 @@ public class CameraController : ObjectBase
         public override void OnEnterState(State from)
         {
             cc.state = CamState.Warp;
+
+            cc.m_up  = PlayerController.pc.world_up;
+            cc.m_dir = PlayerController.pc.world_direction;
         }
 
         public override void OnExitState(State to)
         { }
 
         public override void UpdateState()
-        { }
+        {
+            // Set new target camera but skip lookAt positions
+            cc.m_playerPos = PlayerController.pc.gameObject.transform.position;
+            cc.m_targetPos = cc.m_playerPos + cc.m_dir * cc.m_dirOffset + cc.m_upOffset * cc.m_up;
+
+            // Tilt if a tilt button is pressed or interpolate back to normal position
+            cc.Tilt();
+
+            // Update position
+            cc.transform.position = Vector3.MoveTowards(cc.transform.position, cc.m_targetPos, Time.deltaTime * cc.followSpeed * 0.75f);
+        }
     }
 
     class GravChange : State
@@ -336,9 +356,9 @@ public class CameraController : ObjectBase
             stateName = (int)CamState.Anim;
 
             // Set the intro animation of that level
-            m_anim = cc.gameObject.GetComponent<Animator>();
+            m_anim             = cc.gameObject.GetComponent<Animator>();
             m_animOverrideCtrl = new AnimatorOverrideController(m_anim.runtimeAnimatorController);
-            m_anim.runtimeAnimatorController = m_animOverrideCtrl;
+            m_anim.runtimeAnimatorController      = m_animOverrideCtrl;
             m_animOverrideCtrl["CameraIntroBase"] = LevelController.lc.cameraIntroAnimation;
 
             // Get ID of transition trigger to reset the into animation
@@ -356,7 +376,9 @@ public class CameraController : ObjectBase
         }
 
         public override void OnExitState(State to)
-        { }
+        {
+            cc.m_endIntro = false;
+        }
 
         public override void UpdateState()
         { }
@@ -402,7 +424,7 @@ public class CameraController : ObjectBase
     {
         public Falling(StateMachine sm) : base(sm)
         {
-            stateName = (int)CamState.Default;
+            stateName = (int)CamState.Falling;
         }
 
         public override void OnEnterState(State from)

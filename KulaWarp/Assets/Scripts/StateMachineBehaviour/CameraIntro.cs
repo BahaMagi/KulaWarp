@@ -14,5 +14,6 @@ public class CameraIntro : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.applyRootMotion = true;
+        CameraController.cc.EndIntro();
     }
 }

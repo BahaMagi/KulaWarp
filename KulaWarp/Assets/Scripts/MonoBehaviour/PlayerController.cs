@@ -255,6 +255,7 @@ public class PlayerController : ObjectBase
         sm.AddState(fall);
         sm.AddState(grav);
 
+        // Set the default state, i.e. the starting state of the sm
         sm.SetDefaultState(idle);
         sm.ChangeState(idle);
     }
@@ -316,7 +317,7 @@ public class PlayerController : ObjectBase
                 m_target = pc.transform.position.SnapToGridAll(pc.world_up) + pc.world_up * (2.0f * LevelController.lc.boxSize + 0.5f - pc.sphereRadius);
 
             pc.m_rb.useGravity = false;
-            m_hovering = false;
+            m_hovering         = false;
             pc.m_animator.SetTrigger(pc.m_warp_ID);
         }
 
@@ -355,10 +356,10 @@ public class PlayerController : ObjectBase
 
             if (!m_hovering)
             {
-                pc.transform.position = m_target;
-                pc.m_rb.velocity = Vector3.zero;
+                pc.transform.position   = m_target;
+                pc.m_rb.velocity        = Vector3.zero;
                 pc.m_rb.angularVelocity = Vector3.zero;
-                m_hovering = true;
+                m_hovering              = true;
             }
 
             m_t += Time.deltaTime;
