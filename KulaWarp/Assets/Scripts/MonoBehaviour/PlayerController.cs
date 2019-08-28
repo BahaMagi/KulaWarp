@@ -31,8 +31,7 @@ public class PlayerController : ObjectBase
     private int m_isMoving_ID, m_impact_ID, m_warp_ID;
 
     private int     m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
-    private float   m_circum, m_rotConst, m_angularSpeed; // Circumference of player sphere and precomputed constants to speed up computation
-    private Vector3 m_RotationAngles; // Stores the current rotation angles of the sphere in world axis coordinates
+    private float   m_invCircum, m_angularSpeed; // Inverse circumference of player sphere and precomputed constant to speed up computation
 
     public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange };
     public enum AnimState   { Idle, Moving, FadeOut, FadeIn, Impact };
@@ -56,8 +55,7 @@ public class PlayerController : ObjectBase
         // Precalculate constants
         m_envLayerMask = 1 << 10;
         sphereRadius   = m_sphereCollider_player.radius * player_sphere.transform.lossyScale.x;
-        m_circum       = 2 * Mathf.PI * sphereRadius;
-        m_rotConst     = 360.0f / m_circum;
+        m_invCircum    = 1.0f / 2.0f * Mathf.PI * sphereRadius;
         m_angularSpeed = 90.0f * pc.speed / (LevelController.lc.boxSize * 0.5f); //@TODO forget theory and make this a parameter in the inspector....
 
         // Initiate the game state
@@ -66,19 +64,6 @@ public class PlayerController : ObjectBase
 
         // Setup State Machine
         InitStateMachine();
-
-        // Rotate the sphere once at the start for consistency
-        m_RotationAngles = Vector3.zero;
-
-        // Around world_dir axis
-        float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(world_direction, targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), targetTheta);
-
-        // Around world_dir x world_up axis
-        targetTheta = ((transform.position.getComponent(Vector3.Cross(world_up, world_direction)) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(Vector3.Cross(world_up, world_direction), targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, world_direction, targetTheta);
 
         // Register this object with the LevelController so it is reset on a restart
         LevelController.lc.Register(this);
@@ -106,19 +91,6 @@ public class PlayerController : ObjectBase
 
         // Re-enable gameobject
         player_sphere.SetActive(true);
-
-        // Rotate the sphere once at the start for consistency
-        m_RotationAngles = Vector3.zero;
-
-        // Around world_dir axis
-        float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(world_direction, targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), targetTheta);
-
-        // Around world_dir x world_up axis
-        targetTheta = ((transform.position.getComponent(Vector3.Cross(world_up, world_direction)) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(Vector3.Cross(world_up, world_direction), targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, world_direction, targetTheta);
     }
 
     // PlayerController:
@@ -498,7 +470,7 @@ public class PlayerController : ObjectBase
         public int nextBlockLevel;
 
         private bool    m_easeIn = true, m_arrived = false;
-        private Vector3 m_start, m_target;
+        private Vector3 m_start, m_target, m_posBeforeUpdate;
         private float   m_t, m_easeInTime;
 
         public Moving(StateMachine sm) : base(sm)
@@ -509,6 +481,9 @@ public class PlayerController : ObjectBase
         public override void OnEnterState(State from)
         {
             pc.state = PlayerState.Moving;
+
+            // This is needed to calculate the traveled distance to rotate the sphere 
+            m_posBeforeUpdate = pc.transform.position;
 
             if (from.stateName == (int)PlayerState.GravityChange)
             {
@@ -601,11 +576,13 @@ public class PlayerController : ObjectBase
 
         void RotatePlayerSphere()
         {
-            float targetTheta = ((pc.transform.position.getComponent(pc.world_direction) % pc.m_circum) * pc.m_rotConst) - 180.0f;
-            float dTheta = targetTheta - pc.m_RotationAngles.getComponent(pc.world_direction);
-            pc.m_RotationAngles.setComponent(pc.world_direction, targetTheta);
+            float dist  = (pc.transform.position - m_posBeforeUpdate).magnitude;
+            float theta = 360.0f * dist * pc.m_invCircum;
 
-            pc.player_sphere.transform.RotateAround(pc.player_sphere.transform.position, Vector3.Cross(pc.world_up, pc.world_direction), dTheta * pc.world_direction.getComponent(pc.world_direction));
+            pc.player_sphere.transform.RotateAround(pc.player_sphere.transform.position, Vector3.Cross(pc.world_up, pc.world_direction), theta);
+
+            // Set the position for the next frame
+            m_posBeforeUpdate = pc.transform.position;
         }
     }
 }
