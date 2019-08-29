@@ -55,7 +55,7 @@ public class PlayerController : ObjectBase
         // Precalculate constants
         m_envLayerMask = 1 << 10;
         sphereRadius   = m_sphereCollider_player.radius * player_sphere.transform.lossyScale.x;
-        m_invCircum    = 1.0f / 2.0f * Mathf.PI * sphereRadius;
+        m_invCircum    = 1.0f / (2.0f * Mathf.PI * sphereRadius);
         m_angularSpeed = 90.0f * pc.speed / (LevelController.lc.boxSize * 0.5f); //@TODO forget theory and make this a parameter in the inspector....
 
         // Initiate the game state

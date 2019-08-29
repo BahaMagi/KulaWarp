@@ -52,6 +52,7 @@ MonoBehaviour:
   hoverAmount: 0.01
   scoreValue: 100
   up: {x: 0, y: 1, z: 0}
+  scaleAmount: 0
 --- !u!33 &7779417118798847485
 MeshFilter:
   m_ObjectHideFlags: 0
