@@ -11,14 +11,9 @@ Kula World was chosen as convenient target due to its comparatively small scope.
 
 The project is ongoing and very far from being finished. However, it demonstrates design concepts and skills used to develop the game thus far. 
 ## Getting Started
-The game was developed with [Unity 2019.1.7f1 Personal](https://unity3d.com/de/get-unity/download/archive). All files necessary to build the game yourself should be included in the repository. In order to display all objects properly, [Blender](https://www.blender.org/download/) might be required.	
+The game was developed with [Unity 2019.1.7f1 Personal](https://unity3d.com/de/get-unity/download/archive). All files necessary to build the game yourself should be included in the repository. In order to display all objects properly in the Unity inspector, [Blender](https://www.blender.org/download/) might be required.	
 
-If you would like to test a pre-built version of the game, here are some binaries compiled on August, 14th 2019 from the master branch:
-* [Windows](https://www.dropbox.com/s/elskrk1usktkcg8/KulaWarp_WindowsBuild.rar?dl=0)
-* [Mac OS ](https://www.dropbox.com/s/lyerriojb8spn26/KulaWarp_Mac_Build.app.zip?dl=0)
-* [Linux](https://www.dropbox.com/sh/ijsg46bt71zpuaj/AADvI8QkZlIXeijh3UoiOdG2a?dl=0)
-
-If you are interested how the project developed since then, feel free to roam the dev branch. 
+If you encounter problems when building the project (or would like a pre-built version) please contact me.
 ## Controls 
 The use of an Xbox 360° controller is recommended on Windows. However, due to different key mappings on Mac and Linux players will have to stick to keyboard for now. The controller mappings should be rather intuitive. But as there are no control options that contain the keyboard controls yet, this section explains the basic mappings. 
 
@@ -44,5 +39,5 @@ Warps the player sphere two blocks forwards or upwards. If there is a block dire
 Assets in this project were mostly created by the developer for this project with tools like Photoshop and Blender. In addition to that, inspiration and samples were taken from 
 * The Unity [Asset store](https://assetstore.unity.com/), i.e. the skyboxes,
 * [Poliigon](https://www.poliigon.com/), i.e. textures which are in the files but not yet in the game
-* [FlatIcon](https://www.flaticon.com/), i.e. images which were either directly used or incorporated into the UI. 
-All third party assets are temporary. They will be replaced with self-made assets once more development time can be invested into asset creation or once I stumble upon a friendly graphics designer who is willing to support my cause. 
+
+All third party assets which are not free for commercial use are temporary. They will be replaced with self-made assets once more development time can be invested into asset creation or once I stumble upon a friendly graphics designer who is willing to support my cause. 
