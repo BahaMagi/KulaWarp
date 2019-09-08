@@ -44,7 +44,7 @@ public class PickUpController : ObjectBase
 
     // PickUpController:
 
-    protected void AnimObject()
+    protected virtual void AnimObject()
     {
         transform.Rotate(Vector3.up, rotSpeed * Time.deltaTime);
         transform.position = m_idlePos + up * Mathf.Sin(hoverSpeed * m_timeOffset) * hoverAmount;

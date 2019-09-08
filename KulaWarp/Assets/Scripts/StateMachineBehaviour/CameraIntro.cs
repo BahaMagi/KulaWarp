@@ -8,13 +8,12 @@ public class CameraIntro : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.applyRootMotion = false;
-        CameraController.cc.camState = CameraController.CamState.Anim;
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        CameraController.cc.camState    = CameraController.CamState.Default;
-        animator.applyRootMotion        = true;
+        animator.applyRootMotion = true;
+        CameraController.cc.EndIntro();
     }
 }

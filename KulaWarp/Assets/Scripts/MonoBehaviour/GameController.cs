@@ -66,7 +66,6 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0.0f;
 
         PlayerController.pc.Enable(false);
-        CameraController.cc.Pause();
 
         m_gameState = GameState.GameOver;
 
@@ -91,8 +90,8 @@ public class GameController : MonoBehaviour
                     { LevelController.lc.Restart(); Resume(); }
                 break;
             default:
-                if (Input.GetButtonDown("Pause")    &&
-                    CameraController.cc.IsDefault() &&
+                if (Input.GetButtonDown("Pause") &&
+                    CameraController.cc.state == CameraController.CamState.Default &&
                     PlayerController.pc.state == PlayerController.PlayerState.Idle)
                         Pause();
                 break;
@@ -102,6 +101,11 @@ public class GameController : MonoBehaviour
     public bool IsPaused()
     {
         return m_gameState == GameState.Paused;
+    }
+
+    public bool IsDefault()
+    {
+        return m_gameState == GameState.Default;
     }
 
     public void LoadGame()
@@ -124,7 +128,6 @@ public class GameController : MonoBehaviour
 
         UIController.uic.PauseScreen(false);
         PlayerController.pc.Enable(false);
-        CameraController.cc.Pause();
 
         m_gameState = GameState.Lost;
 
@@ -158,7 +161,6 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0.0f; // Freeze time such that everything that relies on Time.DeltaTime does not continue 
 
         PlayerController.pc.Enable(false);
-        CameraController.cc.Pause();
         UIController.uic.PauseScreen(true);
     }
 
@@ -175,7 +177,6 @@ public class GameController : MonoBehaviour
         m_gameState    = GameState.Default;
         Time.timeScale = 1.0f; // Resume time 
 
-        CameraController.cc.Resume();
         PlayerController.pc.Enable(true);
         UIController.uic.PauseScreen(false);
     }
@@ -196,7 +197,6 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0.0f;
 
         PlayerController.pc.Enable(false);
-        CameraController.cc.Pause();
 
         m_gameState = GameState.Won;
         

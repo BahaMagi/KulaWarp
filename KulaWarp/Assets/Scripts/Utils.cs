@@ -164,6 +164,11 @@ static class ExtensionMethods
         return vec.Round(Vector3.one) - (LevelController.lc.boxSize * 0.5f - PlayerController.pc.sphereRadius) * up;
     }
 
+    public static Vector3 Abs(this Vector3 v)
+    {
+        return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
+    }
+
 }
 
 

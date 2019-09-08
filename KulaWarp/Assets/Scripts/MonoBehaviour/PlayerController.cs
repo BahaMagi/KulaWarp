@@ -31,8 +31,7 @@ public class PlayerController : ObjectBase
     private int m_isMoving_ID, m_impact_ID, m_warp_ID;
 
     private int     m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
-    private float   m_circum, m_rotConst, m_angularSpeed; // Circumference of player sphere and precomputed constants to speed up computation
-    private Vector3 m_RotationAngles; // Stores the current rotation angles of the sphere in world axis coordinates
+    private float   m_invCircum, m_angularSpeed; // Inverse circumference of player sphere and precomputed constant to speed up computation
 
     public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange };
     public enum AnimState   { Idle, Moving, FadeOut, FadeIn, Impact };
@@ -56,29 +55,15 @@ public class PlayerController : ObjectBase
         // Precalculate constants
         m_envLayerMask = 1 << 10;
         sphereRadius   = m_sphereCollider_player.radius * player_sphere.transform.lossyScale.x;
-        m_circum       = 2 * Mathf.PI * sphereRadius;
-        m_rotConst     = 360.0f / m_circum;
-        m_angularSpeed = 90.0f * pc.speed / (LevelController.lc.boxSize * 0.5f);
+        m_invCircum    = 1.0f / (2.0f * Mathf.PI * sphereRadius);
+        m_angularSpeed = 90.0f * pc.speed / (LevelController.lc.boxSize * 0.5f); //@TODO forget theory and make this a parameter in the inspector....
 
         // Initiate the game state
         world_up        = LevelController.lc.startUp;
         world_direction = LevelController.lc.startDir;
 
-        // Setup Statemachine
+        // Setup State Machine
         InitStateMachine();
-
-        // Rotate the sphere once at the start for consistency
-        m_RotationAngles = Vector3.zero;
-
-        // Around world_dir axis
-        float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(world_direction, targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), targetTheta);
-
-        // Around world_dir x world_up axis
-        targetTheta = ((transform.position.getComponent(Vector3.Cross(world_up, world_direction)) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(Vector3.Cross(world_up, world_direction), targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, world_direction, targetTheta);
 
         // Register this object with the LevelController so it is reset on a restart
         LevelController.lc.Register(this);
@@ -106,19 +91,6 @@ public class PlayerController : ObjectBase
 
         // Re-enable gameobject
         player_sphere.SetActive(true);
-
-        // Rotate the sphere once at the start for consistency
-        m_RotationAngles = Vector3.zero;
-
-        // Around world_dir axis
-        float targetTheta = ((transform.position.getComponent(world_direction) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(world_direction, targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, Vector3.Cross(world_up, world_direction), targetTheta);
-
-        // Around world_dir x world_up axis
-        targetTheta = ((transform.position.getComponent(Vector3.Cross(world_up, world_direction)) % m_circum) * m_rotConst) - 180.0f;
-        m_RotationAngles.setComponent(Vector3.Cross(world_up, world_direction), targetTheta);
-        player_sphere.transform.RotateAround(player_sphere.transform.position, world_direction, targetTheta);
     }
 
     // PlayerController:
@@ -133,14 +105,15 @@ public class PlayerController : ObjectBase
         // Check the front first. Any hit allows us to move.
         // This covers both forward and forward-up movement.
         Vector3 frontDown = world_direction - world_up;
-        bool isHitFront = Physics.Raycast(origin, frontDown, l, m_envLayerMask);
+        bool isHitFront   = Physics.Raycast(origin, frontDown, l, m_envLayerMask);
 
         // The player can't start moving if the previous movement isn't finished,
         // the camera is moving or the game is paused.
-        if ((sm.currentState.stateName == (int)PlayerState.GravityChange) ||
-            (sm.currentState.stateName == (int)PlayerState.Warping) ||
-            (sm.currentState.stateName == (int)PlayerState.Falling) ||
-            !CameraController.cc.IsDefault() || GameController.gc.IsPaused())
+        if ((sm.currentState.stateName  == (int)PlayerState.GravityChange) ||
+            (sm.currentState.stateName  == (int)PlayerState.Warping) ||
+            (sm.currentState.stateName  == (int)PlayerState.Falling) ||
+            !(CameraController.cc.state == CameraController.CamState.Default) || 
+            GameController.gc.IsPaused())
             return false;
 
         // If there is something in front it is always possible to move. 
@@ -162,8 +135,10 @@ public class PlayerController : ObjectBase
     {
         // The player can't warp if the player is falling/warping/in a gravity transition,
         // the camera is moving or the game is paused.
-        if (!CameraController.cc.IsDefault() || state == PlayerState.Warping ||
-            state == PlayerState.Falling || state == PlayerState.GravityChange ||
+        if (!(CameraController.cc.state == CameraController.CamState.Default) || 
+            state == PlayerState.Warping || 
+            state == PlayerState.Falling || 
+            state == PlayerState.GravityChange ||
             GameController.gc.IsPaused())
             return false;
 
@@ -220,7 +195,7 @@ public class PlayerController : ObjectBase
         Warping warp       = new Warping(sm);
         Falling fall       = new Falling(sm);
 
-        // Setup transitions
+        // Setup triggered transitions
         Func<bool> transIdle_Mov  = (() => (Input.GetAxisRaw("Vertical") == 1 && CanMove()));
         Func<bool> transIdle_Warp = (() => (Input.GetButtonDown("Warp") && CanWarp()));
         Func<bool> transMov_Idle  = (() => mov.Arrived());
@@ -236,7 +211,7 @@ public class PlayerController : ObjectBase
         // Fromm Moving
         mov.AddTransition(idle, transMov_Idle); // Mov -> Idle, movement finished
         mov.AddTransition(grav); // Mov -> GravChange, MoveUp/Down
-        mov.AddTransition(warp, transIdle_Warp); // Idle -> Warp, Press Warp
+        mov.AddTransition(warp, transIdle_Warp); // Mov -> Warp, Press Warp
 
         // From GravityChange
         grav.AddTransition(mov); // Grav -> Mov, MoveUp/Down
@@ -252,6 +227,7 @@ public class PlayerController : ObjectBase
         sm.AddState(fall);
         sm.AddState(grav);
 
+        // Set the default state, i.e. the starting state of the sm
         sm.SetDefaultState(idle);
         sm.ChangeState(idle);
     }
@@ -313,7 +289,7 @@ public class PlayerController : ObjectBase
                 m_target = pc.transform.position.SnapToGridAll(pc.world_up) + pc.world_up * (2.0f * LevelController.lc.boxSize + 0.5f - pc.sphereRadius);
 
             pc.m_rb.useGravity = false;
-            m_hovering = false;
+            m_hovering         = false;
             pc.m_animator.SetTrigger(pc.m_warp_ID);
         }
 
@@ -352,10 +328,10 @@ public class PlayerController : ObjectBase
 
             if (!m_hovering)
             {
-                pc.transform.position = m_target;
-                pc.m_rb.velocity = Vector3.zero;
+                pc.transform.position   = m_target;
+                pc.m_rb.velocity        = Vector3.zero;
                 pc.m_rb.angularVelocity = Vector3.zero;
-                m_hovering = true;
+                m_hovering              = true;
             }
 
             m_t += Time.deltaTime;
@@ -403,7 +379,7 @@ public class PlayerController : ObjectBase
     {
         private bool    m_gradual; // Does the player BoxCollider have to be rotated gradually, i.e. all but moving up
         private Vector3 m_dir, m_up, m_contactPoint;
-        private float   m_t;
+        private float   m_t,   m_rotTime;
 
         private State pred;
 
@@ -429,13 +405,14 @@ public class PlayerController : ObjectBase
                     m_gradual      = true;
                     m_contactPoint = pc.transform.position - pc.world_up * pc.sphereRadius;
                     m_t            = 0.0f;
+                    m_rotTime      = 1 / CameraController.cc.rotSpeed;
 
                     pc.m_rb.useGravity = false; // Turn off gravity while rotating to avoid sliding.
                 }
                 else
                 {
                     m_dir = pc.world_up;
-                    m_up = -pc.world_direction;
+                    m_up  = -pc.world_direction;
                 }
 
 
@@ -443,47 +420,44 @@ public class PlayerController : ObjectBase
             else if (from.stateName == (int)PlayerState.Warping)
             {
                 m_dir = (pred as Warping).newDir;
-                m_up = (pred as Warping).boxDir * -1;
+                m_up  = (pred as Warping).boxDir * -1;
             }
 
             pc.world_up        = m_up;
             pc.world_direction = m_dir;
             Physics.gravity    = LevelController.lc.gravity * -pc.world_up;
 
-            pc.m_rb.useGravity = true;
+            // If this was accesed from Warp gravity is still turned off. 
+            // This is to avoid having gravity being evaluated for one frame before this is
+            // entered. 
+            if (!m_gradual) pc.m_rb.useGravity = true;
 
-            CameraController.cc.camState = CameraController.CamState.GravChange;
+            CameraController.cc.TriggerGravChange();
         }
 
         public override void OnExitState(State to)
-        { }
+        {
+            // Correct minor inaccuracies from the rotation
+            pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
+        }
 
         public override void UpdateState()
         {
             if (!m_gradual)
             {
-                if (pred.stateName == (int)PlayerState.Moving && CameraController.cc.camState == CameraController.CamState.Default)
-                {
-                    pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
+                if (pred.stateName == (int)PlayerState.Moving && CameraController.cc.state == CameraController.CamState.Default)
                     transitions[0].Trigger();
-                }
                 else if (pred.stateName == (int)PlayerState.Warping)
-                {
-                    pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
                     transitions[1].Trigger();
-                }
             }
             else
             {
-                float dt = pc.m_angularSpeed * Time.deltaTime - Mathf.Min(0, 90.0f - m_t);
+                m_t += Time.deltaTime;
 
-                pc.transform.RotateAround(m_contactPoint, Vector3.Cross(-pc.world_direction, pc.world_up), dt);
-
-                m_t += pc.m_angularSpeed * Time.deltaTime;
-
-                if (m_t >= 90)
+                if (m_t < m_rotTime)
+                    pc.transform.RotateAround(m_contactPoint, Vector3.Cross(-pc.world_direction, pc.world_up), (90f / m_rotTime) * Time.deltaTime);
+                else if (m_t >= m_rotTime && CameraController.cc.state == CameraController.CamState.Default)
                 {
-                    pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
                     pc.m_rb.useGravity = true;
                     transitions[0].Trigger();
                 }
@@ -496,7 +470,7 @@ public class PlayerController : ObjectBase
         public int nextBlockLevel;
 
         private bool    m_easeIn = true, m_arrived = false;
-        private Vector3 m_start, m_target;
+        private Vector3 m_start, m_target, m_posBeforeUpdate;
         private float   m_t, m_easeInTime;
 
         public Moving(StateMachine sm) : base(sm)
@@ -507,6 +481,9 @@ public class PlayerController : ObjectBase
         public override void OnEnterState(State from)
         {
             pc.state = PlayerState.Moving;
+
+            // This is needed to calculate the traveled distance to rotate the sphere 
+            m_posBeforeUpdate = pc.transform.position;
 
             if (from.stateName == (int)PlayerState.GravityChange)
             {
@@ -599,11 +576,13 @@ public class PlayerController : ObjectBase
 
         void RotatePlayerSphere()
         {
-            float targetTheta = ((pc.transform.position.getComponent(pc.world_direction) % pc.m_circum) * pc.m_rotConst) - 180.0f;
-            float dTheta = targetTheta - pc.m_RotationAngles.getComponent(pc.world_direction);
-            pc.m_RotationAngles.setComponent(pc.world_direction, targetTheta);
+            float dist  = (pc.transform.position - m_posBeforeUpdate).magnitude;
+            float theta = 360.0f * dist * pc.m_invCircum;
 
-            pc.player_sphere.transform.RotateAround(pc.player_sphere.transform.position, Vector3.Cross(pc.world_up, pc.world_direction), dTheta * pc.world_direction.getComponent(pc.world_direction));
+            pc.player_sphere.transform.RotateAround(pc.player_sphere.transform.position, Vector3.Cross(pc.world_up, pc.world_direction), theta);
+
+            // Set the position for the next frame
+            m_posBeforeUpdate = pc.transform.position;
         }
     }
 }
