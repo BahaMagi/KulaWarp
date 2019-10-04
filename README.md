@@ -14,6 +14,7 @@ The project is ongoing and very far from being finished. However, it demonstrate
 The game was developed with [Unity 2019.1.7f1 Personal](https://unity3d.com/de/get-unity/download/archive). All files necessary to build the game yourself should be included in the repository. In order to display all objects properly in the Unity inspector, [Blender](https://www.blender.org/download/) might be required.	
 
 If you encounter problems when building the project (or would like a pre-built version) please contact me.
+
 ## Controls 
 The use of an Xbox 360° controller is recommended on Windows. However, due to different key mappings on Mac and Linux players will have to stick to keyboard for now. The controller mappings should be rather intuitive. But as there are no control options that contain the keyboard controls yet, this section explains the basic mappings. 
 
