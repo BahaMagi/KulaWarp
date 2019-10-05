@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 8991244237512801422}
   - component: {fileID: 8991244237512801420}
   - component: {fileID: 8991244237512801423}
-  m_Layer: 11
+  m_Layer: 1
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -948,7 +948,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 3
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -4846,7 +4846,7 @@ GameObject:
   - component: {fileID: 8991244238323038494}
   - component: {fileID: 8991244238323038492}
   - component: {fileID: 8991244238323038495}
-  m_Layer: 11
+  m_Layer: 1
   m_Name: Core
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5057,7 +5057,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0, g: 0.39344263, b: 1, a: 1}
+      maxColor: {r: 0.4542987, g: 0.5832085, b: 0.7830189, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -5119,7 +5119,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.95
+      scalar: 0.4
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -5817,9 +5817,9 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0.5409813
-          inSlope: 0.4590187
-          outSlope: 0.4590187
+          value: 0.45901638
+          inSlope: 0.5409836
+          outSlope: 0.5409836
           tangentMode: 34
           weightedMode: 0
           inWeight: 0
@@ -5827,8 +5827,8 @@ ParticleSystem:
         - serializedVersion: 3
           time: 1
           value: 1
-          inSlope: 0.4590187
-          outSlope: 0.4590187
+          inSlope: 0.5409836
+          outSlope: 0.5409836
           tangentMode: 34
           weightedMode: 0
           inWeight: 0.33333334
@@ -8660,7 +8660,7 @@ ParticleSystem:
     intensityCurve:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.5
+      scalar: 2
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -9598,7 +9598,7 @@ GameObject:
   - component: {fileID: 8991244238344858338}
   - component: {fileID: 8991244238344858336}
   - component: {fileID: 8991244238344858339}
-  m_Layer: 11
+  m_Layer: 1
   m_Name: Halo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9702,7 +9702,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 6
+      scalar: 5
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -9809,7 +9809,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.033018887, g: 0.38236472, b: 1, a: 1}
+      maxColor: {r: 0.35408506, g: 0.46842262, b: 0.6886792, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -10568,10 +10568,10 @@ ParticleSystem:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 3
-          time: 0.0124223605
-          value: 0.83606356
-          inSlope: 0.43988648
-          outSlope: 0.43988648
+          time: 0
+          value: 0.7213098
+          inSlope: 0.72368026
+          outSlope: 0.72368026
           tangentMode: 34
           weightedMode: 0
           inWeight: 0
@@ -10579,8 +10579,8 @@ ParticleSystem:
         - serializedVersion: 3
           time: 0.38510132
           value: 1
-          inSlope: 0.43988648
-          outSlope: 0.43988648
+          inSlope: 0.72368026
+          outSlope: 0.72368026
           tangentMode: 34
           weightedMode: 0
           inWeight: 0.33333334
@@ -14350,7 +14350,7 @@ GameObject:
   - component: {fileID: 8991244239086921827}
   - component: {fileID: 8991244239086921825}
   - component: {fileID: 8991244239086921824}
-  m_Layer: 11
+  m_Layer: 1
   m_Name: EnergyEmission
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14623,8 +14623,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 3
-      minScalar: 2
+      scalar: 2
+      minScalar: 1.5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -15322,18 +15322,18 @@ ParticleSystem:
         - serializedVersion: 3
           time: 0
           value: 0
-          inSlope: 1
-          outSlope: 1
-          tangentMode: 34
+          inSlope: 2
+          outSlope: 2
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
           time: 1
           value: 1
-          inSlope: 1
-          outSlope: 1
-          tangentMode: 34
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
           outWeight: 0
