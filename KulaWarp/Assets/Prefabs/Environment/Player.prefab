@@ -187,7 +187,7 @@ MonoBehaviour:
   particleSystemsA:
   - {fileID: 2877125789120580867, guid: 4585ebfeadf916c42aa1c719fbed07f1, type: 3}
   - {fileID: 7921856048130776839, guid: 30496f7943fcf424dbefc6423178bef7, type: 3}
-  rootMotion: 0
+  rootMotion: 1
 --- !u!1 &54068310053535782
 GameObject:
   m_ObjectHideFlags: 0
@@ -290,7 +290,6 @@ GameObject:
   - component: {fileID: 371941825679164750}
   - component: {fileID: 8289404482716025729}
   - component: {fileID: 8722984238842066024}
-  - component: {fileID: 6178202447283584665}
   m_Layer: 8
   m_Name: Sphere_Appear
   m_TagString: Player
@@ -357,16 +356,3 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!135 &6178202447283584665
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8693346674189113381}
-  m_Material: {fileID: 13400000, guid: d8f701cbe3d21c7438302aec224b3d98, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
