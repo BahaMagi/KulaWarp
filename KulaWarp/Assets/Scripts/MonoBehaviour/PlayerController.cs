@@ -27,8 +27,7 @@ public class PlayerController : ObjectBase
     private Animator       m_animator;
     private Rigidbody      m_rb;
 
-    // Animator trigger IDs:
-    private int m_isMoving_ID, m_impact_ID, m_warp_ID;
+    private int m_isMoving_ID, m_impact_ID; // Animator trigger IDs
 
     private int     m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
     private float   m_invCircum, m_angularSpeed; // Inverse circumference of player sphere and precomputed constant to speed up computation
@@ -50,7 +49,6 @@ public class PlayerController : ObjectBase
         // Animator related constants
         m_isMoving_ID = Animator.StringToHash("isMoving"); // @TODO Check if there is another way of doing this that is not string search based. 
         m_impact_ID   = Animator.StringToHash("impact");
-        m_warp_ID     = Animator.StringToHash("warp");
 
         // Precalculate constants
         m_envLayerMask = 1 << 10;
@@ -265,37 +263,52 @@ public class PlayerController : ObjectBase
 
     class Warping : State
     {
-        public Vector3 newDir, boxDir;
+        public Vector3 newDir, boxDir; // Used in the GravChange state to set new world_dir/up
 
-        private Vector3 m_target;
-        private float   m_t, m_hoverTime = 0.3f;
-        private bool    m_hovering;
+        private Vector3       m_target;
+        private float         m_t, m_hoverTime = 0.3f;
+        private bool          m_hovering;
+        private WarpAnimation m_warpanim;
+
 
         public Warping(StateMachine sm) : base(sm)
         {
             stateName = (int)PlayerState.Warping;
+
+            m_warpanim = pc.gameObject.GetComponent<WarpAnimation>();
         }
 
         public override void OnEnterState(State from)
         {
             pc.state = PlayerState.Warping;
-
-            m_t = 0.0f;
-            newDir = pc.world_direction; boxDir = -pc.world_up;
-
+            
+            // Set the warp target location. If the player is moving or about to move warp is forwards,
+            // if the player was idle warp is upwards. 
             if (from.stateName == (int)PlayerState.Moving || (int)(Input.GetAxisRaw("Vertical")) == 1)
                 m_target = pc.transform.position.SnapToGridAll(pc.world_up) + pc.world_direction * 2.0f + pc.world_up * (0.5f - pc.sphereRadius);
             else
                 m_target = pc.transform.position.SnapToGridAll(pc.world_up) + pc.world_up * (2.0f * LevelController.lc.boxSize + 0.5f - pc.sphereRadius);
 
+            // Chec if there is a box around the target location. 
+            boxDir = getBoxDir();
+            if (Convert.ToInt32(boxDir.L1Norm()) == 0) // No box around the target location
+                boxDir = -pc.world_up;
+
+            // Keep the curretion direction unless the new up is parallel to that direction. 
+            newDir = pc.world_direction;
+            if (Convert.ToInt32(Mathf.Abs(Vector3.Dot(pc.world_direction, boxDir))) == 1)
+                newDir = pc.world_up;
+
+            m_warpanim.Play(m_target, -boxDir);
+
+            m_t                = 0.0f;
             pc.m_rb.useGravity = false;
             m_hovering         = false;
-            pc.m_animator.SetTrigger(pc.m_warp_ID);
         }
 
         public override void OnExitState(State to)
         {
-            Vector3 origin = pc.transform.position;
+            /*Vector3 origin = pc.transform.position;
 
             if (Physics.Raycast(origin, -pc.world_up, 1.0f, pc.m_envLayerMask))
                 boxDir = -pc.world_up;
@@ -313,30 +326,58 @@ public class PlayerController : ObjectBase
             {
                 pc.m_rb.useGravity = true;
                 return;
-            }
+            }*/
+
 
             // If the old world_direction is still a valid direction (i.e. the new gravity axis is not 
             // pointing in the same or opposit direction) then keep it. Otherwise set it to the old 
             // world_up direction. 
-            newDir = pc.world_direction;
-            if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(pc.world_direction, boxDir))) < 0.01f) newDir = pc.world_up;
+            //newDir = pc.world_direction;
+            //if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(pc.world_direction, boxDir))) < 0.01f) newDir = pc.world_up;
         }
 
         public override void UpdateState()
         {
-            if (pc.animState != AnimState.FadeIn) return;
+            // This prevents previous movement from leaking into the animation.
+            pc.m_rb.velocity        = Vector3.zero;
+            pc.m_rb.angularVelocity = Vector3.zero;
 
-            if (!m_hovering)
+            if (!m_warpanim.isPlaying())
             {
-                pc.transform.position   = m_target;
-                pc.m_rb.velocity        = Vector3.zero;
-                pc.m_rb.angularVelocity = Vector3.zero;
-                m_hovering              = true;
+                // After the animations have played make the player hover for 
+                // <m_hoverTime> seconds before reactivating gravity and 
+                // reenabling control. 
+                if (!m_hovering)
+                {
+                    pc.transform.position   = m_target;
+                    m_warpanim.appearObj.transform.position = m_target;
+                    pc.m_rb.velocity        = Vector3.zero;
+                    pc.m_rb.angularVelocity = Vector3.zero;
+                    m_hovering              = true;
+                }
+
+                m_t += Time.deltaTime;
+
+                if(m_t >= m_hoverTime) transitions[0].Trigger();
             }
+        }
 
-            m_t += Time.deltaTime;
-
-            if (m_t > m_hoverTime) transitions[0].Trigger();
+        Vector3 getBoxDir()
+        {
+            if (Physics.Raycast(m_target, -pc.world_up, 1.0f, pc.m_envLayerMask))
+                return -pc.world_up;
+            else if (Physics.Raycast(m_target, pc.world_direction, 1.0f, pc.m_envLayerMask))
+                return pc.world_direction;
+            else if (Physics.Raycast(m_target, Vector3.Cross(pc.world_direction, pc.world_up), 1.0f, pc.m_envLayerMask))
+                return Vector3.Cross(pc.world_direction, pc.world_up);
+            else if (Physics.Raycast(m_target, Vector3.Cross(pc.world_up, pc.world_direction), 1.0f, pc.m_envLayerMask))
+                return Vector3.Cross(pc.world_up, pc.world_direction);
+            else if (Physics.Raycast(m_target, -pc.world_direction, 1.0f, pc.m_envLayerMask))
+                return -pc.world_direction;
+            else if (Physics.Raycast(m_target, pc.world_up, 1.0f, pc.m_envLayerMask))
+                return pc.world_up;
+            else // No box around the target location
+                return Vector3.zero;
         }
     }
 
