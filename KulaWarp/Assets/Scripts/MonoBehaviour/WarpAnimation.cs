@@ -41,6 +41,9 @@ public class WarpAnimation : MonoBehaviour
         m_rendererD      = dissolveObj.GetComponent<Renderer>();
         m_rendererA      = appearObj.GetComponent<Renderer>();
 
+        // Detach the appearing sphere from its parent to allow proper animation.
+        appearObj.transform.parent = null;
+
         // This is a workaround to make [ExecuteInEditMode] work with setting 
         // material properties. A temporary material copy is created and assiged. 
         Material tempMaterialD = new Material(m_rendererD.sharedMaterial);
@@ -69,7 +72,7 @@ public class WarpAnimation : MonoBehaviour
             Appear();
         }
         else if (m_playing && m_timer > effectTime)
-            Reset();
+            ResetAnim();
 
         m_rendererD.material.SetFloat(m_shaderProperty, cutoffD);
         m_rendererA.material.SetFloat(m_shaderProperty, cutoffA);
@@ -87,16 +90,16 @@ public class WarpAnimation : MonoBehaviour
         appearObj.transform.rotation = dissolveObj.transform.rotation;
     }
 
-    public void Reset()
+    public void ResetAnim()
     {
         m_timer   = 0.0f;
-        m_playing   = false; m_psDPlayed = false;
+        m_playing = false; m_psDPlayed = false;
         cutoffA   = 0.0f;  cutoffD     = 0.0f;
+
+        if (rootMotion) dissolveObj.transform.parent.transform.position = appearObj.transform.position;
 
         m_rendererD.material.SetFloat(m_shaderProperty, cutoffD);
         m_rendererA.material.SetFloat(m_shaderProperty, cutoffA);
-
-        if(rootMotion) dissolveObj.transform.position = appearObj.transform.position;
     }
 
     public bool isPlaying()
@@ -119,6 +122,4 @@ public class WarpAnimation : MonoBehaviour
     {
         cutoffA = animCurveA.Evaluate(Mathf.InverseLerp(0, effectTime, m_timer));
     }
-
-    
 }

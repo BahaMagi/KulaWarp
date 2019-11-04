@@ -24,9 +24,13 @@ public class ParticleSystemsController: MonoBehaviour
     {
         ParticleSystem ps = pool[ID].getInstance();
 
-        ps.transform.position = pos;
-        ps.transform.rotation = Quaternion.FromToRotation(Vector3.up, up);
-        ps.transform.Rotate(new Vector3(-90, 0, 0));
+        // Move particle system to target position and rotate according to worlds up direction.
+        ps.transform.rotation  = Quaternion.FromToRotation(Vector3.up, up);
+        ps.transform.position  = pos;
+
+        // Apply any transforms given in the prefab.
+        ps.transform.Translate(pool[ID].offset, Space.Self);
+        ps.transform.rotation *= pool[ID].orientation;
 
         ps.Play();
     }
@@ -61,10 +65,15 @@ public class ParticleSystemsController: MonoBehaviour
         List<ParticleSystem> instances;
         int poolSize = 1, nextIndex = 0;
 
+        public Vector3 offset;
+        public Quaternion orientation;
+
         public PooledPS(ParticleSystem ps, int poolSize = 1)
         {
             this.ps       = ps;
             this.poolSize = poolSize;
+            offset        = ps.transform.position;
+            orientation   = ps.transform.rotation;
             instances     = new List<ParticleSystem>(poolSize);
             for (int i = 0; i < poolSize; i++)
             {

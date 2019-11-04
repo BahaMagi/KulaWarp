@@ -266,7 +266,7 @@ public class PlayerController : ObjectBase
         public Vector3 newDir, boxDir; // Used in the GravChange state to set new world_dir/up
 
         private Vector3       m_target;
-        private float         m_t, m_hoverTime = 0.3f;
+        private float         m_t, m_hoverTime = 0.2f;
         private bool          m_hovering;
         private WarpAnimation m_warpanim;
 
@@ -307,34 +307,7 @@ public class PlayerController : ObjectBase
         }
 
         public override void OnExitState(State to)
-        {
-            /*Vector3 origin = pc.transform.position;
-
-            if (Physics.Raycast(origin, -pc.world_up, 1.0f, pc.m_envLayerMask))
-                boxDir = -pc.world_up;
-            else if (Physics.Raycast(origin, pc.world_direction, 1.0f, pc.m_envLayerMask))
-                boxDir = pc.world_direction;
-            else if (Physics.Raycast(origin, Vector3.Cross(pc.world_direction, pc.world_up), 1.0f, pc.m_envLayerMask))
-                boxDir = Vector3.Cross(pc.world_direction, pc.world_up);
-            else if (Physics.Raycast(origin, Vector3.Cross(pc.world_up, pc.world_direction), 1.0f, pc.m_envLayerMask))
-                boxDir = Vector3.Cross(pc.world_up, pc.world_direction);
-            else if (Physics.Raycast(origin, -pc.world_direction, 1.0f, pc.m_envLayerMask))
-                boxDir = -pc.world_direction;
-            else if (Physics.Raycast(origin, pc.world_up, 1.0f, pc.m_envLayerMask))
-                boxDir = pc.world_up;
-            else // No box around the target location
-            {
-                pc.m_rb.useGravity = true;
-                return;
-            }*/
-
-
-            // If the old world_direction is still a valid direction (i.e. the new gravity axis is not 
-            // pointing in the same or opposit direction) then keep it. Otherwise set it to the old 
-            // world_up direction. 
-            //newDir = pc.world_direction;
-            //if (Mathf.Abs(1 - Mathf.Abs(Vector3.Dot(pc.world_direction, boxDir))) < 0.01f) newDir = pc.world_up;
-        }
+        { }
 
         public override void UpdateState()
         {
@@ -362,6 +335,16 @@ public class PlayerController : ObjectBase
             }
         }
 
+        /**
+         * Casts a ray into each of the 6 directions in the order:
+         *      down > front > right > left > back > up 
+         * and returns the direction vector to the first hit. 
+         * This order corresponds to the priority order that is given 
+         * to gravity shifts after a warp. Down as first check 
+         * preserves current gravity axis when possible.
+         * 
+         * If there was no hit, (0, 0, 0) is returned. 
+        **/
         Vector3 getBoxDir()
         {
             if (Physics.Raycast(m_target, -pc.world_up, 1.0f, pc.m_envLayerMask))
@@ -418,9 +401,10 @@ public class PlayerController : ObjectBase
 
     class GravityChange : State
     {
-        private bool    m_gradual; // Does the player BoxCollider have to be rotated gradually, i.e. all but moving up
+        private bool    m_gradual; // Does the player BoxCollider have to be rotated gradually, i.e. moving down. 
         private Vector3 m_dir, m_up, m_contactPoint;
         private float   m_t,   m_rotTime;
+        private GameObject dissolve_sphere;
 
         private State pred;
 
@@ -428,12 +412,14 @@ public class PlayerController : ObjectBase
         {
             stateName = (int)PlayerState.GravityChange;
             pred = null;
+
+            dissolve_sphere = GameObject.Find("Sphere_Dissolve");
         }
 
         public override void OnEnterState(State from)
         {
             pc.state = PlayerState.GravityChange;
-            pred = from;
+            pred     = from;
 
             m_gradual = false;
 
@@ -478,8 +464,12 @@ public class PlayerController : ObjectBase
 
         public override void OnExitState(State to)
         {
-            // Correct minor inaccuracies from the rotation
+            // Apply rotation of gravity change to player transform.
+            // Detach the child sphere first to avoid a rotation of that object 
+            // as well.
+            pc.transform.DetachChildren();
             pc.transform.rotation = Quaternion.FromToRotation(Vector3.up, pc.world_up);
+            dissolve_sphere.transform.parent = pc.transform;
         }
 
         public override void UpdateState()

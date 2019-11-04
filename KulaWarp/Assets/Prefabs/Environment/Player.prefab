@@ -130,7 +130,7 @@ MonoBehaviour:
   appearObj: {fileID: 8693346674189113381}
   cutoffD: 0
   cutoffA: 0
-  effectTime: 1
+  effectTime: 0.6
   psThresD: 0.9
   animCurveD:
     serializedVersion: 2
@@ -187,7 +187,6 @@ MonoBehaviour:
   particleSystemsA:
   - {fileID: 2877125789120580867, guid: 4585ebfeadf916c42aa1c719fbed07f1, type: 3}
   - {fileID: 7921856048130776839, guid: 30496f7943fcf424dbefc6423178bef7, type: 3}
-  playing: 0
   rootMotion: 0
 --- !u!1 &54068310053535782
 GameObject:
@@ -247,7 +246,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 10bc6b051fc693e48bfc9ec55952d08d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -307,7 +306,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8693346674189113381}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.34, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 54068309140363629}
@@ -338,7 +337,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: d4464c081cb96714498ceb397790145f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -367,7 +366,7 @@ SphereCollider:
   m_GameObject: {fileID: 8693346674189113381}
   m_Material: {fileID: 13400000, guid: d8f701cbe3d21c7438302aec224b3d98, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
