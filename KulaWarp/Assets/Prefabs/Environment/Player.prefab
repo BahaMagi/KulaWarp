@@ -130,7 +130,7 @@ MonoBehaviour:
   appearObj: {fileID: 8693346674189113381}
   cutoffD: 0
   cutoffA: 0
-  effectTime: 0.6
+  effectTime: 0.4
   psThresD: 0.9
   animCurveD:
     serializedVersion: 2

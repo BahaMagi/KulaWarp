@@ -266,7 +266,7 @@ public class PlayerController : ObjectBase
         public Vector3 newDir, boxDir; // Used in the GravChange state to set new world_dir/up
 
         private Vector3       m_target;
-        private float         m_t, m_hoverTime = 0.2f;
+        private float         m_t, m_hoverTime = 0.1f;
         private bool          m_hovering;
         private WarpAnimation m_warpanim;
 
