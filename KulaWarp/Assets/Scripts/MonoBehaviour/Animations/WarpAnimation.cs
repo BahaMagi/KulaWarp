@@ -27,12 +27,13 @@ public class WarpAnimation : MonoBehaviour
     public List<ParticleSystem> particleSystemsD, particleSystemsA;
     public bool rootMotion = false;
 
-    int       m_shaderProperty;
-    Renderer  m_rendererD, m_rendererA;
-    float     m_timer = 0.0f;
-    bool      m_psDPlayed = false;
-    List<int> m_psIDsD, m_psIDsA;
-    bool      m_playing = false;
+    private Vector3   m_upD;
+    private Renderer  m_rendererD, m_rendererA;
+    private List<int> m_psIDsD,    m_psIDsA;
+    private float     m_timer     = 0.0f;
+    private bool      m_psDPlayed = false;
+    private int       m_shaderProperty;
+    private bool      m_playing = false, m_playingD = false, m_playingA = false;
 
     // Base Classes MonoBehaviour:
     void Start()
@@ -68,23 +69,66 @@ public class WarpAnimation : MonoBehaviour
         {
             m_timer += Time.deltaTime;
 
-            Dissolve();
-            Appear();
+            if(m_playingD)  Dissolve();
+            if (m_playingA) Appear();
         }
         else if (m_playing && m_timer > effectTime)
-            ResetAnim();
+        {
+            if(m_playingA && m_playingD) ResetAnim();
+            else
+            {
+                m_timer = 0.0f;
+                m_playing = false; m_psDPlayed = false;
+                m_playingA = false; m_playingD = false;
+            }
+        }
+            
 
         m_rendererD.material.SetFloat(m_shaderProperty, cutoffD);
         m_rendererA.material.SetFloat(m_shaderProperty, cutoffA);
     }
 
     // WarpAnimation:
-    public void Play(Vector3 target, Vector3 upA)
+
+    /**
+     * Plays both the disappear and the appear animation at the same time.
+     * If root motion is selected the dissolve object will be placed at the target 
+     * position at the end of the animation.
+     */
+    public void Play(Vector3 target, Vector3 upD, Vector3 upA)
     {
-        m_playing = true;
+        m_playing = true; m_playingD = true; m_playingA = true;
+
+        m_upD = upD;
 
         foreach (int ID in m_psIDsA)
             ParticleSystemsController.psc.PlayPS(ID, target, upA);
+
+        appearObj.transform.position = target;
+        appearObj.transform.rotation = dissolveObj.transform.rotation;
+    }
+
+    /**
+     * Plays only the disappear animation. Root motion has no effect on this. 
+     */
+    public void PlayD(Vector3 up)
+    {
+        m_playing = true; m_playingD = true;
+        m_upD     
+= up;
+    }
+
+    /**
+     * Plays only the appear animation at the @target position. 
+     * Root motion has no effect on this. If the disappear object is supposed to end up
+     * at the @target position, @ResetAnim() should be used when the animation has finished.
+     */
+    public void PlayA(Vector3 target, Vector3 up)
+    {
+        m_playing = true; m_playingA = true;
+
+        foreach (int ID in m_psIDsA)
+            ParticleSystemsController.psc.PlayPS(ID, target, up);
 
         appearObj.transform.position = target;
         appearObj.transform.rotation = dissolveObj.transform.rotation;
@@ -110,7 +154,7 @@ public class WarpAnimation : MonoBehaviour
         if (m_timer >= (effectTime * psThresD) && !m_psDPlayed)
         {
             foreach (int ID in m_psIDsD)
-                ParticleSystemsController.psc.PlayPS(ID, dissolveObj.transform.position, PlayerController.pc.world_up);
+                ParticleSystemsController.psc.PlayPS(ID, dissolveObj.transform.position, m_upD);
 
             m_psDPlayed = true;
         }

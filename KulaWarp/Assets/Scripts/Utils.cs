@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 /**
 * Base class used for all objects that are supposed to be reset when the level restarts. 
@@ -169,17 +170,35 @@ static class ExtensionMethods
         return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
     }
 
+    /**
+     * This allows to search for (grand-)children recursively rather than 
+     * only for direct children. 
+     */
+    public static Transform FindDeepChild(this Transform aParent, string aName)
+    {
+        Queue<Transform> queue = new Queue<Transform>();
+        queue.Enqueue(aParent);
+        while (queue.Count > 0)
+        {
+            Transform c = queue.Dequeue();
+            if (c.name == aName)
+                return c;
+            foreach (Transform t in c)
+                queue.Enqueue(t);
+        }
+        return null;
+    }
 }
 
 
 /** 
  * Provide the [ReadOnly] PropertyDrawer to show variables in the inspector 
  * in a read only fashion. 
+ * 
+ * [ReadOnlyWhenPlaying] only disables editing in Play-mode. 
 */
-public class ReadOnlyAttribute : PropertyAttribute
-{
-
-}
+public class ReadOnlyAttribute : PropertyAttribute { }
+public class ReadOnlyWhenPlayingAttribute : PropertyAttribute { }
 
 #if UNITY_EDITOR   
 [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
@@ -198,6 +217,22 @@ public class ReadOnlyDrawer : PropertyDrawer
                                GUIContent label)
     {
         GUI.enabled = false;
+        EditorGUI.PropertyField(position, property, label, true);
+        GUI.enabled = true;
+    }
+}
+
+[CustomPropertyDrawer(typeof(ReadOnlyWhenPlayingAttribute))]
+public class ReadOnlyWhenPlayingAttributeDrawer : PropertyDrawer
+{
+    // Necessary since some properties tend to collapse smaller than their content
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    { return EditorGUI.GetPropertyHeight(property, label, true); }
+
+    // Draw a disabled property field
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        GUI.enabled = !Application.isPlaying;
         EditorGUI.PropertyField(position, property, label, true);
         GUI.enabled = true;
     }

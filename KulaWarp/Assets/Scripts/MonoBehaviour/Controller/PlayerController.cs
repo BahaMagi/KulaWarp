@@ -299,7 +299,7 @@ public class PlayerController : ObjectBase
             if (Convert.ToInt32(Mathf.Abs(Vector3.Dot(pc.world_direction, boxDir))) == 1)
                 newDir = pc.world_up;
 
-            m_warpanim.Play(m_target, -boxDir);
+            m_warpanim.Play(m_target, pc.world_up, -boxDir);
 
             m_t                = 0.0f;
             pc.m_rb.useGravity = false;
