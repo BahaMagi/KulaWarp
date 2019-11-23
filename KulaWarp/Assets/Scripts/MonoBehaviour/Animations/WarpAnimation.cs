@@ -33,7 +33,7 @@ public class WarpAnimation : MonoBehaviour
     private float     m_timer     = 0.0f;
     private bool      m_psDPlayed = false;
     private int       m_shaderProperty;
-    private bool      m_playing = false, m_playingD = false, m_playingA = false;
+    private bool      m_playing = false, m_playingD = false, m_playingA = false, m_reset = true;
 
     // Base Classes MonoBehaviour:
     void Start()
@@ -70,11 +70,11 @@ public class WarpAnimation : MonoBehaviour
             m_timer += Time.deltaTime;
 
             if(m_playingD)  Dissolve();
-            if (m_playingA) Appear();
+            if(m_playingA)  Appear();
         }
         else if (m_playing && m_timer > effectTime)
         {
-            if(m_playingA && m_playingD) ResetAnim();
+            if(m_reset) ResetAnim();
             else
             {
                 m_timer = 0.0f;
@@ -82,7 +82,6 @@ public class WarpAnimation : MonoBehaviour
                 m_playingA = false; m_playingD = false;
             }
         }
-            
 
         m_rendererD.material.SetFloat(m_shaderProperty, cutoffD);
         m_rendererA.material.SetFloat(m_shaderProperty, cutoffA);
@@ -95,9 +94,9 @@ public class WarpAnimation : MonoBehaviour
      * If root motion is selected the dissolve object will be placed at the target 
      * position at the end of the animation.
      */
-    public void Play(Vector3 target, Vector3 upD, Vector3 upA)
+    public void Play(Vector3 target, Vector3 upD, Vector3 upA, bool reset = true)
     {
-        m_playing = true; m_playingD = true; m_playingA = true;
+        m_playing = true; m_playingD = true; m_playingA = true; m_reset = reset;
 
         m_upD = upD;
 
@@ -111,11 +110,12 @@ public class WarpAnimation : MonoBehaviour
     /**
      * Plays only the disappear animation. Root motion has no effect on this. 
      */
-    public void PlayD(Vector3 up)
+    public void PlayD(Vector3 up, bool reset = false)
     {
-        m_playing = true; m_playingD = true;
-        m_upD     
-= up;
+        m_playing  = true;
+        m_playingD = true;
+        m_reset    = reset;
+        m_upD      = up;
     }
 
     /**
@@ -123,9 +123,9 @@ public class WarpAnimation : MonoBehaviour
      * Root motion has no effect on this. If the disappear object is supposed to end up
      * at the @target position, @ResetAnim() should be used when the animation has finished.
      */
-    public void PlayA(Vector3 target, Vector3 up)
+    public void PlayA(Vector3 target, Vector3 up, bool reset = true)
     {
-        m_playing = true; m_playingA = true;
+        m_playing = true; m_playingA = true; m_reset = reset;
 
         foreach (int ID in m_psIDsA)
             ParticleSystemsController.psc.PlayPS(ID, target, up);
@@ -136,9 +136,10 @@ public class WarpAnimation : MonoBehaviour
 
     public void ResetAnim()
     {
-        m_timer   = 0.0f;
-        m_playing = false; m_psDPlayed = false;
-        cutoffA   = 0.0f;  cutoffD     = 0.0f;
+        m_timer    = 0.0f;
+        m_playing  = false; m_psDPlayed = false;
+        m_playingA = false; m_playingD  = false;
+        cutoffA    = 0.0f;  cutoffD     = 0.0f;
 
         if (rootMotion) dissolveObj.transform.parent.transform.position = appearObj.transform.position;
 

@@ -70,10 +70,6 @@ public class MenuCube : MonoBehaviour
         m_tmpTexts[1] = transform.FindDeepChild("Text2").GetComponent<TextMeshProUGUI>();
         m_tmpTexts[2] = transform.FindDeepChild("Text3").GetComponent<TextMeshProUGUI>();
         m_tmpTexts[3] = transform.FindDeepChild("Text4").GetComponent<TextMeshProUGUI>();
-
-        // Animation components attached to the sphere selector
-        m_selectorWarpAnim  = selector.GetComponent<WarpAnimation>();
-        m_selectorHoverAnim = selector.GetComponent<HoverAnim>();
     }
 
     /**
@@ -144,8 +140,6 @@ public class MenuCube : MonoBehaviour
     public void Confirm()
     {
         menuEntries[m_curMenuEntry].callBack.Invoke();
-        //m_selectorWarpAnim.PlayD(Vector3.up);
-        m_selectorHoverAnim.Play();
     }
 
     public MenuEntry getCurMenuEntry()
@@ -159,7 +153,7 @@ public class MenuCube : MonoBehaviour
     public class MenuEntry
     {
         public string     text;
-        public MenuCube subMenu;
+        public MenuCube   subMenu;
         public UnityEvent callBack;
 
         public MenuEntry(string Text, UnityEvent cllBck)
