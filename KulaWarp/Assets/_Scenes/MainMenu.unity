@@ -1304,7 +1304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71fa536a846b19f4fb699e5196497708, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 1
+  duration: 0.75
   height: 0.4
   animCurve:
     serializedVersion: 2
