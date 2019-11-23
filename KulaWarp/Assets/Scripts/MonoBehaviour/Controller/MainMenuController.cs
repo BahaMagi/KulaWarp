@@ -125,15 +125,37 @@ public class MainMenuController : MonoBehaviour
 
     public void OpenPanel(GameObject panel)
     {
+        // Open the panel passed by the current MenuCube
         panel.GetComponent<OpenMenu>().Open();
         m_panelIsOpen = true;
+
+        // Make selector sphere disappear
         m_selectorWarpAnim.PlayD(Vector3.up);
+
+        // Shrink the current MenuCube
+        m_trans.Shrink(menuCube, m_menuStack.Count);
+        m_menuStack.Push(menuCube);
+
+        // Avoid selectoring dropping off while cube is shrinking
+        m_selectorWarpAnim.dissolveObj.GetComponent<Rigidbody>().useGravity = false;
+        m_selectorWarpAnim.appearObj.GetComponent<Rigidbody>().useGravity   = false;
     }
 
     public void ClosePanel(GameObject panel)
     {
+        // Close panel
         panel.GetComponent<OpenMenu>().Close();
         m_closePanel = true;
+
+        // Make selector sphere reappear
         m_selectorWarpAnim.PlayA(new Vector3(0, 0.7f, 0), Vector3.up);
+
+        // Fly MenuCube back in
+        menuCube = m_menuStack.Pop();
+        m_trans.Unshrink(menuCube);
+
+        // Turn gravity back on for the selector
+        m_selectorWarpAnim.dissolveObj.GetComponent<Rigidbody>().useGravity = true;
+        m_selectorWarpAnim.appearObj.GetComponent<Rigidbody>().useGravity   = true;
     }
 }

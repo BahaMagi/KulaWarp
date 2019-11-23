@@ -87,7 +87,7 @@ public class MenuCube : MonoBehaviour
 
         // Apply rotations
         transform.RotateAround(Vector3.zero, Vector3.right, dAngle);
-        selector.transform.RotateAround(selector.transform.position, Vector3.right, dSelectorAngle);
+        selector.transform.RotateAround(selector.transform.position, Vector3.right, -dSelectorAngle);
 
         // If the cube rotated 90° stop rotating by setting @m_rotating back to 0.
         // Furthermore, to make up for small inaccuracies, the rotation is set once more
