@@ -23,6 +23,7 @@ public class MenuCube : MonoBehaviour
     private TextMeshProUGUI[] m_tmpTexts;
     private WarpAnimation     m_selectorWarpAnim;
     private HoverAnim         m_selectorHoverAnim;
+    private AudioSource[]     m_audioSources;
 
 
     // Base Class MonoBehaviour:
@@ -70,6 +71,12 @@ public class MenuCube : MonoBehaviour
         m_tmpTexts[1] = transform.FindDeepChild("Text2").GetComponent<TextMeshProUGUI>();
         m_tmpTexts[2] = transform.FindDeepChild("Text3").GetComponent<TextMeshProUGUI>();
         m_tmpTexts[3] = transform.FindDeepChild("Text4").GetComponent<TextMeshProUGUI>();
+
+        // The order of the AudioSource objects in the array is the same as in the inspector.
+        // There are 2 sources: 
+        // [0] holds the SelectionChange sound effect
+        // [1] holds the selection confirm sound effect
+        m_audioSources = gameObject.GetComponents<AudioSource>();
     }
 
     /**
@@ -117,10 +124,14 @@ public class MenuCube : MonoBehaviour
      * and sphere. The rotation direction is affected by @dir \in {-1, 0, 1} 
      * and whether menu controls are inverted with @m_invertMenuCntrl.
      */
-    public void ChangeSelectedEntry(int dir)
+    public void ChangeSelectedEntry(int dir, bool audio = true)
     {
         if (m_rotating != 0)
             return;
+
+        // Play the according sound effect
+        if (audio)
+            m_audioSources[0].Play();
 
         // Get side that is going to face the camera
         m_currentSide += m_invertMenuCntrl * -dir;
@@ -139,6 +150,9 @@ public class MenuCube : MonoBehaviour
 
     public void Confirm()
     {
+        // Play the according sound effect
+        m_audioSources[1].Play();
+
         menuEntries[m_curMenuEntry].callBack.Invoke();
     }
 

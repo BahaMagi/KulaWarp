@@ -113,7 +113,7 @@ public class MainMenuController : MonoBehaviour
 
             m_trans.Unshrink(subMenuCube);
             m_trans.FlyOut(menuCube);
-            menuCube.ChangeSelectedEntry(-1);
+            menuCube.ChangeSelectedEntry(-1, false);
 
             menuCube = subMenuCube;
         }

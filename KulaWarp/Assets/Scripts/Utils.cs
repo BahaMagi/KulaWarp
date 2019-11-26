@@ -237,4 +237,17 @@ public class ReadOnlyWhenPlayingAttributeDrawer : PropertyDrawer
         GUI.enabled = true;
     }
 }
+
+public class LockMenu : Editor
+{
+    // Adds a menu item to the Tools menu called "Toggle Inspector Lock" with a shortcut "Ctrl + l"
+    [MenuItem("Tools/Toggle Inspector Lock %l")]
+    public static void ToggleInspectorLock() 
+    {
+        // Toggle lock of current inspector and force unity to redraw the inspector window
+        // to make changes immediately visible.
+        ActiveEditorTracker.sharedTracker.isLocked = !ActiveEditorTracker.sharedTracker.isLocked;
+        ActiveEditorTracker.sharedTracker.ForceRebuild();
+    }
+}
 #endif
