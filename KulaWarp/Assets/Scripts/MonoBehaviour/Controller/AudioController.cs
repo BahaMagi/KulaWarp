@@ -18,6 +18,9 @@ public class AudioController : MonoBehaviour
             ac = this;
         }
         else if (ac != this) Destroy(gameObject);
+
+        // Load references to game objects and components
+        LoadComponents();
     }
 
     void Update()
@@ -26,6 +29,11 @@ public class AudioController : MonoBehaviour
         {
             PlayNextClip();
         }
+    }
+
+    void LoadComponents()
+    {
+        m_audioSource = gameObject.GetComponent<AudioSource>();
     }
 
     void PlayNextClip()
