@@ -15,12 +15,14 @@ public class MainMenuController : MonoBehaviour
 
     private WarpAnimation m_selectorWarpAnim;
     private HoverAnim     m_selectorHoverAnim;
+    private FadeInAnim    m_panelFadeInAnim;
 
     // The 2nd boolean is necessary as the onClick event is resolved before
     // Update() but the submit button is still considered clicked in Update().
     // Just setting flags in the callback and resolving them in Update prevents 
     // 'double clicking'. 
-    private bool m_panelIsOpen = false, m_closePanel = false;
+    private bool m_panelIsOpen = false, m_closePanel   = false;
+    private bool m_checkAnims  = false;
 
     // Base Class MonoBehaviour:
 
@@ -53,6 +55,21 @@ public class MainMenuController : MonoBehaviour
             m_closePanel  = false;
             m_panelIsOpen = false;
         }
+
+        // When a level is supposed to be loaded a couple of animations are started
+        // first. The level is not supposed to load before these are over. 
+        if(m_checkAnims)
+        {
+            bool isStillPlaying = m_selectorHoverAnim.isPlaying() 
+                || m_selectorWarpAnim.isPlaying()
+                || m_panelFadeInAnim.isPlaying();
+
+            if (!isStillPlaying)
+            {
+                m_checkAnims   = false;
+                Play();
+            }
+        }
     }
 
     // MainMenuController: 
@@ -61,15 +78,29 @@ public class MainMenuController : MonoBehaviour
     {
         m_trans = GetComponent<MenuTransition>();
 
-        // Animation components attached to the sphere selector
+        // Find animation components
         m_selectorWarpAnim  = selector.GetComponent<WarpAnimation>();
         m_selectorHoverAnim = selector.GetComponent<HoverAnim>();
+        m_panelFadeInAnim   = GameObject.Find("BGPanel_Fade").GetComponent<FadeInAnim>();
     }
 
-    public void Play()
+    public void StartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        // Make selector sphere disappear
+        m_selectorWarpAnim.PlayD(Vector3.up);
+
+        // Fade out the screen
+        m_panelFadeInAnim.Play();
+
+        // Play the sound effect to start the game
+        m_panelFadeInAnim.gameObject.GetComponent<AudioSource>().Play();
+
+        // Set this to wait until animation is over before starting the game
+        m_checkAnims = true;
     }
+
+    private void Play()
+    { SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); }
 
     public void Quit()
     {

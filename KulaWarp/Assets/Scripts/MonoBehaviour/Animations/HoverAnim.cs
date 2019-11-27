@@ -34,7 +34,7 @@ public class HoverAnim : MonoBehaviour
         m_rb.useGravity = true;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (m_isPlaying)
         {
@@ -50,4 +50,7 @@ public class HoverAnim : MonoBehaviour
             }
         }
     }
+
+    public bool isPlaying()
+    { return m_isPlaying; }
 }
