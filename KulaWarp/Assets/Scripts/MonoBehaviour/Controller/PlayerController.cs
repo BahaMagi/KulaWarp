@@ -20,8 +20,9 @@ public class PlayerController : ObjectBase
     [ReadOnly] public AnimState   animState;
     [ReadOnly] public Vector3     world_direction, world_up; // Current World and Camera forwarwards/up direction
 
-    [HideInInspector] public StateMachine sm;
-    [HideInInspector] public float        sphereRadius;
+    [HideInInspector] public StateMachine  sm;
+    [HideInInspector] public float         sphereRadius;
+    [HideInInspector] public SFXController sfxc;
 
     private SphereCollider m_sphereCollider_player;
     private Animator       m_animator;
@@ -175,6 +176,8 @@ public class PlayerController : ObjectBase
     {
         //@TODO play death animation
         GameController.gc.Lost();
+
+        sfxc.Play(SFXController.SFXClip.Burst);
     }
 
     public void Enable(bool enable)
@@ -235,6 +238,7 @@ public class PlayerController : ObjectBase
         m_sphereCollider_player = player_sphere.GetComponent<SphereCollider>();
         m_animator              = GetComponent<Animator>();
         m_rb                    = GetComponent<Rigidbody>();
+        sfxc                  = GetComponent<SFXController>();
     }
 
     // StateMachine:
@@ -384,6 +388,7 @@ public class PlayerController : ObjectBase
         public override void OnExitState(State to)
         {
             pc.m_animator.SetTrigger(pc.m_impact_ID);
+            pc.sfxc.Play(SFXController.SFXClip.Impact);
         }
 
         public override void UpdateState()
@@ -513,22 +518,25 @@ public class PlayerController : ObjectBase
         {
             pc.state = PlayerState.Moving;
 
+            // Start the sfx for rolling
+            pc.sfxc.Play(SFXController.SFXClip.Rolling);
+
             // This is needed to calculate the traveled distance to rotate the sphere 
             m_posBeforeUpdate = pc.transform.position;
 
             if (from.stateName == (int)PlayerState.GravityChange)
             {
                 nextBlockLevel = 0;
-                m_start = pc.transform.position.SnapToGridUp(pc.world_up);
-                m_target = (m_start + pc.world_direction * 0.5f * LevelController.lc.boxSize).SnapToGridAll(pc.world_up);
-                m_easeInTime = 0.0f;
+                m_start        = pc.transform.position.SnapToGridUp(pc.world_up);
+                m_target       = (m_start + pc.world_direction * 0.5f * LevelController.lc.boxSize).SnapToGridAll(pc.world_up);
+                m_easeInTime   = 0.0f;
             }
             else
             {
                 nextBlockLevel = NextBlockLevel();
-                m_start = pc.transform.position.SnapToGridAll(pc.world_up);
-                m_target = GetTarget();
-                m_easeInTime = m_easeIn ? pc.easeInTime : 0.0f;
+                m_start        = pc.transform.position.SnapToGridAll(pc.world_up);
+                m_target       = GetTarget();
+                m_easeInTime   = m_easeIn ? pc.easeInTime : 0.0f;
             }
 
             m_t = 0.0f;
@@ -538,6 +546,9 @@ public class PlayerController : ObjectBase
         public override void OnExitState(State to)
         {
             m_easeIn = true;
+
+            // Start the sfx for rolling
+            pc.sfxc.Stop(SFXController.SFXClip.Rolling);
         }
 
         public override void UpdateState()

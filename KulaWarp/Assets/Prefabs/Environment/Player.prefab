@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 54068309140363624}
   - component: {fileID: 54068309140363626}
   - component: {fileID: 5982518620785963047}
+  - component: {fileID: 5264707736611137027}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -58,6 +59,7 @@ MonoBehaviour:
   world_direction: {x: 0, y: 0, z: 0}
   world_up: {x: 0, y: 0, z: 0}
   sphereRadius: 0
+  sfxc: {fileID: 0}
 --- !u!33 &54068309140363630
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -188,6 +190,23 @@ MonoBehaviour:
   - {fileID: 2877125789120580867, guid: 4585ebfeadf916c42aa1c719fbed07f1, type: 3}
   - {fileID: 7921856048130776839, guid: 30496f7943fcf424dbefc6423178bef7, type: 3}
   rootMotion: 1
+--- !u!114 &5264707736611137027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54068309140363627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0d7f28ed9b105140862e047b7dbc4e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rollingClip: {fileID: 8300000, guid: 24f9fd4fe96d4594cb740312e625f6ac, type: 3}
+  impactClip: {fileID: 8300000, guid: 94f9daf24fbabad42857c4df31db52ba, type: 3}
+  burstClip: {fileID: 8300000, guid: cd1f4cc78c518984e98ad1ed952d02a5, type: 3}
+  SFXMixerGroup: {fileID: 7992179906718490969, guid: 4f52265f58b4049489a96b38793452cc,
+    type: 2}
 --- !u!1 &54068310053535782
 GameObject:
   m_ObjectHideFlags: 0
