@@ -21,12 +21,12 @@ public class MainMenuController : MonoBehaviour
     // Update() but the submit button is still considered clicked in Update().
     // Just setting flags in the callback and resolving them in Update prevents 
     // 'double clicking'. 
-    private bool m_panelIsOpen = false, m_closePanel   = false;
-    private bool m_checkAnims  = false;
+    private bool m_panelIsOpen  = false, m_closePanel   = false;
+    private bool m_waitToStart  = false;
 
     // Base Class MonoBehaviour:
 
-    void Awake()
+    private void Awake()
     {
         // Initialize menu stack
         m_menuStack = new Stack<MenuCube>();
@@ -37,44 +37,40 @@ public class MainMenuController : MonoBehaviour
 
     private void Update()
     {
-        if (!m_panelIsOpen)
+        // Only allow input if no animation is currently playing. 
+        // Otherwise opening and closing panels repeatedly can lead to
+        // bugs like the sphere falling off. 
+        if (!IsAnimPlaying())
         {
-            if (Input.GetButtonDown("Submit"))
-                menuCube.Confirm();
-            else if (Input.GetButtonDown("Cancel"))
-                GoBack();
-            else if (Input.GetButtonDown("Back"))
-                GoBack();
-            else if (Input.GetAxisRaw("Vertical") == 1)
-                menuCube.ChangeSelectedEntry(1);
-            else if (Input.GetAxisRaw("Vertical") == -1)
-                menuCube.ChangeSelectedEntry(-1);
-        }
-        else if(m_closePanel)
-        {
-            m_closePanel  = false;
-            m_panelIsOpen = false;
-        }
-
-        // When a level is supposed to be loaded a couple of animations are started
-        // first. The level is not supposed to load before these are over. 
-        if(m_checkAnims)
-        {
-            bool isStillPlaying = m_selectorHoverAnim.isPlaying() 
-                || m_selectorWarpAnim.isPlaying()
-                || m_panelFadeInAnim.isPlaying();
-
-            if (!isStillPlaying)
-            {
-                m_checkAnims   = false;
+            // The flag is set if the game is supposed to start but the menu is waiting
+            // for animations to finish.
+            if (m_waitToStart)
                 Play();
+
+            if (!m_panelIsOpen)
+            {
+                if (Input.GetButtonDown("Submit"))
+                    menuCube.Confirm();
+                else if (Input.GetButtonDown("Cancel"))
+                    GoBack();
+                else if (Input.GetButtonDown("Back"))
+                    GoBack();
+                else if (Input.GetAxisRaw("Vertical") == 1)
+                    menuCube.ChangeSelectedEntry(1);
+                else if (Input.GetAxisRaw("Vertical") == -1)
+                    menuCube.ChangeSelectedEntry(-1);
+            }
+            else if (m_closePanel)
+            {// Separate flags are used to avoid double registration of input due to events
+                m_closePanel  = false;
+                m_panelIsOpen = false;
             }
         }
     }
 
     // MainMenuController: 
 
-    void LoadComponents()
+    private void LoadComponents()
     {
         m_trans = GetComponent<MenuTransition>();
 
@@ -82,6 +78,16 @@ public class MainMenuController : MonoBehaviour
         m_selectorWarpAnim  = selector.GetComponent<WarpAnimation>();
         m_selectorHoverAnim = selector.GetComponent<HoverAnim>();
         m_panelFadeInAnim   = GameObject.Find("BGPanel_Fade").GetComponent<FadeInAnim>();
+    }
+
+    private bool IsAnimPlaying()
+    {
+        bool isStillPlaying = m_selectorHoverAnim.isPlaying()
+                || m_selectorWarpAnim.isPlaying()
+                || m_panelFadeInAnim.isPlaying()
+                || m_trans.isPlaying();
+
+        return isStillPlaying;
     }
 
     public void StartGame()
@@ -96,7 +102,7 @@ public class MainMenuController : MonoBehaviour
         m_panelFadeInAnim.gameObject.GetComponent<AudioSource>().Play();
 
         // Set this to wait until animation is over before starting the game
-        m_checkAnims = true;
+        m_waitToStart = true;
     }
 
     private void Play()
@@ -174,6 +180,10 @@ public class MainMenuController : MonoBehaviour
 
     public void ClosePanel(GameObject panel)
     {
+        // If an animation is still playing ignore input
+        if (IsAnimPlaying())
+            return;
+
         // Close panel
         panel.GetComponent<OpenMenu>().Close();
         m_closePanel = true;

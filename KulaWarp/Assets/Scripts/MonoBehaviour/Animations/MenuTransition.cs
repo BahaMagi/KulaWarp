@@ -23,6 +23,15 @@ public class MenuTransition : MonoBehaviour
         { a.OnUpdate(); }
     }
 
+    public bool isPlaying()
+    {
+        bool ret = false;
+        foreach (MenuAnimation anim in Anims)
+            ret = ret || anim.isPlaying();
+
+        return ret;
+    }
+
     public void Shrink(MenuCube cube, int sideBarPos)
     { ShrinkAnim.Play(cube, sideBarPos); }
 
@@ -138,6 +147,9 @@ public abstract class MenuAnimation
     protected float  m_timer     = 0.0f;
     
     protected MenuCube m_cube;
+
+    public bool isPlaying()
+    { return m_isPlaying; }
 
     public    abstract void Play(MenuCube cube);
     protected abstract void EvalCurves();
