@@ -52,7 +52,7 @@ public class MenuCube : MonoBehaviour
         InitTexts();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (m_rotating != 0)
             RotateCube();
