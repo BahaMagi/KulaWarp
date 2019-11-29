@@ -12,6 +12,7 @@ public class MainMenuController : MonoBehaviour
 
     private MenuTransition  m_trans;
     private Stack<MenuCube> m_menuStack;
+    private GameObject      m_curPanel;
 
     private WarpAnimation m_selectorWarpAnim;
     private HoverAnim     m_selectorHoverAnim;
@@ -23,6 +24,7 @@ public class MainMenuController : MonoBehaviour
     // 'double clicking'. 
     private bool m_panelIsOpen  = false, m_closePanel   = false;
     private bool m_waitToStart  = false;
+
 
     // Base Class MonoBehaviour:
 
@@ -64,6 +66,11 @@ public class MainMenuController : MonoBehaviour
             {// Separate flags are used to avoid double registration of input due to events
                 m_closePanel  = false;
                 m_panelIsOpen = false;
+            }
+            else if (m_panelIsOpen)
+            {
+                if (Input.GetButtonDown("Cancel") || Input.GetButtonDown("Back"))
+                    ClosePanel(m_curPanel);
             }
         }
     }
@@ -165,6 +172,7 @@ public class MainMenuController : MonoBehaviour
         // Open the panel passed by the current MenuCube
         panel.GetComponent<OpenMenu>().Open();
         m_panelIsOpen = true;
+        m_curPanel    = panel;
 
         // Make selector sphere disappear
         m_selectorWarpAnim.PlayD(Vector3.up);
@@ -198,5 +206,7 @@ public class MainMenuController : MonoBehaviour
         // Turn gravity back on for the selector
         m_selectorWarpAnim.dissolveObj.GetComponent<Rigidbody>().useGravity = true;
         m_selectorWarpAnim.appearObj.GetComponent<Rigidbody>().useGravity   = true;
+
+        m_curPanel = null;
     }
 }
