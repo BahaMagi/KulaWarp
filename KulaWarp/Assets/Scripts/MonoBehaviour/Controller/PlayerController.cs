@@ -33,7 +33,7 @@ public class PlayerController : ObjectBase
     private int     m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
     private float   m_invCircum, m_angularSpeed; // Inverse circumference of player sphere and precomputed constant to speed up computation
 
-    public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange };
+    public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange, Paused };
     public enum AnimState   { Idle, Moving, FadeOut, FadeIn, Impact };
 
     // Base Classes ObjectBase and MonoBehaviour:

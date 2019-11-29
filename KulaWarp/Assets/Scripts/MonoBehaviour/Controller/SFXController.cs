@@ -21,6 +21,7 @@ public class SFXController : MonoBehaviour
         m_audioSources[(int)SFXClip.Rolling].clip        = rollingClip;
         m_audioSources[(int)SFXClip.Rolling].playOnAwake = false;
         m_audioSources[(int)SFXClip.Rolling].outputAudioMixerGroup = SFXMixerGroup;
+        m_audioSources[(int)SFXClip.Rolling].spatialBlend = 1.0f;
 
 
         m_audioSources[(int)SFXClip.Impact]             = gameObject.AddComponent<AudioSource>();
@@ -28,12 +29,14 @@ public class SFXController : MonoBehaviour
         m_audioSources[(int)SFXClip.Impact].playOnAwake = false;
         m_audioSources[(int)SFXClip.Impact].loop        = false;
         m_audioSources[(int)SFXClip.Impact].outputAudioMixerGroup = SFXMixerGroup;
+        m_audioSources[(int)SFXClip.Rolling].spatialBlend = 1.0f;
 
         m_audioSources[(int)SFXClip.Burst]             = gameObject.AddComponent<AudioSource>();
         m_audioSources[(int)SFXClip.Burst].clip        = burstClip;
         m_audioSources[(int)SFXClip.Burst].playOnAwake = false;
         m_audioSources[(int)SFXClip.Burst].loop        = false;
         m_audioSources[(int)SFXClip.Burst].outputAudioMixerGroup = SFXMixerGroup;
+        m_audioSources[(int)SFXClip.Rolling].spatialBlend = 1.0f;
     }
 
     public void Play(SFXClip clip)

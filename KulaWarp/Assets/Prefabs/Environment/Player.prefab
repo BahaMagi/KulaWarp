@@ -408,7 +408,7 @@ GameObject:
   - component: {fileID: 8289404482716025729}
   - component: {fileID: 8722984238842066024}
   - component: {fileID: 1965669672718232976}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Sphere_Appear
   m_TagString: Player
   m_Icon: {fileID: 0}
