@@ -33,7 +33,7 @@ public class PlayerController : ObjectBase
     private int     m_envLayerMask; // Layermask to only check layer 10, i.e. the Environment layer, for collisions. 
     private float   m_invCircum, m_angularSpeed; // Inverse circumference of player sphere and precomputed constant to speed up computation
 
-    public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange, Paused };
+    public enum PlayerState { Idle, Moving, Warping, Falling, GravityChange };
     public enum AnimState   { Idle, Moving, FadeOut, FadeIn, Impact };
 
     // Base Classes ObjectBase and MonoBehaviour:
@@ -197,10 +197,10 @@ public class PlayerController : ObjectBase
         Falling fall       = new Falling(sm);
 
         // Setup triggered transitions
-        Func<bool> transIdle_Mov  = (() => (Input.GetAxisRaw("Vertical") == 1 && CanMove()));
-        Func<bool> transIdle_Warp = (() => (Input.GetButtonDown("Warp") && CanWarp()));
-        Func<bool> transMov_Idle  = (() => mov.Arrived());
-        Func<bool> transFall_Idle = (() => fall.hit);
+        Func<bool> transIdle_Mov   = (() => (Input.GetAxisRaw("Vertical") == 1 && CanMove()));
+        Func<bool> transIdle_Warp  = (() => (Input.GetButtonDown("Warp") && CanWarp()));
+        Func<bool> transMov_Idle   = (() => mov.Arrived());
+        Func<bool> transFall_Idle  = (() => fall.hit);
 
         // From Idle
         idle.AddTransition(mov, transIdle_Mov); // Idle -> Mov, Press Forward

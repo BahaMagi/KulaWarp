@@ -128,6 +128,7 @@ public class GameController : MonoBehaviour
 
         UIController.uic.PauseScreen(false);
         PlayerController.pc.Enable(false);
+        PlayerController.pc.sm.Reset();
 
         m_gameState = GameState.Lost;
 
