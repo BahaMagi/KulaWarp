@@ -54,7 +54,9 @@ public class CameraController : ObjectBase
 
     public override void Reset()
     {
-        m_resetSM = true;
+        //m_resetSM = true;
+        // Reset Statemachine
+        sm.Reset();
     }
 
     // CameraController:
@@ -88,6 +90,9 @@ public class CameraController : ObjectBase
         Func<bool> transPause_Def  = (() =>  GameController.gc.IsDefault());
         Func<bool> transWarp_Grav  = (() => PlayerController.pc.state != PlayerController.PlayerState.Warping);
         Func<bool> transAnim_Def   = (() => m_endIntro);
+        Func<bool> transWarp_Pause = (() => !GameController.gc.IsDefault());
+        Func<bool> transFall_Pause = (() => !GameController.gc.IsDefault());
+        Func<bool> transGrav_Pause = (() => !GameController.gc.IsDefault());
 
         // From Def
         def.AddTransition(rot,   transDef_Rot);
@@ -102,9 +107,11 @@ public class CameraController : ObjectBase
 
         // From Warp
         warp.AddTransition(grav, transWarp_Grav);
+        warp.AddTransition(pause, transWarp_Pause);
 
         // From GravChange
         grav.AddTransition(def);
+        grav.AddTransition(pause, transGrav_Pause);
 
         // From Pause
         pause.AddTransition(def,  transPause_Def);
@@ -114,6 +121,7 @@ public class CameraController : ObjectBase
 
         // From Fall
         fall.AddTransition(def, transFall_Def);
+        fall.AddTransition(pause, transFall_Pause);
 
         // Set the default state, i.e. the starting state of the sm
         sm.SetDefaultState(anim);
