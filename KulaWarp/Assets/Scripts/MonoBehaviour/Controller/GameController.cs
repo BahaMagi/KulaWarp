@@ -51,6 +51,9 @@ public class GameController : MonoBehaviour
         m_saveData = new SaveData();
         if(saveFileName.Length == 0) m_savePath = Application.dataPath + "/save.mem";
         else m_savePath = Application.dataPath + saveFileName;
+
+        // Register callback that is called when a new scene has finished loading
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void LateUpdate()
@@ -147,14 +150,24 @@ public class GameController : MonoBehaviour
         m_saveData.curLevel++;
         SaveGame();
 
-        Resume();
-
         // Load the next level if there is one. If there is not, return to the main menu.
         if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCountInBuildSettings - 1)
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         else
             SceneManager.LoadScene(0);
+
+        
     }
+
+    /**
+     * This is called when a a new level finished loading.
+     */
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Resume Game
+        Resume();
+    }
+
 
     public void Pause()
     {
