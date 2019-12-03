@@ -43,6 +43,9 @@ public class StateMachine
     {
         // Change State to s without(!) calling OnExitState of the state that was left. 
         State tmp    = currentState;
+        //// // Testing with OnExitState. Can't remember why I took it out...
+        tmp.OnExitState(defaultState);
+        ////
         currentState = defaultState;
         currentState.OnEnterState(tmp);
     }
