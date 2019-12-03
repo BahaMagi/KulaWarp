@@ -383,6 +383,7 @@ public class CameraController : ObjectBase
 
             // Restart the intro animation
             m_anim.SetTrigger(m_reset_trigger_ID);
+            m_anim.Update(0f);
         }
 
         public override void OnExitState(State to)
