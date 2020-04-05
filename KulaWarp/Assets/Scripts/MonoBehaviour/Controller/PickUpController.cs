@@ -55,7 +55,7 @@ public class PickUpController : ObjectBase
     protected virtual void OnTriggerEnter(Collider other)
     {
         gameObject.SetActive(false);
-        LevelController.lc.Score(scoreValue);
+        LevelController.lc.Score(scoreValue, Currency.Points);
     }
 
     

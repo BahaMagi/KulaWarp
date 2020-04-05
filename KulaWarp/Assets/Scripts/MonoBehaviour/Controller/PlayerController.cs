@@ -182,6 +182,10 @@ public class PlayerController : ObjectBase
 
     public void Enable(bool enable)
     {
+        // The rolling loop is so long that it has to be stopped manually
+        if (!enable)
+            pc.sfxc.Stop(SFXController.SFXClip.Rolling);
+
         player_sphere.SetActive(enable);
     }
 

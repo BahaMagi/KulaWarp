@@ -100,11 +100,30 @@ public class LevelController : MonoBehaviour
         GameController.gc.Resume();
     }
 
-    public void Score(int points)
+    /**
+     * Accumulates the values of pickups according to their 
+     * currency. 
+     */ 
+    public void Score(int value, Currency currency)
     {
-        m_points += points;
-
-        // Display the new score
-        UIController.uic.Score(m_points);
+        switch(currency)
+        {
+            case Currency.Points:
+                m_points += value;
+                // Display the new score
+                UIController.uic.Score(m_points);
+                break;
+            case Currency.Energy:
+                m_curEnergy++;
+                // Adjust Energy HUD
+                UIController.uic.ColorEnergy(m_curEnergy);
+                ActivateExit();
+                break;
+            case Currency.Secret:
+                // TODO: Add secrets 
+                break;
+            default:
+                break;
+        }
     }
 }

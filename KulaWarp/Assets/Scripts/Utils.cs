@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using System.Linq;
+
 
 /**
 * Base class used for all objects that are supposed to be reset when the level restarts. 
@@ -89,6 +91,12 @@ public class MyInterps
 static class ExtensionMethods
 {//@TODO Take care of the "ref" vs none "ref" Extensions. Might lead to unintended sideeffects. 
     // Should unify the behaviour at some point.
+
+
+    public static string ToMyString<T>(this List<T> L, string separator = ", ")
+    {
+        return string.Join(separator, L.Select(i => i.ToString()));
+    }
 
     /**
      * Round the components of vec for which axis is != 0. 
@@ -188,15 +196,46 @@ static class ExtensionMethods
         }
         return null;
     }
+
+    /**
+     * Instantiates a prefab as prefab regardless of whether <prefab> is an 
+     * isntance of a prefab or the asset object from which an instance should be created. 
+     * Note, that a call to Instantiate creates a gameobject that is not 
+     * linked to the prefab anymore, thus not taking any changes. 
+     */
+    public static GameObject InstantiatePrefabAsPrefab(GameObject prefab)
+    {
+        GameObject newObject, p = prefab;
+        PrefabAssetType      pType       = PrefabUtility.GetPrefabAssetType(p);
+        PrefabInstanceStatus pInstStatus = PrefabUtility.GetPrefabInstanceStatus(p);
+
+        // Check if the object in elementPrefab is part of a prefab
+        // If elementPrefab is a prefab thats been dragged into place from the project window,
+        // i.e. its not an instance, the instantiation has to be differnet than if the
+        // instance of a prefab was used. Both are flagged prefabs and look the same
+        // but cannot be instantiated the same way. 
+        if (pType == PrefabAssetType.NotAPrefab)
+        {
+            Debug.LogError("The passed parameter has to be a prefab.");
+            newObject = null;
+        }
+        else
+        {
+            // PrefabInstanceStatus.NotAPrefab is missleading but it means that the object is not
+            // an instance(!) of a prefab but rather the asset object from which a prefab instance
+            // was instantiated. 
+            // If the object i elementPrefab is an instance we need to get the asset object first. 
+            if (pInstStatus != PrefabInstanceStatus.NotAPrefab)
+                p = PrefabUtility.GetCorrespondingObjectFromSource(p) as GameObject;
+
+            newObject = (PrefabUtility.InstantiatePrefab(p) as GameObject);
+        }
+
+        return newObject;
+    }
 }
 
 
-/** 
- * Provide the [ReadOnly] PropertyDrawer to show variables in the inspector 
- * in a read only fashion. 
- * 
- * [ReadOnlyWhenPlaying] only disables editing in Play-mode. 
-*/
 public class ReadOnlyAttribute : PropertyAttribute { }
 public class ReadOnlyWhenPlayingAttribute : PropertyAttribute { }
 
@@ -207,9 +246,7 @@ public class ReadOnlyDrawer : PropertyDrawer
     // Override Height to prevent overlapping property fields in the inspector
     public override float GetPropertyHeight(SerializedProperty property,
                                             GUIContent label)
-    {
-        return EditorGUI.GetPropertyHeight(property, label, true);
-    }
+    { return EditorGUI.GetPropertyHeight(property, label, true); }
 
     // Disable input
     public override void OnGUI(Rect position,
