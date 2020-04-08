@@ -52,6 +52,11 @@ public class CameraController : ObjectBase
         sm.Update();
     }
 
+    void Update() {
+        // Track Axis input to simulate 'GetAxisDown'
+        AxisDown.onUpdate();
+    }
+
     public override void Reset()
     {
         //m_resetSM = true;
@@ -80,7 +85,8 @@ public class CameraController : ObjectBase
         Falling    fall  = new Falling(sm);
 
         //Setup triggered transitions
-        Func<bool> transDef_Rot    = (() => (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") == -1) && CanRotate());
+        //Func<bool> transDef_Rot    = (() => (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") == -1) && CanRotate());
+        Func<bool> transDef_Rot    = (() => (AxisDown.GetLeftDown() || AxisDown.GetRightDown() || AxisDown.GetDownDown()) && CanRotate());
         Func<bool> transDef_Warp   = (() => PlayerController.pc.state == PlayerController.PlayerState.Warping);
         Func<bool> transDef_Grav   = (() => m_gravChangeTrigger);
         Func<bool> transDef_Anim   = (() => m_resetSM);

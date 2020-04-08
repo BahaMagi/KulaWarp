@@ -5,6 +5,41 @@ using System.Linq;
 
 
 /**
+ * Simulates GetButtonDown for Axes
+ */
+public static class AxisDown
+{
+    private static bool u = false, d = false, l = false, r = false; 
+    private static bool uD = false, dD = false, lD = false, rD = false; 
+
+    public static bool GetRightDown() { return rD; }
+    public static bool GetLeftDown() { return lD; }
+    public static bool GetUpDown() { return uD; }
+    public static bool GetDownDown() { return dD; }
+    public static void onUpdate()
+    {
+        if( Input.GetAxisRaw("Horizontal") < 0 && l  == false)
+        { l = true; lD = true; }
+        else lD = false;
+        if( Input.GetAxisRaw("Horizontal") > 0 && r == false)
+        { r = true; rD = true; }
+        else rD = false;
+        if( Input.GetAxisRaw("Vertical")   < 0 && d == false)
+        { d = true; dD = true;}
+        else dD = false;
+        if( Input.GetAxisRaw("Vertical")   > 0 && u == false)
+        { uD = true; u = true; }
+        else uD = false;
+
+        if( Input.GetAxisRaw("Horizontal") == 0)
+        { l  = false; r = false; }
+        if( Input.GetAxisRaw("Vertical") == 0)
+        { u   = false; d = false; }
+    }
+}
+
+
+/**
 * Base class used for all objects that are supposed to be reset when the level restarts. 
 */
 public abstract class ObjectBase : MonoBehaviour
