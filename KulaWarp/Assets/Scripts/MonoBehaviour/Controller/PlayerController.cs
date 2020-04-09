@@ -245,6 +245,9 @@ public class PlayerController : ObjectBase
         sfxc                  = GetComponent<SFXController>();
     }
 
+    public void resetScale() 
+    { transform.localScale = new Vector3(sphereRadius, sphereRadius, sphereRadius); }
+
     // StateMachine:
 
     class Idle : State

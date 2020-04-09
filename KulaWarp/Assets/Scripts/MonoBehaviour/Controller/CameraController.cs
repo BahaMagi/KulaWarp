@@ -85,7 +85,6 @@ public class CameraController : ObjectBase
         Falling    fall  = new Falling(sm);
 
         //Setup triggered transitions
-        //Func<bool> transDef_Rot    = (() => (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") == -1) && CanRotate());
         Func<bool> transDef_Rot    = (() => (AxisDown.GetLeftDown() || AxisDown.GetRightDown() || AxisDown.GetDownDown()) && CanRotate());
         Func<bool> transDef_Warp   = (() => PlayerController.pc.state == PlayerController.PlayerState.Warping);
         Func<bool> transDef_Grav   = (() => m_gravChangeTrigger);

@@ -8,4 +8,7 @@ public class AnimStateTrackerImpact : StateMachineBehaviour
     {
         PlayerController.pc.animState = PlayerController.AnimState.Impact;
     }
+    override public void OnStateExit(Animator animator, AnimatorStateInfo animatorStateInfo, int layerIndex) {
+        PlayerController.pc.resetScale();
+    }
 }
