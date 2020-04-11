@@ -22,8 +22,9 @@ Material:
     m_TexEnvs: []
     m_Floats:
     - Vector1_155A5207: 1
-    - Vector1_2C9669D4: 0.46
-    - Vector1_42D2B013: 0.69
-    - Vector1_CA0003B1: 0.4
+    - Vector1_2C9669D4: 0.55
+    - Vector1_42D2B013: 0.51
+    - Vector1_BB27CC7A: 1
+    - Vector1_CA0003B1: 0.29
     m_Colors:
     - Color_776C5ECA: {r: 0.11320752, g: 0.0934496, b: 0.0934496, a: 1}
