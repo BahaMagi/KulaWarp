@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ElementGizmo : MonoBehaviour
+public class Gizmo_Element : MonoBehaviour
 {
     private float size          = 0.25f;
     private Color color         = Color.white;
