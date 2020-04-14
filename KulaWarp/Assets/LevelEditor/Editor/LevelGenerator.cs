@@ -84,7 +84,6 @@ public class LevelGenerator
             // Apply mesh, material and translation to the new gameObj.
             combinedObj.GetComponent<MeshFilter>().sharedMesh        = finalMesh;
             combinedObj.GetComponent<MeshRenderer>().sharedMaterials = connectedComponent[0].GetComponent<MeshRenderer>().sharedMaterials;
-            combinedObj.AddComponent<UVOffset>();
 
             // Add physics compontents.
             combinedObj.AddComponent<MeshCollider>();
