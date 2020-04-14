@@ -11,9 +11,6 @@
 # file on crash reports
 sysinfo.txt
 
-# TextMesh Pro files
-*/[Aa]ssets/TextMesh*Pro/
-
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
 
@@ -24,6 +21,7 @@ sysinfo.txt
 
 # Visual Studio cache directory
 .vs/
+.vscode/
 
 ###
 # VS/MD solution and project files
