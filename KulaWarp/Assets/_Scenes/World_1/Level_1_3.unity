@@ -2946,7 +2946,6 @@ GameObject:
   - component: {fileID: 1207036489}
   - component: {fileID: 1207036488}
   - component: {fileID: 1207036487}
-  - component: {fileID: 1207036486}
   - component: {fileID: 1207036485}
   m_Layer: 10
   m_Name: Environment
@@ -2969,19 +2968,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1322860363}
---- !u!114 &1207036486
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1207036484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 637297130c8c3c841a38e5aa4809201b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  material_index: 0
 --- !u!23 &1207036487
 MeshRenderer:
   m_ObjectHideFlags: 0
