@@ -695,30 +695,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 6116890864164938281, guid: d59591bc7000e8345a7fbbbee4505c26,
-        type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 32535
-      objectReference: {fileID: 0}
-    - target: {fileID: 6116890864164938281, guid: d59591bc7000e8345a7fbbbee4505c26,
-        type: 3}
-      propertyPath: orthographic
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6116890864164938283, guid: d59591bc7000e8345a7fbbbee4505c26,
         type: 3}
       propertyPath: m_Name
       value: Main Camera
-      objectReference: {fileID: 0}
-    - target: {fileID: 6116890864164938283, guid: d59591bc7000e8345a7fbbbee4505c26,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6116890864164938283, guid: d59591bc7000e8345a7fbbbee4505c26,
-        type: 3}
-      propertyPath: m_Layer
-      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 6116890864164938286, guid: d59591bc7000e8345a7fbbbee4505c26,
         type: 3}
