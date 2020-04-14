@@ -15,7 +15,7 @@ sysinfo.txt
 !/[Aa]ssets/**/*.meta
 
 # TextMeshPro Examples
-Assets/**/TextMeshPro/Examples_Extras/
+**/TextMesh Pro/Examples_Extras/
 
 # Unity3D generated meta files
 *.pidb.meta
