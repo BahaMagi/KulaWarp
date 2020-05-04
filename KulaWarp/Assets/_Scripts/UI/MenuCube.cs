@@ -41,9 +41,13 @@ public class MenuCube : MonoBehaviour
         // and 3 on the bottom. 
         m_cubeRotations = new Quaternion[4];
         m_cubeRotations[0] = transform.rotation;
-        m_cubeRotations[1] = Quaternion.Euler(-90, 0, 0) * m_cubeRotations[0];
-        m_cubeRotations[2] = Quaternion.Euler(180, 0, 0) * m_cubeRotations[0];
-        m_cubeRotations[3] = Quaternion.Euler(90, 0, 0)  * m_cubeRotations[0];
+        transform.RotateAround(transform.position, transform.right, -90);
+        m_cubeRotations[1] = transform.rotation;
+        transform.RotateAround(transform.position, transform.right, -90);
+        m_cubeRotations[2] = transform.rotation;
+        transform.RotateAround(transform.position, transform.right, -90);
+        m_cubeRotations[3] = transform.rotation;
+        transform.RotateAround(transform.position, transform.right, -90);
 
         // Load references to game objects and components
         LoadComponents();
@@ -93,7 +97,7 @@ public class MenuCube : MonoBehaviour
         float dSelectorAngle = (m_invertMenuCntrl * m_rotating * selectorRotAmount) * Time.deltaTime;
 
         // Apply rotations
-        transform.RotateAround(Vector3.zero, Vector3.right, dAngle);
+        transform.RotateAround(transform.position, transform.right, dAngle);
         selector.transform.RotateAround(selector.transform.position, Vector3.right, -dSelectorAngle);
 
         // If the cube rotated 90° stop rotating by setting @m_rotating back to 0.

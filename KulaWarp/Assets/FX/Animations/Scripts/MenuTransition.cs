@@ -49,22 +49,27 @@ public class MenuTransition : MonoBehaviour
     {
         public AnimationCurve animCurvePos, animCurveScale;
 
-        public Vector3 sideBarPos  = new Vector3(-1.25f, 0.5f, -0.25f);
-        public Vector3 shrinkScale = new Vector3( 0.75f, 0.5f,  0.5f);
-        public Vector3 largeScale  = new Vector3( 1.5f,  1.0f,  1.0f);
-        public float   spacing     = 0.0f;
+        public Vector3 sideBarPos      = new Vector3(-1.25f, 0.5f, -0.25f);
+        public Vector3 shrinkScale     = new Vector3( 0.5f, 0.5f,  0.5f);
+        public Vector3 largeScale      = new Vector3( 1.0f,  1.0f,  1.0f);
+        public float   spacing         = 0.0f;
+        public float   sideBarRotation = 15.0f;
 
         private Vector3 m_startPos,   m_targetPos;
         private Vector3 m_startScale, m_targetScale;
-        private int     m_sideBarPos = 0;
+        private int     m_sideBarIndex = 0;
+        private float   m_tickAngle = 0.0f;
+        private float   m_baseRot = 0.0f;
 
         public override void Play(MenuCube cube)
         {
             m_cube        = cube;
             m_startPos    = cube.transform.position;
-            m_targetPos   = sideBarPos + m_sideBarPos * Vector3.down * (shrinkScale.y + spacing); // + spot offset + margin
+            m_targetPos   = cube.transform.TransformPoint(sideBarPos + m_sideBarIndex * Vector3.up * (shrinkScale.y + spacing)); // + spot offset + margin
             m_startScale  = cube.transform.localScale;
             m_targetScale = shrinkScale;
+            m_tickAngle   = sideBarRotation / duration;
+            m_baseRot     = cube.transform.rotation.eulerAngles.y;
 
             m_timer     = 0;
             m_isPlaying = true;
@@ -72,29 +77,33 @@ public class MenuTransition : MonoBehaviour
 
         public void Play(MenuCube cube, int sideBarPos)
         {
-            m_sideBarPos = sideBarPos;
+            m_sideBarIndex = sideBarPos;
             Play(cube);
         }
 
         protected override void EvalCurves()
         {
-                m_cube.transform.position   = Vector3.Lerp(m_startPos,   m_targetPos,   animCurvePos.Evaluate  (Mathf.InverseLerp(0, duration/2, m_timer)));
-                m_cube.transform.localScale = Vector3.Lerp(m_startScale, m_targetScale, animCurveScale.Evaluate(Mathf.InverseLerp(0, duration/2, m_timer)));
+            m_cube.transform.position   = Vector3.Lerp(m_startPos,   m_targetPos,   animCurvePos.Evaluate  (Mathf.InverseLerp(0, duration/2, m_timer)));
+            m_cube.transform.localScale = Vector3.Lerp(m_startScale, m_targetScale, animCurveScale.Evaluate(Mathf.InverseLerp(0, duration/2, m_timer)));
+            m_cube.transform.Rotate(Vector3.up, m_tickAngle * Time.deltaTime);
         }
 
         protected override void EndAnim()
         {
+            m_sideBarIndex = 0;
+
             m_cube.transform.position = m_targetPos;
-            m_sideBarPos = 0;
+            m_cube.transform.rotation = Quaternion.Euler(0, m_tickAngle > 0 ? m_baseRot + sideBarRotation : m_baseRot, 0);
         }
 
         public void Reverse(MenuCube cube)
         {
             m_cube        = cube;
             m_startPos    = cube.transform.position;
-            m_targetPos   = Vector3.zero;
+            m_targetPos   = cube.transform.parent.transform.position;
             m_startScale  = cube.transform.localScale;
             m_targetScale = largeScale;
+            m_tickAngle   = (-1) * sideBarRotation / duration;
 
             m_timer     = 0;
             m_isPlaying = true;
@@ -112,7 +121,7 @@ public class MenuTransition : MonoBehaviour
         {
             m_cube      = cube;
             m_startPos  = cube.transform.position;
-            m_targetPos = Vector3.zero;
+            m_targetPos = cube.transform.parent.transform.position;
             m_timer     = 0;
             m_isPlaying = true;
         }
@@ -121,7 +130,7 @@ public class MenuTransition : MonoBehaviour
         {
             m_cube      = cube;
             m_startPos  = cube.transform.position;
-            m_targetPos = cube.transform.position + Vector3.right * 10;
+            m_targetPos = cube.transform.TransformPoint(Vector3.right * 10);
             m_timer     = 0;
             m_isPlaying = true;
         }
