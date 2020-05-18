@@ -181,7 +181,7 @@ public class MainMenuController : MonoBehaviour
         m_trans.Shrink(menuCube, m_menuStack.Count);
         m_menuStack.Push(menuCube);
 
-        // Avoid selectoring dropping off while cube is shrinking
+        // Avoid selector dropping off while cube is shrinking
         m_selectorWarpAnim.dissolveObj.GetComponent<Rigidbody>().useGravity = false;
         m_selectorWarpAnim.appearObj.GetComponent<Rigidbody>().useGravity   = false;
     }

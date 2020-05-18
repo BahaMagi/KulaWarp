@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: RotateUV
+  m_Shader: {fileID: -6465566751694194690, guid: 9efe2bb488f3a5c40869e3bb5da4c8b9,
+    type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - Texture2D_4EFC4547:
+        m_Texture: {fileID: 2800000, guid: 50d6c736a90b1f14190a4cf5d7cfa37f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_7EF318:
+        m_Texture: {fileID: 2800000, guid: 49bf8766735ce92499cd20db6632a7d0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_E449A4D8:
+        m_Texture: {fileID: 2800000, guid: 789ddeee8ba073845a9c050a5d0b6420, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_FFB32D2B:
+        m_Texture: {fileID: 2800000, guid: 6d998e76b7c7fa042a5a56956ad7e34b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Vector1_1B3D3F84: 90
+    - Vector1_30F1A146: 1
+    - Vector1_4D31FC36: 0.43
+    - Vector1_821E19CC: 0.1
+    - Vector1_B9CC40CF: 1
+    m_Colors:
+    - Color_9321B7DB: {r: 1, g: 1, b: 1, a: 1}
+    - Vector2_AAF4867C: {r: 0.47, g: 0, b: 0, a: 0}

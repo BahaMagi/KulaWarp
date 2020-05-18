@@ -59,17 +59,17 @@ public class MenuTransition : MonoBehaviour
         private Vector3 m_startScale, m_targetScale;
         private int     m_sideBarIndex = 0;
         private float   m_tickAngle = 0.0f;
-        private float   m_baseRot = 0.0f;
+        private float   m_baseRot = 0.0f, m_targetRot = 0.0f;
 
         public override void Play(MenuCube cube)
         {
             m_cube        = cube;
-            m_startPos    = cube.transform.position;
-            m_targetPos   = cube.transform.TransformPoint(sideBarPos + m_sideBarIndex * Vector3.up * (shrinkScale.y + spacing)); // + spot offset + margin
+            m_startPos    = cube.transform.localPosition;
+            m_targetPos   = sideBarPos + m_sideBarIndex * Vector3.up * (shrinkScale.y + spacing); // + spot offset + margin
             m_startScale  = cube.transform.localScale;
             m_targetScale = shrinkScale;
-            m_tickAngle   = sideBarRotation / duration;
-            m_baseRot     = cube.transform.rotation.eulerAngles.y;
+            m_baseRot     = cube.transform.localRotation.eulerAngles.y;
+            m_targetRot   = sideBarRotation;
 
             m_timer     = 0;
             m_isPlaying = true;
@@ -83,27 +83,28 @@ public class MenuTransition : MonoBehaviour
 
         protected override void EvalCurves()
         {
-            m_cube.transform.position   = Vector3.Lerp(m_startPos,   m_targetPos,   animCurvePos.Evaluate  (Mathf.InverseLerp(0, duration/2, m_timer)));
-            m_cube.transform.localScale = Vector3.Lerp(m_startScale, m_targetScale, animCurveScale.Evaluate(Mathf.InverseLerp(0, duration/2, m_timer)));
-            m_cube.transform.Rotate(Vector3.up, m_tickAngle * Time.deltaTime);
+            m_cube.transform.localPosition    = Vector3.Lerp(m_startPos,   m_targetPos,   animCurvePos.Evaluate  (Mathf.InverseLerp(0, duration/2, m_timer)));
+            m_cube.transform.localScale       = Vector3.Lerp(m_startScale, m_targetScale, animCurveScale.Evaluate(Mathf.InverseLerp(0, duration/2, m_timer)));
+            m_cube.transform.localEulerAngles = Vector3.Lerp(new Vector3(0, m_baseRot, 0), new Vector3(0, m_targetRot, 0), animCurveScale.Evaluate(Mathf.InverseLerp(0, duration/2, m_timer)));
         }
 
         protected override void EndAnim()
         {
             m_sideBarIndex = 0;
 
-            m_cube.transform.position = m_targetPos;
-            m_cube.transform.rotation = Quaternion.Euler(0, m_tickAngle > 0 ? m_baseRot + sideBarRotation : m_baseRot, 0);
+            m_cube.transform.localPosition = m_targetPos;
         }
 
         public void Reverse(MenuCube cube)
         {
             m_cube        = cube;
-            m_startPos    = cube.transform.position;
-            m_targetPos   = cube.transform.parent.transform.position;
+            m_startPos    = cube.transform.localPosition;
+            m_targetPos   = Vector3.zero;
             m_startScale  = cube.transform.localScale;
             m_targetScale = largeScale;
             m_tickAngle   = (-1) * sideBarRotation / duration;
+            m_baseRot     = cube.transform.localRotation.eulerAngles.y;
+            m_targetRot   = 0.0f;
 
             m_timer     = 0;
             m_isPlaying = true;
