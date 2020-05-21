@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TreeBark_Wind
+  m_Shader: {fileID: -6465566751694194690, guid: fc0f6beaa489cf249a519231d2f8c79f,
+    type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - Texture2D_7BE2B81F:
+        m_Texture: {fileID: 2800000, guid: ea3c5ce5295496446aaca4e9d3c1a57f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_85EFB806:
+        m_Texture: {fileID: 2800000, guid: 1ff76bbb483fdc443be602badf893899, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_9074C90F:
+        m_Texture: {fileID: 2800000, guid: 6e91fd30a35fcf14a9be30aa02f78468, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_B96935F7:
+        m_Texture: {fileID: 2800000, guid: 2176feab8427f7d42aab6415c233a01e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseSetup_1100E459_Texture2D3229FE7F_563840265:
+        m_Texture: {fileID: 2800000, guid: 6e91fd30a35fcf14a9be30aa02f78468, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseSetup_1100E459_Texture2D40D861E4_1707608281:
+        m_Texture: {fileID: 2800000, guid: 2176feab8427f7d42aab6415c233a01e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseSetup_1100E459_Texture2D54DDDC52_134530371:
+        m_Texture: {fileID: 2800000, guid: 1ff76bbb483fdc443be602badf893899, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseSetup_1100E459_Texture2D99FB65A7_989159939:
+        m_Texture: {fileID: 2800000, guid: ea3c5ce5295496446aaca4e9d3c1a57f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_14CC932C_Out_0:
+        m_Texture: {fileID: 2800000, guid: 2176feab8427f7d42aab6415c233a01e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_2310DC40_Out_0:
+        m_Texture: {fileID: 2800000, guid: 1ff76bbb483fdc443be602badf893899, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_49B89B01_Out_0:
+        m_Texture: {fileID: 2800000, guid: 6e91fd30a35fcf14a9be30aa02f78468, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_6561CC86_Out_0:
+        m_Texture: {fileID: 2800000, guid: ea3c5ce5295496446aaca4e9d3c1a57f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_75497F4A_Out_0:
+        m_Texture: {fileID: 2800000, guid: 2176feab8427f7d42aab6415c233a01e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_D1379AA1_Out_0:
+        m_Texture: {fileID: 2800000, guid: 6e91fd30a35fcf14a9be30aa02f78468, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_D6F0AF26_Out_0:
+        m_Texture: {fileID: 2800000, guid: ea3c5ce5295496446aaca4e9d3c1a57f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_FE9D1871_Out_0:
+        m_Texture: {fileID: 2800000, guid: 1ff76bbb483fdc443be602badf893899, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Vector1_2419F195: 0.5
+    - Vector1_305E69A6: 0.247
+    - Vector1_34FCC82: 0.5
+    - Vector1_4914121B: 3
+    - Vector1_59414776: 0.01
+    - Vector1_7DA02C79: 0.5
+    - Vector1_7DB86227: 0.166
+    - Vector1_9568DA46: 5
+    - Vector1_E2254EE8: 0.05
+    - Vector1_F57E78FC: 1
+    - Vector1_F940276B: 12
+    m_Colors:
+    - Color_411FB0F5: {r: 1, g: 1, b: 1, a: 0}
+    - Vector3_2AB3F8C7: {r: 1, g: -0.5, b: 1, a: 0}
