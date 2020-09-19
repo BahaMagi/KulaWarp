@@ -5,7 +5,7 @@ The goal of the game is to collect energy to activate the warp to the next level
 
 In order to get to these keys there are multiple ways to change the direction of gravity to allow you to reach even far away points in the level. The means of movement in the game were slightly modified compared to the original Kula World. Rather than jumping, the player can warp forwards or upwards to teleport the sphere through space. The sphere will manifest at the target location and reattach to any block in the vicinity. This provides an intriguing new way to change gravity and circumvent obstacles. 
 
-![Main Menu](/img/Menu.PNG)
+![Main Menu](/KulaWarp/Assets/Media/Image/General/Readme.png)
 ## About the Project 
 The project was started end of June/beginning of July 2019 to build a portfolio to demonstrate technical skills and familiarity with some of the tools needed to develop games. All code, content and assets were (mostly) developed by one person. A list of resources for some of the images and textures is given below. 
 
