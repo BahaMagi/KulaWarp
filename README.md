@@ -1,5 +1,5 @@
-# Kula Warp
-Kula Warp is a tribute to [Kula World](https://en.wikipedia.org/wiki/Kula_World) developed by Game Design Sweden AB in 1998. The game is a 3D puzzle platformer that challenges your spatial thinking. 
+# Warp Away
+Warp Away (tentative title) is a tribute to [Kula World](https://en.wikipedia.org/wiki/Kula_World) developed by Game Design Sweden AB in 1998. The game is a 3D puzzle platformer that challenges your spatial thinking. 
 
 The goal of the game is to collect energy to activate the warp to the next level. Additional pickups provide points which at the same time provide lives. The arcade like game punishes you for falling short on time or off the level by inflicting a penalty to your total points based on the points accumulated at the time of death.
 
